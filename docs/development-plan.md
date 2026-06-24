@@ -7,6 +7,22 @@ A **track** here is a self-contained unit of work with explicit inputs, delivera
 definition-of-done — sized so it can be handed to one person (or one focused Claude
 session) and progressed independently of its siblings.
 
+### Build status (2026-06-24)
+
+| Track | Status | Artifact |
+|---|---|---|
+| 0 Coordination | ✅ done | the `docs/` spec + decisions |
+| 1 Parts/Models/BOM | ✅ built & `kicad-cli`-validated | `hardware/lib/cremat.kicad_sym`, lib tables, `.kicad_pro`, `hardware/bom/` |
+| 2 Circuit | ✅ done | [hardware/circuit-design.md](hardware/circuit-design.md) |
+| 3 Integration | ✅ done | [hardware/integration-notes.md](../hardware/integration-notes.md) |
+| 4 Mechanical | ✅ done | [hardware/mechanical.md](../hardware/mechanical.md) |
+| 5 Schematic | ⏳ KiCad GUI/human | guide: [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md) |
+| 6 Layout | ⏳ KiCad GUI/human | same guide |
+| 7 Fab/Assembly | ⏳ after 6 | same guide + [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) |
+
+Tracks 5–7 are the eeschema/pcbnew GUI boundary (no scripting API for schematic capture);
+KiCad 10 is installed and the library/netlist/mechanical inputs are all ready.
+
 ---
 
 ## Track map at a glance

@@ -1,0 +1,79 @@
+# Building the board in KiCad (Tracks 5 → 6 → 7)
+
+Everything up to schematic capture is done and validated: the symbol library
+([lib/cremat.kicad_sym](lib/cremat.kicad_sym)), the project + net classes
+([multi-channel-cremat-amplifier.kicad_pro](multi-channel-cremat-amplifier.kicad_pro)),
+the lib tables, the fielded BOM ([bom/](bom/)), the per-channel netlist
+([integration-notes.md](integration-notes.md)), and the mechanical envelope
+([mechanical.md](mechanical.md)).
+
+The remaining three tracks are **GUI/human work in KiCad 10** (the schematic editor has no
+scripting API for capture, so this is done in eeschema/pcbnew, not generated). KiCad 10 is
+installed at `C:\Program Files\KiCad\10.0\`. This guide makes that mechanical.
+
+---
+
+## Track 5 — Schematic capture
+
+1. **Open the project** `multi-channel-cremat-amplifier.kicad_pro`. Confirm the `cremat`
+   symbol lib resolves (Preferences → Manage Symbol Libraries → it's in the project table).
+2. **Create `channel.kicad_sch`** (one hierarchical sheet) and capture **one channel** from
+   [integration-notes.md](integration-notes.md):
+   - Place: `J_BIAS`, `J_SIPM`, `J_OUT` (Conn_Coaxial), `Rf1`, `Rf2`, `Cf`, `JP_Rf1`,
+     `JP_Rf2`, `Cc`, `U_CSP` (cremat:CR-11X), `U_SHAPER` (cremat:CR-200), `U_BLR`
+     (cremat:CR-210), `JP_BLR`, `U_BUF` (cremat:EL5167), `R_OUT`, trimpots, decoupling.
+   - Wire by the **net→pin table** in integration-notes.md. Internal nets (`BIAS_IN`,
+     `N_filt`, `FE`, `CSP_IN`, `CSP_OUT`, `SH_OUT`, `PZ`, `BLR_OUT`, `BUF_OUT`, `OUT`) =
+     local labels; `+VDC`/`-VDC`/`GND` = **hierarchical labels** (the only sheet ports).
+   - **Bias filter** = `Rf1`+`Cf`+`Rf2`, with `JP_Rf1`∥`Rf1` and `JP_Rf2`∥`Rf2`.
+   - **CR-210** between `SH_OUT` and `BLR_OUT`, with `JP_BLR`∥ the module.
+   - **P/Z network + buffer**: copy the sub-circuit from
+     `reference/cremat-x6-board/channel.kicad_sch` (open it side-by-side), resizing passives
+     to 0805. That gives the exact gain/feedback/offset network.
+   - Set `DNP` per the **Full** variant ([bom/bom.md](bom/bom.md)): `JP_Rf1/JP_Rf2/JP_BLR`
+     DNP; everything else fitted.
+3. **Root sheet** `multi-channel-cremat-amplifier.kicad_sch`: place **12 sheet instances**
+   of `channel.kicad_sch` (`ch1..ch12`); wire all 12 sheets' `+VDC`/`-VDC`/`GND` pins to the
+   rails; add `J_PWR` (3-pos screw terminal) and a **PWR_FLAG** on each of `+VDC`/`-VDC`/`GND`
+   so ERC sees them driven.
+4. **Annotate** → **assign footprints** per [bom/bom.md](bom/bom.md) (stock libs; create the
+   one MCX footprint — see [lib/cremat.pretty/README.md](lib/cremat.pretty/README.md)).
+5. **ERC** until 0 errors. Export the netlist + the BOM.
+
+> Gate: ERC 0 errors. The net classes (`hv_bias` etc.) are already in the project.
+
+---
+
+## Track 6 — PCB layout
+
+1. **Update PCB from schematic** (import the netlist). Set the **stackup** (4-layer 1.6 mm
+   recommended; ground plane under the analog chain).
+2. **Outline ≈ 225 × 235 mm**, 4× M3 holes — per [mechanical.md](mechanical.md). Confirm
+   against the real tray interior first.
+3. **Placement:** 12 identical channel cells in rows; **inputs (`J_BIAS`+`J_SIPM`) on one
+   long edge, `J_OUT` on the other** (signal flows across). Keep each front-end node compact.
+4. **Net classes** apply automatically (`hv_bias` ~1.0 mm creepage on `BIAS*`/`SIPM*`/`FE*`;
+   `signal` 0.33 mm for `OUT*`; `power` 0.5 mm). Guard the front-end node.
+5. **Route**, pour + stitch grounds. **DRC until 0 errors** (creepage is an error).
+
+> Gotcha (from `reference/ets-breakout`): headless `ZONE_FILLER.Fill()` segfaults — fill
+> zones as a separate pass / in the GUI. Run `kicad-cli pcb drc` as the gate.
+
+---
+
+## Track 7 — Fabrication & assembly
+
+1. Generate fab outputs (a KiCad **job set** is easiest):
+   ```
+   "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" pcb export gerbers <pcb> -o fab/gerber/
+   "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" pcb export drill   <pcb> -o fab/drill/
+   "C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" pcb export pos      <pcb> -o fab/pos.csv --format csv --units mm
+   ```
+2. Export the **fielded BOM** with the **Full** DNP set (already drafted in
+   [bom/bom.md](bom/bom.md)); reconcile against the schematic export.
+3. Order FR4/ENIG, 1.6 mm. Assemble per
+   [../docs/fabrication/fabrication-guide.md](../docs/fabrication/fabrication-guide.md);
+   bench bring-up + the Track 2 checklist in
+   [../docs/hardware/circuit-design.md](../docs/hardware/circuit-design.md).
+
+> `fab/`, `gerber/`, etc. are git-ignored — regenerate before ordering.

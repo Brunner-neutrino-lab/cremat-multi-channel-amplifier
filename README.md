@@ -81,8 +81,12 @@ git submodule update --init --recursive
 - **Specification + documentation: complete.** This repo fully specifies the modified
   12-channel board.
 - **Development is divided into tracks** — see [docs/development-plan.md](docs/development-plan.md).
-  Phase 1 (parts/models/BOM, circuit, integration, mechanical) runs in parallel; Phase 2
-  (schematic → layout → fab) is serial. KiCad implementation has not started.
+  **Phase 1 is built:** [hardware/](hardware/) has the `kicad-cli`-validated symbol library
+  ([hardware/lib/cremat.kicad_sym](hardware/lib/cremat.kicad_sym)), the project + net classes,
+  lib tables, the fielded BOM ([hardware/bom/](hardware/bom/)), the golden per-channel netlist
+  ([hardware/integration-notes.md](hardware/integration-notes.md)), and the mechanical spec
+  ([hardware/mechanical.md](hardware/mechanical.md)). **Phase 2 (schematic → layout → fab) is
+  the KiCad GUI step** — guide: [hardware/BUILD-IN-KICAD.md](hardware/BUILD-IN-KICAD.md).
 - **CR-210 pinout + bypass-jumper integration: confirmed** against Cremat's open-source
   [CR-160-R7](reference/cremat-CR-160-R7/) board (pin 2 = GND vs the CR-200's P/Z).
 - **Build decisions resolved** (D1–D6, see the plan): bias ≤ 60 V (100 V parts); all

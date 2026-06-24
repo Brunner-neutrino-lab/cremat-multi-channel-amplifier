@@ -69,12 +69,19 @@ off the one biased node. Full detail in [modifications.md](modifications.md) and
 
 **Done (this track):** submodules wired; complete spec/docs; repo hygiene.
 
-**Open — hardware track (implementation):**
-1. Create `hardware/` KiCad project: re-home reference symbols, build the channel
-   hierarchical sheet with the bias front-end + CR-210 + 0R jumpers, instantiate 12×, lay
-   out, route, DRC-clean (0 errors), generate fab + BOM. Follow `ets-breakout`'s pipeline.
-2. Build the project library (`lib/cremat.kicad_sym`, `cremat.pretty/`) incl. the CR-210
-   and the SIP-8 footprint reuse — see [hardware/component-libraries.md](hardware/component-libraries.md).
+**Built (Tracks 1, 3, 4 — real, `kicad-cli`-validated artifacts under `hardware/`):**
+- `lib/cremat.kicad_sym` (CR-11X/CR-112, CR-200, CR-210, EL5167) — validated with
+  `kicad-cli sym upgrade` on KiCad 10. `sym-lib-table`/`fp-lib-table`, the
+  `.kicad_pro` with net classes (Default/power/hv_bias/signal + pattern assignment),
+  `bom/` (fielded Full-variant BOM + CSV), `integration-notes.md` (golden netlist),
+  `mechanical.md`. See [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md).
+
+**Open — Tracks 5/6/7 (KiCad GUI/human; toolchain is installed & ready):**
+1. **Schematic capture** (eeschema has no scripting API — done in GUI): capture the channel
+   from `integration-notes.md`, copy the P/Z+buffer sub-circuit from the reference channel,
+   instantiate 12×, ERC 0. Step-by-step in `hardware/BUILD-IN-KICAD.md`.
+2. **Layout** (placement/route/DRC 0) and **fab** (gerbers/drill/pos + BOM) follow from the
+   netlist — same guide. KiCad 10 at `C:\Program Files\KiCad\10.0\`.
 
 **Resolved this session:**
 - ✅ **CR-210 pin map.** Confirmed from `reference/cremat-CR-160-R7` (`CR-160-R7-cache.lib`

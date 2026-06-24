@@ -75,5 +75,10 @@ reference/                    git submodules (read-only)
   ets-breakout/               HOW we build/document (pipeline + doc structure)
   cremat-CR-160-R7/           CR-210 pinout + bypass-jumper integration (Cremat OSHW)
   cremat-CR-150-R5/           CR-11X CSP reference (Cremat OSHW)
-hardware/                     (to be created by the hardware track) KiCad project
+hardware/                     KiCad project (Phase 1 built; schematic/PCB = GUI step)
+  multi-channel-cremat-amplifier.kicad_pro   net classes + DRC severities
+  lib/cremat.kicad_sym         CR-11X/CR-112, CR-200, CR-210, EL5167 (kicad-cli-validated)
+  lib/cremat.pretty/           project footprints (MCX CONMCX013 = to create)
+  sym-lib-table  fp-lib-table  bom/  integration-notes.md  mechanical.md
+  BUILD-IN-KICAD.md            Tracks 5-7 GUI build guide
 ```
