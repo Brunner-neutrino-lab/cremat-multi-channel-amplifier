@@ -148,25 +148,62 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 
 ---
 
-## Phase 2 kickoff briefs (one line each)
+## Kickoff briefs (what each track reads, then does)
 
-- **Track 5 (Schematic):** Capture the per-channel cell from
-  [hardware/channel.md](hardware/channel.md) + [hardware/circuit-design.md](hardware/circuit-design.md)
-  — bias front-end (`Rf1=Rf2=10k`, `Cf=100n`, `JP_Rf` 0R bypass) → `Cc=0.22µF` → CR-112 →
-  CR-200-1µs → optional CR-210 (`JP_BLR` 0R across it) → buffer → `49.9Ω` → `OUT` — using
-  Track 1's re-homed Cremat symbols, instantiate it **12×** on a root sheet that fans the
-  shared `±Vs`/`GND` (screw terminal) and per-channel `BIAS_IN`/`SIPM`/`OUT` (MCX) nets, and
-  deliver an **ERC-clean netlist**.
-- **Track 6 (Layout):** From the Track 5 netlist and Track 1 footprints, place the 12
-  identical cells into the **≈225 × 235 mm, 1U** open-tray envelope (tall parts < ~35 mm) with
-  inputs (`BIAS_IN`+`SIPM`) on one long edge and `OUT` on the other, apply the net classes
-  (`hv_bias` ~1.0 mm creepage on the ≤60 V bias nets, guarded front-end node, 50 Ω `OUT`),
-  pour/stitch grounds, and reach **DRC 0/0**.
-- **Track 7 (Fab/Assembly):** From the DRC-clean board, generate the fab package
-  (gerbers + Excellon drill + position CSV) and the fielded BOM with the **Full-variant DNP
-  set** (bias filter + CR-210 fitted, all `JP_*` bypasses DNP), order as FR4/ENIG, and update
-  [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) with the as-built
-  assembly + bring-up steps.
+Each brief names the docs/references to read first, then the action + deliverable. Every
+track also reads [CLAUDE.md](../CLAUDE.md) (iron rules) and this plan once.
+
+### Phase 1 (parallel)
+
+- **Track 1 — Parts, Models & BOM.** *Read:* [hardware/component-libraries.md](hardware/component-libraries.md),
+  [hardware/bom.md](hardware/bom.md), [hardware/circuit-design.md](hardware/circuit-design.md);
+  and the reference libs — `reference/cremat-CR-160-R7/CR-160-R7-cache.lib` + `CR-160-R7 BOM.xls`
+  (CR-200, CR-210, buffer), `reference/cremat-CR-150-R5/CR-150-R5-cache.lib` + BOM (CR-11X),
+  `reference/cremat-x6-board/` (passives, jumpers, `Conn_Coaxial`); plus the TE `CONMCX013`
+  and Cremat CR-112 / CR-200-1µs / CR-210 datasheets. *Do:* build the project library
+  (`hardware/lib/cremat.kicad_sym` + `cremat.pretty/` with datasheet-verified footprints + 3D
+  models) and the fielded BOM (`MPN`/`MFN`/`VPN`/`VN`/`DNP`), 0805 passives, MCX, screw terminal.
+- **Track 2 — Circuit & Front-End.** *Read:* [hardware/circuit-design.md](hardware/circuit-design.md)
+  (the deliverable — already written), [hardware/channel.md](hardware/channel.md); the
+  Hamamatsu VUV4 S13370 datasheet and the Cremat CR-112/CR-200/CR-210 specs. *Do:* values are
+  locked; own the **bench-verify checklist** (CR-112 output sign, warm/cold OV offset,
+  single-p.e. amplitude / CR-112-vs-CR-113, P/Z) once first boards exist.
+- **Track 3 — Reference Integration & Topology.** *Read:* [hardware/channel.md](hardware/channel.md),
+  [modifications.md](modifications.md) (Changes 3–4), [§ CR-210 integration](#cr-210-integration-confirmed);
+  `reference/cremat-CR-160-R7/` (`CR-160-R7 schematic.pdf` + `.net` + `cache.lib`) and
+  `reference/cremat-x6-board/channel.kicad_sch`. *Do:* write `hardware/integration-notes.md` —
+  the golden per-channel netlist intent, confirmed CR-11X/CR-200/CR-210 pinouts, and the two
+  0R-bypass node connections.
+- **Track 4 — Mechanical, Connectors & I/O.** *Read:* [hardware/board.md](hardware/board.md)
+  (§ Mechanical + Connectors), [§ Decisions](#decisions--resolved-2026-06-24) (D2/D3/D5);
+  the TE `CONMCX013` and the chosen screw-terminal datasheets. *Do:* write
+  `hardware/mechanical.md` — outline ≈ 225 × 235 mm, M3 standoff pattern, the
+  inputs-one-edge / outputs-other-edge MCX placement, and the 1U height check (< ~35 mm).
+
+### Phase 2 (serial: 5 → 6 → 7)
+
+- **Track 5 — Schematic.** *Read:* [hardware/channel.md](hardware/channel.md) +
+  [hardware/circuit-design.md](hardware/circuit-design.md) (topology + values), Track 3's
+  `integration-notes.md`, Track 1's library, and `reference/cremat-x6-board/channel.kicad_sch`
+  as a worked example. *Do:* capture the per-channel cell — bias front-end (`Rf1=Rf2=10k`,
+  `Cf=100n`, `JP_Rf` 0R bypass) → `Cc=0.22µF` → CR-112 → CR-200-1µs → optional CR-210
+  (`JP_BLR` 0R across it) → buffer → `49.9Ω` → `OUT` — instantiate **12×** on a root sheet
+  fanning the shared `±Vs`/`GND` (screw terminal) and per-channel `BIAS_IN`/`SIPM`/`OUT` (MCX)
+  nets; deliver an **ERC-clean netlist**.
+- **Track 6 — Layout.** *Read:* [hardware/pcb-design-rules.md](hardware/pcb-design-rules.md),
+  [hardware/board.md](hardware/board.md) (§ Mechanical + Layout intent), the Track 5 netlist +
+  Track 1 footprints; and `reference/ets-breakout/` (README + `tools/` for the
+  generate→fill-zones→DRC pipeline gotchas). *Do:* place the 12 cells into the **≈225 × 235 mm,
+  1U** envelope (tall parts < ~35 mm), inputs (`BIAS_IN`+`SIPM`) one long edge / `OUT` the
+  other, apply net classes (`hv_bias` ~1.0 mm creepage on the ≤60 V bias nets, guarded
+  front-end node, 50 Ω `OUT`), pour/stitch grounds; reach **DRC 0/0**.
+- **Track 7 — Fab/Assembly.** *Read:* [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md),
+  [hardware/bom.md](hardware/bom.md) (DNP tables), [hardware/board.md](hardware/board.md)
+  (build variants); and the `reference/ets-breakout/boards/*/fab/` outputs as a format example.
+  *Do:* from the DRC-clean board generate the fab package (gerbers + Excellon drill + position
+  CSV) and the fielded BOM with the **Full-variant DNP set** (bias filter + CR-210 fitted, all
+  `JP_*` DNP), order as FR4/ENIG, and update the fabrication guide with as-built assembly +
+  bring-up steps.
 
 ---
 
