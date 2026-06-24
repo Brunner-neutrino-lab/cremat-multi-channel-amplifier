@@ -6,13 +6,23 @@ verified libraries (the `ets-breakout` / reference-board convention), referenced
 
 ---
 
-## Reuse from the reference board
+## Canonical sources (reuse, don't redraw)
 
-The reference project (`reference/cremat-x6-board/`) already contains verified symbols for
-the parts carried forward. Copy these into the new project's library rather than
-re-drawing:
+Four reference submodules carry verified symbols/footprints for the parts we keep. Prefer
+the **upstream Cremat eval boards** (clean, authoritative) over the x6-board's rescue libs:
 
-| Symbol (reference lib) | Part | Carried forward |
+| Part | Canonical source | Asset to copy |
+|---|---|---|
+| CR-11X CSP (CR-110/-111/-112/-113) | `reference/cremat-CR-150-R5` (`CR-150-R5-cache.lib`) | symbol + 8-pin SIP footprint + BOM |
+| CR-200-X shaper | `reference/cremat-CR-160-R7` (`CR-160-R7-cache.lib`) | symbol + `Cremat_footprints:8pinSIP` |
+| **CR-210 BLR** | `reference/cremat-CR-160-R7` (`CR-160-R7-cache.lib`) | symbol (pinout confirmed) + `8pinSIP` |
+| EL5163/EL5167 buffer | `reference/cremat-CR-160-R7`, `reference/cremat-x6-board` | symbol |
+
+The `reference/cremat-x6-board/` project also has these (as KiCad "rescue" symbols), plus
+the passive/jumper/connector symbols below — fine to reuse, but re-home them into a clean
+project lib and drop the rescue/absolute paths.
+
+| Symbol (x6-board lib) | Part | Carried forward |
 |---|---|---|
 | `CR-11X` (`CR-150-R5-rescue`) | Cremat CR-110/-111/-112/-113 CSP (SIP-8) | yes |
 | `CR-200` (`CR-160-R7-rescue`) | Cremat CR-200-X shaper (SIP-8) | yes |
@@ -32,13 +42,13 @@ re-drawing:
 
 ## New parts to add
 
-### Cremat CR-210 baseline restorer (NEW)
-- **Symbol:** 8-pin SIP. Easiest path — duplicate the `CR-200` symbol and re-label per the
-  **`CR-210-R0` spec sheet**. ⚠️ The pin functions differ from the CR-200; do not ship the
-  CR-200 map. Confirm `input` / `output` / `+Vs` / `-Vs` / `GND` from the datasheet
-  (tracked in [session-report.md](../session-report.md)).
-- **Footprint:** 8-pin SIP, 0.1" (2.54 mm) pitch — the **same physical footprint** as the
-  CR-11X / CR-200 modules already on the board. Reuse that `.kicad_mod` (pin 1 marked).
+### Cremat CR-210 baseline restorer (NEW — symbol available, pinout confirmed)
+- **Symbol:** copy the `CR-210` symbol straight from `reference/cremat-CR-160-R7`
+  (`CR-160-R7-cache.lib`). Confirmed pinout `1=input, 2=GND, 3=GND, 4=-Vs, 5=+Vs, 6=GND,
+  7=GND, 8=output` — identical to the CR-200 except pin 2 (P/Z → GND), so don't reuse the
+  CR-200 symbol as-is.
+- **Footprint:** the same `Cremat_footprints:8pinSIP` used by the CR-200 on that board
+  (0.1" pitch, pin 1 marked). One footprint serves CR-11X, CR-200, and CR-210.
 
 ### 0R bypass jumpers (0805)
 - Use a standard **`R_0805_2012Metric`** footprint stuffed with a 0R link for

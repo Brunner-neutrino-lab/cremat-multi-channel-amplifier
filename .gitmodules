@@ -4,3 +4,9 @@
 [submodule "reference/ets-breakout"]
 	path = reference/ets-breakout
 	url = https://github.com/Brunner-neutrino-lab/ets-breakout.git
+[submodule "reference/cremat-CR-160-R7"]
+	path = reference/cremat-CR-160-R7
+	url = https://github.com/CrematInc/CR-160-R7.git
+[submodule "reference/cremat-CR-150-R5"]
+	path = reference/cremat-CR-150-R5
+	url = https://github.com/CrematInc/CR-150-R5.git

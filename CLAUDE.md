@@ -36,9 +36,12 @@ See [`docs/modifications.md`](docs/modifications.md) for the authoritative chang
    the `SIPM`/`BIAS_IN` nets must be rated and spaced for the full SiPM bias voltage
    (the reference uses a 100 V X5R coupling cap). HV creepage is a DRC concern — see
    [`docs/hardware/pcb-design-rules.md`](docs/hardware/pcb-design-rules.md).
-5. **Two facts are still unverified — flag, don't guess.** The exact CR-210 8-pin map
-   (confirm against the `CR-210-R0` spec sheet) and the target SiPM bias range. Both are
-   called out in [`docs/session-report.md`](docs/session-report.md).
+5. **CR-210 pinout + bypass are confirmed; the SiPM bias range is not.** The CR-210 map
+   and the jumper-bypass scheme are taken from Cremat's own open-source board
+   `reference/cremat-CR-160-R7` (pin 2 = GND, vs the CR-200's P/Z). The target SiPM **bias
+   voltage** is still open and gates HV creepage + cap ratings — flag, don't guess. See
+   [`docs/session-report.md`](docs/session-report.md) and the decision list in
+   [`docs/development-plan.md`](docs/development-plan.md).
 
 ## Build philosophy (inherited from `ets-breakout`)
 
@@ -62,6 +65,7 @@ BOM with `MPN`/`MFN`/`VPN`/`VN` fields and DNP flags, and a DRC gate before fab.
 README.md                     overview + documentation map
 CLAUDE.md                     this file
 docs/                         the build documentation set (see README map)
+  development-plan.md          work-track breakdown + dependency graph + decisions
   architecture.md  modifications.md  session-report.md
   hardware/   channel.md board.md bom.md pcb-design-rules.md component-libraries.md
   fabrication/fabrication-guide.md
@@ -69,5 +73,7 @@ docs/                         the build documentation set (see README map)
 reference/                    git submodules (read-only)
   cremat-x6-board/            WHAT we build (6-ch CR-110/CR-200 eval board)
   ets-breakout/               HOW we build/document (pipeline + doc structure)
+  cremat-CR-160-R7/           CR-210 pinout + bypass-jumper integration (Cremat OSHW)
+  cremat-CR-150-R5/           CR-11X CSP reference (Cremat OSHW)
 hardware/                     (to be created by the hardware track) KiCad project
 ```

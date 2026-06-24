@@ -10,11 +10,18 @@ brief.
 
 ## 1. What this session produced
 
-- **Two git submodules under `reference/`:**
+- **Four git submodules under `reference/`:**
   - `cremat-x6-board` (`Brunner-neutrino-lab/cremat-x6-board`) — *what we build*: the
     6-channel CR-110/CR-200 eval board this design derives from.
   - `ets-breakout` (`Brunner-neutrino-lab/ets-breakout`) — *how we build/document*: the
     single-source-of-truth KiCad pipeline + the docs structure imitated here.
+  - `cremat-CR-160-R7` (`CrematInc/CR-160-R7`) — *CR-210 reference*: Cremat's open-source
+    CR-200/CR-210 eval board; the authority for the CR-210 pinout + bypass-jumper scheme.
+  - `cremat-CR-150-R5` (`CrematInc/CR-150-R5`) — *CR-11X reference*: Cremat's open-source
+    CSP eval board (origin of the CR-11X symbol).
+- **A track breakdown** ([development-plan.md](development-plan.md)): one foundation track
+  for parts/models/BOM, parallel tracks for circuit / integration / mechanical, then serial
+  schematic → layout → fab tracks, with a dependency graph and the decision list.
 - **A complete documentation set** (`README.md`, `CLAUDE.md`, `docs/…`) specifying the
   modified board, with the change list, per-channel circuit, board plan, BOM/DNP logic,
   PCB rules, library plan, fabrication, and operation.
@@ -69,21 +76,23 @@ off the one biased node. Full detail in [modifications.md](modifications.md) and
 2. Build the project library (`lib/cremat.kicad_sym`, `cremat.pretty/`) incl. the CR-210
    and the SIP-8 footprint reuse — see [hardware/component-libraries.md](hardware/component-libraries.md).
 
-**Open — verification (must close before fab):**
-1. **CR-210 pin map.** Confirm the exact 8-pin SIP assignment against the **`CR-210-R0`
-   spec sheet** (input/output/±Vs/GND). It is a distinct module — do **not** copy the
-   CR-200 pinout. *(This session pulled the CR-210 datasheet but the PDF pinout could not
-   be auto-extracted; needs a human read or a clean copy.)*
-2. **SiPM bias voltage range.** Sets `hv_bias` creepage and the voltage rating of `Cc`/`Cf`
-   (reference uses 100 V parts). Get the target detector's operating bias from the user.
-3. **Bias filter R/C values.** Pick `Rf`,`Cf` for the detector's bias current + the noise
-   to reject (docs give 10 kΩ / 100 nF as a *placeholder*, not a final value).
-4. **SiPM terminal polarity** (cathode- vs anode-bias) and CR-11X input polarity.
+**Resolved this session:**
+- ✅ **CR-210 pin map.** Confirmed from `reference/cremat-CR-160-R7` (`CR-160-R7-cache.lib`
+  + netlist): `1=input, 2=GND, 3=GND, 4=-Vs, 5=+Vs, 6=GND, 7=GND, 8=output` — identical to
+  the CR-200 except pin 2 (P/Z → GND). The CR-160-R7 also confirms the **optional**
+  integration: a jumper (`JU1`) across the module's input/output nodes — exactly our
+  `JP_BLR` 0R scheme.
 
-**Open — product decisions (ask the user):**
-- Coax jack type for `SIPM`/`OUT` (MCX vs SMA), and `BIAS_IN` connector (SHV?).
-- CR-200-X shaping time and CR-11X gain grade to order.
-- Whether per-channel bias trim is ever wanted (currently one shared `BIAS_IN`).
+**Open — verification (must close before fab):**
+1. **SiPM bias voltage range.** Sets `hv_bias` creepage and the voltage rating of `Cc`/`Cf`
+   (reference uses 100 V parts). Get the target detector's operating bias from the user.
+2. **Bias filter R/C values.** Pick `Rf`,`Cf` for the detector's bias current + the noise
+   to reject (docs give 10 kΩ / 100 nF as a *placeholder*, not a final value).
+3. **SiPM terminal polarity** (cathode- vs anode-bias) and CR-11X input polarity.
+
+**Open — product decisions (ask the user):** see the decision list in
+[development-plan.md](development-plan.md#decisions-needed-from-the-user) (D1–D6: bias
+range, jack types, `BIAS_IN` connector, module grades, enclosure, default build variant).
 
 ---
 

@@ -98,10 +98,14 @@ stay unique across the 12 instances.
 
 - 8-pin SIP module, follows the shaper. Holds the output baseline at ground at high
   count rate. Shares `+VDC`/`-VDC`/`GND` + decoupling.
-- **Optional:** `U_BLR` populated **xor** `JP_BLR` (0R) populated. See
-  [modifications.md](../modifications.md#change-3) and the DNP table in [bom.md](bom.md).
-- ⚠️ **Pinout to be confirmed against the `CR-210-R0` spec sheet** — it is a distinct
-  module; do not assume the CR-200 map.
+- **Pinout — confirmed from `reference/cremat-CR-160-R7`** (`8pinSIP` footprint): same as
+  the CR-200 except **pin 2 = GND** (CR-200 pin 2 is P/Z). Full map:
+  `1=input, 2=GND, 3=GND, 4=-Vs, 5=+Vs, 6=GND, 7=GND, 8=output`.
+- **Optional via bypass jumper, exactly as on the CR-160-R7** (its `JU1`): `JP_BLR` (0805
+  0R) bridges the **CR-210 input node (shaper output) to the CR-210 output node**.
+  - **Fitted:** populate `U_BLR`, leave `JP_BLR` open/DNP.
+  - **Bypassed:** DNP `U_BLR`, close `JP_BLR` (0R) → shaper passes straight to the buffer.
+  - See [modifications.md](../modifications.md#change-3) and the DNP table in [bom.md](bom.md).
 
 ### 5. Output buffer (`U_BUF`)
 

@@ -89,8 +89,10 @@ Two independent options, **per channel**. Exactly one path in each pair is popul
 - **Cremat modules** (CR-11X, CR-200-X, CR-210) are sourced from Cremat Inc. / distributors
   (e.g. Advatech UK, FAST ComTec). Long-ish lead time — order early. Pick the CR-200 `-X`
   shaping time and the CR-11X gain grade per the detector before ordering.
-- The reference board ships a BOM with supplier info (`reference/cremat-x6-board/README.txt`);
-  reuse those line items for the parts carried forward, updating sizes to 0805.
+- BOMs with supplier info ship in the references — `reference/cremat-x6-board/` and the
+  Cremat eval boards `reference/cremat-CR-160-R7/CR-160-R7 BOM.xls` (CR-200/CR-210/buffer)
+  and `reference/cremat-CR-150-R5/CR-150-R5 BOM.xls` (CR-11X). Reuse those line items for
+  the parts carried forward, updating passive sizes to 0805.
 - Generate the final fielded BOM from KiCad (see
   [../fabrication/fabrication-guide.md](../fabrication/fabrication-guide.md)); keep
   `pcbfab/`/`assembly/` outputs out of git (`.gitignore`), regenerate before each order.

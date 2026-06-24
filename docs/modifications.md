@@ -50,26 +50,33 @@ Insert a **CR-210 baseline restorer** between the CR-200-X shaper output and the
 buffer, on every channel. The CR-210 corrects baseline depression at medium/high count
 rates and preserves the Gaussian shape; it is designed to follow any Cremat shaper.
 
-**Optional via 0R bypass** — exactly one of these is populated per build:
+This mirrors Cremat's own open-source eval board
+[`reference/cremat-CR-160-R7`](../reference/cremat-CR-160-R7/), which carries the CR-200
+(`U4`) and the **optional** CR-210 (`U5`) with a bypass jumper (`JU1`) across the module.
+
+**Optional via 0R bypass** — `JU1` becomes our 0805 `JP_BLR`; exactly one is populated:
 
 ```
-           ┌──────── CR-210 (BLR) ────────┐
- CR-200 ───┤                              ├──► buffer
- OUT       └────────── 0R bypass ─────────┘
-            (JP_BLR: 0805 0R link)
+ CR-200 out ──┬──► CR-210 in (U5.1)      CR-210 out (U5.8) ──┬──► buffer in
+   (U4.8)     │                                              │
+              └──────────── JP_BLR (0R, was JU1) ────────────┘   across the module
 ```
 
-| Variant | CR-210 (U_BLR) | `JP_BLR` 0R bypass | Result |
+| Variant | CR-210 (`U_BLR`) | `JP_BLR` 0R | Signal path |
 |---|---|---|---|
-| **BLR fitted** | populate | DNP | shaper → CR-210 → buffer |
-| **BLR bypassed** | DNP | populate | shaper → buffer (identical to reference) |
+| **BLR fitted** | populate | **open / DNP** | shaper → CR-210 → buffer |
+| **BLR bypassed** | DNP | **close / 0R** | shaper → buffer (identical to reference) |
 
-- The CR-210 is an **8-pin SIP** (0.1" spacing, pin 1 marked with a white dot), same
-  mechanical family as the CR-11X / CR-200 already on the board. Add its symbol +
-  footprint to the project library ([hardware/component-libraries.md](hardware/component-libraries.md)).
-- ⚠️ **Confirm the exact CR-210 pin→function map against the `CR-210-R0` spec sheet**
-  before routing (input / output / ±Vs / GND). Do not copy the CR-200 pinout blindly —
-  it is a *different* module. Tracked in [session-report.md](session-report.md).
+- **CR-210 pinout — confirmed from `cremat-CR-160-R7` (footprint `8pinSIP`).** Identical to
+  the CR-200 *except pin 2*:
+
+  | Pin | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+  |---|---|---|---|---|---|---|---|---|
+  | **CR-210** | input | **GND** | GND | -Vs | +Vs | GND | GND | output |
+  | CR-200 | input | P/Z | GND | -Vs | +Vs | GND | GND | output |
+
+  Reuse the existing CR-200 SIP-8 footprint; the symbol/footprint live in the reference
+  board's `CR-160-R7-cache.lib` ([hardware/component-libraries.md](hardware/component-libraries.md)).
 - The CR-210 shares the `+VDC`/`-VDC`/`GND` rails and gets its own decoupling, like the
   other modules.
 

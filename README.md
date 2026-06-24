@@ -46,6 +46,7 @@ Full detail: [docs/hardware/channel.md](docs/hardware/channel.md).
 
 | Doc | Contents |
 |-----|----------|
+| [docs/development-plan.md](docs/development-plan.md) | **Work-track breakdown** (parts/models/BOM, circuit, integration, mechanical → schematic → layout → fab), dependencies, decisions needed |
 | [docs/architecture.md](docs/architecture.md) | System/board block diagram, channel signal chain, design partitioning |
 | [docs/modifications.md](docs/modifications.md) | **The four changes vs. `cremat-x6-board`, with rationale + the optional/DNP jumper scheme** |
 | [docs/hardware/channel.md](docs/hardware/channel.md) | Per-channel circuit: bias front-end, AC/DC coupling, CSP/shaper/BLR/buffer, jumpers |
@@ -63,6 +64,8 @@ Full detail: [docs/hardware/channel.md](docs/hardware/channel.md).
 |------|------|------|
 | [reference/cremat-x6-board/](reference/cremat-x6-board/) | `Brunner-neutrino-lab/cremat-x6-board` | **What we're building** — the 6-channel CR-110/CR-200 eval board this design derives from |
 | [reference/ets-breakout/](reference/ets-breakout/) | `Brunner-neutrino-lab/ets-breakout` | **How we build/document** — KiCad-from-source-of-truth pipeline + doc structure to imitate |
+| [reference/cremat-CR-160-R7/](reference/cremat-CR-160-R7/) | `CrematInc/CR-160-R7` | **CR-210 pinout + integration** — Cremat's open-source CR-200/CR-210 eval board (the CR-210 bypass-jumper scheme) |
+| [reference/cremat-CR-150-R5/](reference/cremat-CR-150-R5/) | `CrematInc/CR-150-R5` | **CR-11X reference** — Cremat's open-source CSP eval board (source of the CR-11X symbol) |
 
 Clone with submodules:
 
@@ -76,9 +79,11 @@ git submodule update --init --recursive
 
 - **Specification + documentation: complete.** This repo fully specifies the modified
   12-channel board.
-- **KiCad implementation: not started** (the hardware track). The reference channel
-  schematic ([reference/cremat-x6-board/channel.kicad_sch](reference/cremat-x6-board/channel.kicad_sch))
-  is the starting point; apply the changes in [docs/modifications.md](docs/modifications.md).
-- **Open verification items** are tracked in [docs/session-report.md](docs/session-report.md)
-  (notably: confirm the **CR-210 pin map** against the `CR-210-R0` spec sheet, and the
-  SiPM **bias voltage range** that sets HV creepage and capacitor voltage ratings).
+- **Development is divided into tracks** — see [docs/development-plan.md](docs/development-plan.md).
+  Phase 1 (parts/models/BOM, circuit, integration, mechanical) runs in parallel; Phase 2
+  (schematic → layout → fab) is serial. KiCad implementation has not started.
+- **CR-210 pinout + bypass-jumper integration: confirmed** against Cremat's open-source
+  [CR-160-R7](reference/cremat-CR-160-R7/) board (pin 2 = GND vs the CR-200's P/Z).
+- **Open items** (tracked in [docs/session-report.md](docs/session-report.md) and the
+  plan's decision list): the SiPM **bias voltage range** (sets HV creepage + cap ratings),
+  bias-filter R/C values, jack/connector choices, and the CR-200-X / CR-11X grades to order.
