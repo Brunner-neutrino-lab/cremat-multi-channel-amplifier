@@ -76,17 +76,25 @@ single distribution network on the root sheet feeds every channel.
 
 ---
 
-## Mechanical (D5 — rack-mounted, two boards per box)
+## Mechanical (D5 — rack box ≈ 482 × 244 mm, two boards side-by-side)
 
-- The board is **rack-mounted**, with **two 12-channel boards side-by-side** in one
-  enclosure (user is sourcing a box sized for 2). Design each board to **≈ half the usable
-  rack interior width** (19" rack ≈ 444 mm usable → budget **≈ 200–215 mm per board** after
-  side margins, the inter-board gap, and card guides). **Confirm the exact internal width,
-  depth, and mounting from the chosen box before fixing the outline.**
-- **Put all 36 MCX on one edge** (the rack front panel) so cabling exits the front; the
-  power connector goes on the opposite/rear edge. 36 front-edge MCX is the dominant
-  placement constraint — expect to stack them in 2–3 rows or group by channel.
-- Provide **M3 mounting holes / card-guide edges** compatible with the box's rails.
+- **Enclosure ≈ 482 mm × 244 mm** (482 mm ≈ 19" rack width; 244 mm deep), holding **two
+  12-channel boards side-by-side** across the 482 mm width.
+- **Per-board outline budget ≈ 225 mm (W) × ~235 mm (D):** 482 mm ÷ 2 = 241 mm, minus
+  enclosure walls, the center gap/divider, and board-to-wall clearance. **Confirm against
+  the actual interior width, depth, and any card-guide/divider before fixing the outline.**
+  The board height (rack U) is not yet specified — needed if the MCX exit through a front
+  panel (see below).
+- **Connector density is the dominant constraint.** 36 board-edge MCX (`CONMCX013`,
+  ~6.4 mm body) do **not** fit single-row on a ~225 mm front edge (225/36 ≈ 6.3 mm pitch).
+  Resolve in Track 4 by one of:
+  - **Front/rear split (recommended):** `BIAS_IN` + `SIPM` (24) on the front edge
+    (~9.4 mm pitch — detector + bias cabling at the front), `OUT` (12) on the rear edge
+    (~19 mm pitch — outputs to DAQ at the back). Clean and roomy.
+  - **Two staggered rows** on the front edge (~18/row, ~12 mm pitch).
+  - **Per-channel clusters** of 3 (`BIAS_IN`/`SIPM`/`OUT`) grouped by channel.
+- The **power** connector goes on a free edge (e.g. rear), shared by the one board.
+- Provide **M3 mounting holes / card-guide edges** matched to the box's rails/divider.
 - This drives Track 4 (mechanical) and constrains Track 6 (layout).
 
 > Board dimensions, exact jack placement, and the outline are defined in the KiCad PCB

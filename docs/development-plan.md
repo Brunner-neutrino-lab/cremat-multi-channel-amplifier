@@ -114,10 +114,12 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 ### Track 4 — Mechanical, Connectors & I/O
 
 - Connectors are decided (D2/D3): all per-channel I/O is MCX `CONMCX013`. Remaining work:
-  the **power** connector, and confirming the box's internal dimensions/mounting (D5).
-- Board **outline** sized for **two boards side-by-side in a rack box** (≈ 200–215 mm wide),
-  12-channel **pitch/arrangement**, mounting/card-guide edges, and the front-panel placement
-  of the **36 MCX** jacks (`BIAS_IN` + `SIPM` + `OUT` per channel).
+  the **power** connector, and the rack **U height / front-panel** (the box footprint
+  ≈ 482 × 244 mm is now known, D5).
+- Board **outline ≈ 225 × 235 mm** (two side-by-side in the 482 mm box), 12-channel
+  **pitch/arrangement**, mounting/card-guide edges, and the **36 MCX** placement — which
+  doesn't fit single-row, so resolve the front/rear split (recommended: 24 `BIAS_IN`+`SIPM`
+  front, 12 `OUT` rear) per [hardware/board.md](hardware/board.md).
 - **Deliverable:** `docs/hardware/mechanical.md` + an outline/placement constraint sketch.
 - **Done when:** Track 6 has fixed connector parts, an outline, and a placement strategy.
 - **Needs from user:** cabling standard (MCX/SMA), enclosure intent (see Decisions).
@@ -185,7 +187,7 @@ are this board's additions on top of the single-channel CR-160-R7 reference.
 | D2 | `SIPM`/`OUT` jack | **MCX edge-mount, TE Connectivity Linx `CONMCX013`** (DK `343-CONMCX013-ND`), 50 Ω SMT board-edge | T1, T4 |
 | D3 | `BIAS_IN` connector | **Same MCX `CONMCX013`** — *not* SHV | T1, T4 |
 | D4 | Modules to order | shaper **CR-200-1µs**; CSP **CR-112** (reference x6-board used CR-113) | T1 (BOM) |
-| D5 | Enclosure | **Rack-mounted; two 12-ch boards side-by-side** in one box (user sourcing the box) → board-width budget ≈ ½ usable rack interior; see [hardware/board.md](hardware/board.md) | T4 |
+| D5 | Enclosure | **Rack box ≈ 482 × 244 mm** (19" wide), two 12-ch boards side-by-side → per-board outline **≈ 225 (W) × 235 (D) mm**; rack U / front-panel height still TBD. See [hardware/board.md](hardware/board.md) | T4 |
 | D6 | First-build variant | **Full (bias filter fitted + CR-210 fitted)** — confirmed; changeable per build | T7 |
 
 ### ⚠ Connector clarification (architecture-affecting)
