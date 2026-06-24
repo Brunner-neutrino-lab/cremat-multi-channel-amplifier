@@ -78,7 +78,7 @@ Two independent options, **per channel**. Exactly one path in each pair is popul
 | Class | Part | Notes |
 |---|---|---|
 | Bulk decoupling | 10 µF + 100 µF electrolytic per rail | At ±Vs entry |
-| Power connector | screw terminal / locking header | ±Vs, GND (the only shared connector) |
+| Power connector | **3-pos screw terminal**, low-profile (< 1U) | ±Vs, GND (the only shared connector) |
 | Mounting | M3 holes / standoffs | Per outline |
 
 ---

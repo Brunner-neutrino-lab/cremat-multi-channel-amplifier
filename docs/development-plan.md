@@ -113,9 +113,9 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 
 ### Track 4 — Mechanical, Connectors & I/O
 
-- Mostly specified now (D2/D3/D5): MCX `CONMCX013` I/O; **1U open tray**, board ≈ 225 × 235 mm
-  on M3 standoffs, tall parts < ~35 mm. Remaining: pick the **power** connector and finalize
-  jack placement + outline.
+- Specified (D2/D3/D5): MCX `CONMCX013` I/O; **3-pos screw terminal** for ±Vs/GND;
+  **1U open tray**, board ≈ 225 × 235 mm on M3 standoffs, tall parts < ~35 mm. Remaining:
+  finalize jack placement + outline (a layout detail, handed to Track 6).
 - **Jack placement:** inputs (24 `BIAS_IN`+`SIPM`) on one long edge, outputs (12 `OUT`) on
   the opposite long edge → channel flows input-edge → amplifier → output-edge
   ([hardware/board.md](hardware/board.md)). No bulkhead cutouts (open tray).
@@ -145,6 +145,28 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
   package, write the assembly/bring-up steps.
 - **Gated by:** Track 6 (layout), Track 1 (BOM).
 - **Deliverable:** fab zip + [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) kept current.
+
+---
+
+## Phase 2 kickoff briefs (one line each)
+
+- **Track 5 (Schematic):** Capture the per-channel cell from
+  [hardware/channel.md](hardware/channel.md) + [hardware/circuit-design.md](hardware/circuit-design.md)
+  — bias front-end (`Rf1=Rf2=10k`, `Cf=100n`, `JP_Rf` 0R bypass) → `Cc=0.22µF` → CR-112 →
+  CR-200-1µs → optional CR-210 (`JP_BLR` 0R across it) → buffer → `49.9Ω` → `OUT` — using
+  Track 1's re-homed Cremat symbols, instantiate it **12×** on a root sheet that fans the
+  shared `±Vs`/`GND` (screw terminal) and per-channel `BIAS_IN`/`SIPM`/`OUT` (MCX) nets, and
+  deliver an **ERC-clean netlist**.
+- **Track 6 (Layout):** From the Track 5 netlist and Track 1 footprints, place the 12
+  identical cells into the **≈225 × 235 mm, 1U** open-tray envelope (tall parts < ~35 mm) with
+  inputs (`BIAS_IN`+`SIPM`) on one long edge and `OUT` on the other, apply the net classes
+  (`hv_bias` ~1.0 mm creepage on the ≤60 V bias nets, guarded front-end node, 50 Ω `OUT`),
+  pour/stitch grounds, and reach **DRC 0/0**.
+- **Track 7 (Fab/Assembly):** From the DRC-clean board, generate the fab package
+  (gerbers + Excellon drill + position CSV) and the fielded BOM with the **Full-variant DNP
+  set** (bias filter + CR-210 fitted, all `JP_*` bypasses DNP), order as FR4/ENIG, and update
+  [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) with the as-built
+  assembly + bring-up steps.
 
 ---
 

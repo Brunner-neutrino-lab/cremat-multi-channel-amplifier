@@ -50,7 +50,7 @@ single distribution network on the root sheet feeds every channel.
 | `BIAS_IN` (per channel) | 12 | HV detector bias in (≤ 60 V), one per channel | **MCX edge-mount, TE Linx `CONMCX013`** (DK `343-CONMCX013-ND`) |
 | `SIPM` (per channel) | 12 | Coax to each detector (DC bias + signal) | same `CONMCX013` |
 | `OUT` (per channel) | 12 | 50 Ω shaped output to DAQ | same `CONMCX013` |
-| Power (±Vs, GND) | 1 | Analog supply (shared) | Screw terminal / locking header |
+| Power (±Vs, GND) | 1 | Analog supply (shared) | **Screw terminal** (3-pos: +Vs / -Vs / GND), low-profile (< 1U) |
 
 - **All three per-channel jacks are the same MCX part — `CONMCX013` — so 36 MCX/board.**
   50 Ω, female, board-edge cutout, SMT. Track 1 pulls its datasheet/footprint/3D model
