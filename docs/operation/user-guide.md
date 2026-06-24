@@ -8,15 +8,18 @@ firmware, no commands, no channel selection. All 12 channels amplify continuousl
 
 ## What you connect
 
+All per-channel jacks are **MCX** (TE Linx `CONMCX013`). Each channel has **three**:
+
 | Connector | Qty | Connect to |
 |---|---|---|
+| `BIAS_IN` (per channel) | 12 | Detector bias supply (HV, ≤ 60 V), one feed per channel |
 | `SIPM` (per channel) | 12 | One detector each (coax). Carries **DC bias + signal** on the same line. |
 | `OUT` (per channel) | 12 | DAQ / digitizer / scope input (50 Ω, coax). |
-| `BIAS_IN` | 1 | Detector bias supply (HV). Shared by all 12 channels. |
 | Power (±Vs, GND) | 1 | Dual analog supply (Cremat-style, typically ±12 V — confirm module ratings). |
 
-Because the bias rail is shared, **all detectors run at the same bias voltage.** Group
-detectors that want the same over-voltage on one board.
+**`BIAS_IN` is per-channel**, so channels can be biased independently. To run them all at
+one voltage, fan a single bias supply out to the 12 `BIAS_IN` jacks (external splitter /
+daisy-chain). The board does not distribute bias internally.
 
 ---
 
@@ -100,5 +103,6 @@ detector charge ─► SiPM (DC-biased via filter) ─► Cc (AC) ─► CR-11X 
    for SiPMs, possibly more). Ramp down before touching detector cabling. Follow lab HV
    practice.
 2. **ESD:** SiPMs and the front-end are ESD-sensitive — grounded strap + mat.
-3. **Shared bias:** all 12 channels share `BIAS_IN`; a fault on one detector line affects
-   the shared rail. Use per-detector series protection if that risk matters.
+3. **Per-channel bias:** each channel has its own `BIAS_IN`. If you fan one supply out to
+   all 12, a fault on one line still pulls on the common external supply — keep the bias
+   filter fitted (its series R limits fault current) and add per-feed protection if needed.

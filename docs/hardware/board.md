@@ -30,29 +30,33 @@ single distribution network on the root sheet feeds every channel.
 |---|---|---|
 | `+VDC` / `-VDC` (±Vs) | Power connector (screw terminal or header) | Star/bus to each module; **bulk** electrolytics at entry (e.g. 10 µF + 100 µF per rail), **local** decoupling at every Cremat module and op-amp |
 | `GND` | same connector | Solid ground plane; common reference for supply and bias |
-| `BIAS_IN` (HV) | dedicated HV connector (e.g. SHV / isolated) | Single rail fanned to all 12 bias filters; widened creepage, no plane crossing under it |
 
+> **`BIAS_IN` is per-channel, not a shared rail.** Each channel has its own `BIAS_IN` MCX
+> jack feeding only its own bias filter — see [Connectors](#connectors). There is no
+> board-wide bias distribution net; the bias supply is fanned to the 12 jacks externally.
+
+- The analog supply (`±Vs`, `GND`) **is** shared across all channels.
 - Decoupling values follow the reference (per-rail 0.1 µF / 1 µF / 10 µF near modules),
   resized to 0805 where the voltage rating allows.
-- Keep the **bias rail away from the ground plane edges** and honor HV creepage
-  ([pcb-design-rules.md](pcb-design-rules.md)).
+- Keep each **`BIAS_IN<n>` net away from the ground plane edges** and honor HV creepage
+  (≤ 60 V → ~1.0 mm, [pcb-design-rules.md](pcb-design-rules.md)).
 
 ---
 
 ## Connectors
 
-| Connector | Qty | Purpose | Candidate part |
+| Connector | Qty | Purpose | Part |
 |---|---|---|---|
-| `SIPM` (per channel) | 12 | Coax to each detector (DC bias + signal) | MCX / SMA edge jack (match reference `Conn_Coaxial`) |
-| `OUT` (per channel) | 12 | 50 Ω shaped output to DAQ | MCX / SMA edge jack |
-| `BIAS_IN` | 1 | HV detector bias in | SHV or isolated HV connector |
-| Power (±Vs, GND) | 1 | Analog supply | Screw terminal / locking header |
+| `BIAS_IN` (per channel) | 12 | HV detector bias in (≤ 60 V), one per channel | **MCX edge-mount, TE Linx `CONMCX013`** (DK `343-CONMCX013-ND`) |
+| `SIPM` (per channel) | 12 | Coax to each detector (DC bias + signal) | same `CONMCX013` |
+| `OUT` (per channel) | 12 | 50 Ω shaped output to DAQ | same `CONMCX013` |
+| Power (±Vs, GND) | 1 | Analog supply (shared) | Screw terminal / locking header |
 
-- The reference uses generic `Conn_Coaxial` symbols for in/out; pick the physical jack
-  (MCX vs SMA) to match the lab's cabling, as `ets-breakout` did (it offered MCX/SMA/U.FL
-  variants). 24 coax jacks (12 `SIPM` + 12 `OUT`) drive the board outline.
-- Group each channel's `SIPM` and `OUT` near its cell to keep the bias node and the
-  output trace short.
+- **All three per-channel jacks are the same MCX part — `CONMCX013` — so 36 MCX/board.**
+  50 Ω, female, board-edge cutout, SMT. Track 1 pulls its datasheet/footprint/3D model
+  ([component-libraries.md](component-libraries.md)).
+- Group each channel's `BIAS_IN` + `SIPM` + `OUT` near its cell to keep the bias node and
+  the output trace short. 36 edge jacks dominate the board outline and the panel layout.
 
 ---
 
@@ -64,11 +68,26 @@ single distribution network on the root sheet feeds every channel.
 2. **Front-end node is the sensitive node.** Keep `BIAS_IN→filter→node→Cc→CSP` compact;
    minimize the high-impedance amplifier-input copper. Consider a guard around it
    (the reference and `ets-breakout` both guard sensitive analog nodes).
-3. **Bias rail isolation.** Route `BIAS_IN` and the per-channel filtered bias as an HV
-   net class with extra clearance; do not run signal traces under it.
+3. **Bias-net isolation.** Route each `BIAS_IN<n>` and its filtered bias as the `hv_bias`
+   net class with extra clearance (≤ 60 V → ~1.0 mm); do not run signal traces under it.
 4. **Output side is 50 Ω.** The `49.9R` + buffer drive coax; keep `OUT` traces short and
    reference them to ground (controlled impedance only if trace length warrants).
 5. **Ground plane** continuous under the analog chain for low-noise return.
+
+---
+
+## Mechanical (D5 — rack-mounted, two boards per box)
+
+- The board is **rack-mounted**, with **two 12-channel boards side-by-side** in one
+  enclosure (user is sourcing a box sized for 2). Design each board to **≈ half the usable
+  rack interior width** (19" rack ≈ 444 mm usable → budget **≈ 200–215 mm per board** after
+  side margins, the inter-board gap, and card guides). **Confirm the exact internal width,
+  depth, and mounting from the chosen box before fixing the outline.**
+- **Put all 36 MCX on one edge** (the rack front panel) so cabling exits the front; the
+  power connector goes on the opposite/rear edge. 36 front-edge MCX is the dominant
+  placement constraint — expect to stack them in 2–3 rows or group by channel.
+- Provide **M3 mounting holes / card-guide edges** compatible with the box's rails.
+- This drives Track 4 (mechanical) and constrains Track 6 (layout).
 
 > Board dimensions, exact jack placement, and the outline are defined in the KiCad PCB
 > once implemented; this document is design intent, the PCB file is authoritative

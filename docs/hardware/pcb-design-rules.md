@@ -2,7 +2,8 @@
 
 Net classes, trace widths, clearances, and HV considerations for the 12-channel amplifier.
 Modeled on the reference board and on `ets-breakout`'s net-class scheme, with the addition
-of an explicit **HV bias** class because this board now carries the detector bias rail.
+of an explicit **HV bias** class because this board now carries the per-channel detector
+bias nets (12× `BIAS_IN`, ≤ 60 V).
 
 Set these in the KiCad project (`*.kicad_pro`) so they apply automatically by net name.
 
@@ -47,15 +48,15 @@ the coax-driven nets. Apply controlled impedance only if `OUT` runs are long.
 
 ---
 
-## HV clearance / creepage (bias rail)
+## HV clearance / creepage (per-channel bias nets)
 
-The detector bias sets the minimum spacing on the `hv_bias` class. **Confirm the actual
-SiPM bias voltage** ([session-report.md](../session-report.md)) and apply at least:
+The detector bias sets the minimum spacing on the `hv_bias` class. **Bias is ≤ 60 V (D1)**
+→ use the **≤ 100 V row (~1.0 mm)**; parts (`Cc`,`Cf`) stay rated 100 V for margin.
 
 | Bias voltage | Min clearance/creepage (uncoated FR4, guide) |
 |---|---|
 | ≤ 50 V | 0.5 mm |
-| ≤ 100 V | 1.0 mm |
+| **≤ 100 V (this board, 60 V)** | **1.0 mm** |
 | ≤ 250 V | 2.0 mm |
 
 These are conservative starting points (IPC-2221 B internal/external, no conformal

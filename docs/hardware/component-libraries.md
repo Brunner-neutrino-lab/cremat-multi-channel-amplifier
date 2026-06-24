@@ -60,9 +60,11 @@ project lib and drop the rescue/absolute paths.
   `Cf`) use the same 0805 footprint but a voltage-rated MLCC part number in the BOM.
 
 ### Connectors
-- Pick the physical coax jack (MCX or SMA) and import a datasheet-verified footprint, as
-  `ets-breakout` did (it kept MCX/SMA/U.FL footprints, each checked against the maker's
-  drawing). Add an SHV/HV footprint for `BIAS_IN`.
+- One MCX part serves all per-channel I/O (`BIAS_IN`, `SIPM`, `OUT`): **TE Connectivity
+  Linx `CONMCX013`** (DK `343-CONMCX013-ND`), 50 Ω female board-edge SMT. Import a
+  datasheet-verified footprint + 3D model (verify the edge cutout against the TE drawing),
+  as `ets-breakout` did for its coax jacks. No separate HV connector — `BIAS_IN` uses the
+  same MCX.
 
 ---
 

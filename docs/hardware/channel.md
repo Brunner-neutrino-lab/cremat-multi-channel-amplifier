@@ -118,12 +118,12 @@ stay unique across the 12 instances.
 
 ## Per-channel I/O and nets
 
-| Net / port | Direction | Description |
-|---|---|---|
-| `BIAS_IN` | in (shared) | HV detector bias, common to all 12 channels |
-| `SIPM` | out (per ch) | Coax to the detector; carries DC bias + the detector's pulse |
-| `OUT` | out (per ch) | 50 Ω-driven shaped pulse to DAQ |
-| `+VDC`,`-VDC`,`GND` | power | Analog supply, common to all modules |
+| Net / port | Direction | Connector | Description |
+|---|---|---|---|
+| `BIAS_IN` | in (per ch) | MCX `CONMCX013` | This channel's HV detector bias (≤ 60 V); own jack, not a shared rail |
+| `SIPM` | out (per ch) | MCX `CONMCX013` | Coax to the detector; carries DC bias + the detector's pulse |
+| `OUT` | out (per ch) | MCX `CONMCX013` | 50 Ω-driven shaped pulse to DAQ |
+| `+VDC`,`-VDC`,`GND` | power | (board power conn.) | Analog supply, **shared** across all modules |
 
 ---
 

@@ -51,8 +51,8 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 - **Does:** resolve cross-track questions, gate each handoff (sign off a track's
   definition-of-done before the dependent track starts), keep the four reference
   submodules wired, merge work, run `git`/DRC/ERC gates.
-- **Decisions to pull from the user** (these unblock Phase-1 tracks — see
-  [§ Decisions needed](#decisions-needed-from-the-user)).
+- **Decisions to pull from the user** (these unblock Phase-1 tracks — D1–D6 now resolved,
+  see [§ Decisions](#decisions--resolved-2026-06-24)).
 - **Done when:** Track 7 produces a fab package that passes the gates and the build
   variants are documented.
 
@@ -111,10 +111,11 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 
 ### Track 4 — Mechanical, Connectors & I/O
 
-- Choose **coax jack** type for `SIPM`/`OUT` (MCX vs SMA), **`BIAS_IN`** HV connector
-  (SHV?), and the **power** connector.
-- Board **outline**, 12-channel **pitch/arrangement**, mounting holes, enclosure
-  (cf. Cremat `CR-160-BOX`), panel/edge placement of the 24 jacks.
+- Connectors are decided (D2/D3): all per-channel I/O is MCX `CONMCX013`. Remaining work:
+  the **power** connector, and confirming the box's internal dimensions/mounting (D5).
+- Board **outline** sized for **two boards side-by-side in a rack box** (≈ 200–215 mm wide),
+  12-channel **pitch/arrangement**, mounting/card-guide edges, and the front-panel placement
+  of the **36 MCX** jacks (`BIAS_IN` + `SIPM` + `OUT` per channel).
 - **Deliverable:** `docs/hardware/mechanical.md` + an outline/placement constraint sketch.
 - **Done when:** Track 6 has fixed connector parts, an outline, and a placement strategy.
 - **Needs from user:** cabling standard (MCX/SMA), enclosure intent (see Decisions).
@@ -174,17 +175,30 @@ are this board's additions on top of the single-channel CR-160-R7 reference.
 
 ---
 
-## Decisions needed from the user
+## Decisions — resolved 2026-06-24
 
-These gate Phase-1 tracks; collecting them early keeps 1–4 unblocked:
-
-| # | Decision | Gates | Default if unspecified |
+| # | Decision | Answer | Gates |
 |---|---|---|---|
-| D1 | SiPM **bias voltage range** + detector capacitance/charge | T2, T3, PCB rules | size HV parts for ≤100 V (reference uses 100 V) |
-| D2 | **Coax jack** type for `SIPM`/`OUT` (MCX vs SMA) | T1, T4 | MCX (compact, lab-standard) |
-| D3 | **`BIAS_IN`** connector (SHV / isolated / terminal) | T1, T4 | SHV |
-| D4 | CR-200-**X** shaping time + CR-11X gain grade to order | T1 (BOM) | per detector; flag for order |
-| D5 | Enclosure intent (bare board vs `CR-160-BOX`-style) | T4 | bare board, M3 mounts |
-| D6 | Default build variant for the first run (filter/BLR fitted?) | T7 | Full (filter + BLR fitted) |
+| D1 | SiPM bias voltage range | **≤ 60 V**; keep all HV parts (`Cc`,`Cf`) rated **100 V** → `hv_bias` creepage from the ≤100 V row (~1.0 mm) | T2, T3, PCB rules |
+| D2 | `SIPM`/`OUT` jack | **MCX edge-mount, TE Connectivity Linx `CONMCX013`** (DK `343-CONMCX013-ND`), 50 Ω SMT board-edge | T1, T4 |
+| D3 | `BIAS_IN` connector | **Same MCX `CONMCX013`** — *not* SHV | T1, T4 |
+| D4 | Modules to order | shaper **CR-200-1µs**; CSP **CR-112** (reference x6-board used CR-113) | T1 (BOM) |
+| D5 | Enclosure | **Rack-mounted; two 12-ch boards side-by-side** in one box (user sourcing the box) → board-width budget ≈ ½ usable rack interior; see [hardware/board.md](hardware/board.md) | T4 |
+| D6 | First-build variant | **Full (bias filter fitted + CR-210 fitted)** — pending final confirm; changeable per build | T7 |
+
+### ⚠ Connector clarification (architecture-affecting)
+**`SIPM`, `OUT`, and `BIAS_IN` are all per-channel** — three MCX `CONMCX013` jacks per
+channel → **36 MCX per board**. `BIAS_IN` is **not** a single shared rail; each channel has
+its own bias-input connector feeding its own (optional) bias filter. The bias supply is
+fanned to the per-channel `BIAS_IN` jacks externally (e.g. an external splitter), or each
+channel is biased independently.
+
+### D6 explained (the one you flagged)
+Each board is soldered in *one* fixed configuration, because the optional blocks are
+populate-or-bypass (0R / DNP), not switchable. D6 just asks **what to populate on the first
+batch**: bias filter fitted vs bypassed, and CR-210 fitted vs bypassed (the four variants in
+[hardware/board.md](hardware/board.md)). Recommended default = **Full** (filter + CR-210
+both fitted) since you're biasing SiPMs on-board and want baseline restoration; confirm or
+pick another variant and it costs nothing to change at assembly.
 
 Tracked alongside the open engineering items in [session-report.md](session-report.md).

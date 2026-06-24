@@ -84,6 +84,9 @@ git submodule update --init --recursive
   (schematic → layout → fab) is serial. KiCad implementation has not started.
 - **CR-210 pinout + bypass-jumper integration: confirmed** against Cremat's open-source
   [CR-160-R7](reference/cremat-CR-160-R7/) board (pin 2 = GND vs the CR-200's P/Z).
-- **Open items** (tracked in [docs/session-report.md](docs/session-report.md) and the
-  plan's decision list): the SiPM **bias voltage range** (sets HV creepage + cap ratings),
-  bias-filter R/C values, jack/connector choices, and the CR-200-X / CR-11X grades to order.
+- **Build decisions resolved** (D1–D6, see the plan): bias ≤ 60 V (100 V parts); all
+  per-channel I/O is **MCX `CONMCX013`** (`BIAS_IN`, `SIPM`, `OUT` — **`BIAS_IN` is
+  per-channel**, 36 MCX/board); modules **CR-112** + **CR-200-1µs** (+ CR-210); rack-mounted,
+  two boards per box; first build = Full.
+- **Open items**: bias-filter R/C values and SiPM terminal polarity (Track 2/3 — need the
+  detector's bias current/capacitance), and the rack box's exact internal dimensions (D5).

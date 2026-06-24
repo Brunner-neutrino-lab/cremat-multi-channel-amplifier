@@ -17,10 +17,11 @@ coax IN ─► Cc ─► CR-113 (CSP) ─► CR-200-X (shaper, P/Z trim) ─► 
 ## Change 1 — 12 channels (was 6)
 
 - Instantiate the channel cell **12 times** instead of 6.
-- Power entry, bulk decoupling, and the bias distribution rail scale to 12 channels.
-- Mechanical: ~2× the channel area; pick a board outline and connector pitch that fit
-  12 `SIPM` + 12 `OUT` jacks plus `BIAS_IN` and the ±Vs/GND entry. See
-  [hardware/board.md](hardware/board.md).
+- Power entry + bulk decoupling (the shared `±Vs`/`GND`) scale to 12 channels; bias is
+  per-channel (no shared rail — see Change 4).
+- Mechanical: ~2× the channel area; the outline is sized for **two boards side-by-side in
+  a rack box** and must fit **36 MCX jacks** (12× `BIAS_IN` + `SIPM` + `OUT`) plus the
+  ±Vs/GND entry. See [hardware/board.md](hardware/board.md).
 
 **Rationale:** denser detector coverage per board; same per-channel electronics.
 
@@ -88,9 +89,10 @@ low-rate / minimal-latency use (bypassed) without a layout change.
 ## Change 4 — On-board SiPM bias front-end per channel (optional filter)
 
 This is the largest topology change. The reference board had **one coax input** carrying
-an already-biased signal. This board adds, per channel, a **`BIAS_IN` feed and a `SIPM`
-connector**, with an optional bias filter, arranged so the detector and the amplifier
-share one biased node:
+an already-biased signal. This board adds, **per channel**, its own **`BIAS_IN` jack and
+`SIPM` jack** (both MCX `CONMCX013`, alongside the channel's `OUT` jack → 3 MCX/channel),
+with an optional bias filter, arranged so the detector and the amplifier share one biased
+node. **`BIAS_IN` is per-channel — there is no shared on-board bias rail** (bias ≤ 60 V):
 
 ```
                           bias filter (optional, 0R-bypassable)

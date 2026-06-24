@@ -58,7 +58,7 @@ off the one biased node. Full detail in [modifications.md](modifications.md) and
 - **0805 applies to passives only.** Cremat modules are SIP-8 through-hole; op-amps and
   jacks are their own packages. The docs say so explicitly to avoid an impossible BOM.
 - **Bias front-end is the real design work.** Drawn terminal-agnostic; the AC/DC split is
-  the standard SiPM readout. The new HV bias rail drove the addition of an `hv_bias` net
+  the standard SiPM readout. The new per-channel HV bias nets drove the addition of an `hv_bias` net
   class with voltage-derived creepage.
 - **Single board, not a multi-board system.** Unlike the reference IV-mux systems, this is
   one 12-channel PCB with no controller/firmware.
@@ -84,15 +84,15 @@ off the one biased node. Full detail in [modifications.md](modifications.md) and
   `JP_BLR` 0R scheme.
 
 **Open — verification (must close before fab):**
-1. **SiPM bias voltage range.** Sets `hv_bias` creepage and the voltage rating of `Cc`/`Cf`
-   (reference uses 100 V parts). Get the target detector's operating bias from the user.
-2. **Bias filter R/C values.** Pick `Rf`,`Cf` for the detector's bias current + the noise
-   to reject (docs give 10 kΩ / 100 nF as a *placeholder*, not a final value).
-3. **SiPM terminal polarity** (cathode- vs anode-bias) and CR-11X input polarity.
+1. **Bias filter R/C values.** Pick `Rf`,`Cf` for the detector's bias current + the noise
+   to reject (docs give 10 kΩ / 100 nF as a *placeholder*, not a final value). [Track 2]
+2. **SiPM terminal polarity** (cathode- vs anode-bias) and CR-11X input polarity. [Track 2/3]
 
-**Open — product decisions (ask the user):** see the decision list in
-[development-plan.md](development-plan.md#decisions-needed-from-the-user) (D1–D6: bias
-range, jack types, `BIAS_IN` connector, module grades, enclosure, default build variant).
+**Resolved — product decisions (D1–D6, 2026-06-24):** bias ≤ 60 V / 100 V parts; all
+per-channel I/O is MCX `CONMCX013`; **`BIAS_IN` is per-channel** (architecture correction —
+not a shared rail); modules CR-112 + CR-200-1µs (+ CR-210); rack-mounted, two boards per
+box; first build = Full. Details + the D6 explanation in
+[development-plan.md](development-plan.md#decisions--resolved-2026-06-24).
 
 ---
 
