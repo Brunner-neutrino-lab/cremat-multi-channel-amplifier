@@ -101,7 +101,7 @@ A given board is assembled in one configuration; the common ones:
 
 | Build | Bias filter | CR-210 | Use case |
 |---|---|---|---|
-| **Full** | fitted | fitted | On-board bias + high-rate spectroscopy |
+| **Full** ← *first build (D6)* | fitted | fitted | On-board bias + high-rate spectroscopy |
 | **No-BLR** | fitted | bypassed | On-board bias, low rate / minimal latency |
 | **External-bias** | bypassed | (either) | Clean external bias supply / external bias-tee |
 | **Reference-equivalent** | bypassed | bypassed | Behaves like the original 6-ch board (×12) |

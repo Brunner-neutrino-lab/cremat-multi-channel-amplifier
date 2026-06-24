@@ -184,7 +184,7 @@ are this board's additions on top of the single-channel CR-160-R7 reference.
 | D3 | `BIAS_IN` connector | **Same MCX `CONMCX013`** — *not* SHV | T1, T4 |
 | D4 | Modules to order | shaper **CR-200-1µs**; CSP **CR-112** (reference x6-board used CR-113) | T1 (BOM) |
 | D5 | Enclosure | **Rack-mounted; two 12-ch boards side-by-side** in one box (user sourcing the box) → board-width budget ≈ ½ usable rack interior; see [hardware/board.md](hardware/board.md) | T4 |
-| D6 | First-build variant | **Full (bias filter fitted + CR-210 fitted)** — pending final confirm; changeable per build | T7 |
+| D6 | First-build variant | **Full (bias filter fitted + CR-210 fitted)** — confirmed; changeable per build | T7 |
 
 ### ⚠ Connector clarification (architecture-affecting)
 **`SIPM`, `OUT`, and `BIAS_IN` are all per-channel** — three MCX `CONMCX013` jacks per
@@ -197,8 +197,8 @@ channel is biased independently.
 Each board is soldered in *one* fixed configuration, because the optional blocks are
 populate-or-bypass (0R / DNP), not switchable. D6 just asks **what to populate on the first
 batch**: bias filter fitted vs bypassed, and CR-210 fitted vs bypassed (the four variants in
-[hardware/board.md](hardware/board.md)). Recommended default = **Full** (filter + CR-210
-both fitted) since you're biasing SiPMs on-board and want baseline restoration; confirm or
-pick another variant and it costs nothing to change at assembly.
+[hardware/board.md](hardware/board.md)). **Decided: the first build is Full** (bias filter
++ CR-210 both fitted) — on-board biasing with baseline restoration. Later boards can use a
+different variant at no design cost (just a DNP change).
 
 Tracked alongside the open engineering items in [session-report.md](session-report.md).
