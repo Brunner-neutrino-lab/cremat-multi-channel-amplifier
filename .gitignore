@@ -19,6 +19,10 @@ fp-info-cache
 **/assembly/
 out/
 
+# Generated validation artifacts (regenerate: python hardware/gen_sch.py + scripts/erc.sh)
+reports/
+sim/netlists/
+
 # Python
 __pycache__/
 *.pyc

@@ -7,13 +7,26 @@ the lib tables, the fielded BOM ([bom/](bom/)), the per-channel netlist
 ([integration-notes.md](integration-notes.md)), and the mechanical envelope
 ([mechanical.md](mechanical.md)).
 
-The remaining three tracks are **GUI/human work in KiCad 10** (the schematic editor has no
-scripting API for capture, so this is done in eeschema/pcbnew, not generated). KiCad 10 is
-installed at `C:\Program Files\KiCad\10.0\`. This guide makes that mechanical.
+**Update — Track 5 is now generated headless and ERC-clean** (see
+[../docs/KICAD_WITH_CLAUDE_CODE.md](../docs/KICAD_WITH_CLAUDE_CODE.md)). The schematic is
+produced by [gen_sch.py](gen_sch.py):
+```
+python hardware/gen_sch.py          # writes channel.kicad_sch + multi-channel-cremat-amplifier.kicad_sch
+bash scripts/erc.sh                 # ERC -> reports/erc_root.json (0 errors)
+```
+`kicad-cli sch erc` reports **0 errors** (4 warnings = MCX/screw-terminal footprint links).
+The Track 5 steps below are now **optional GUI refinement** (e.g. swapping the unity-follower
+buffer for the reference's exact gain/P-Z network, or tidying placement). **Tracks 6–7
+(layout + fab) are the remaining work.** KiCad 10 is at `C:\Program Files\KiCad\10.0\`.
+
+> Generator caveat: once you edit the schematic in the GUI, the `.kicad_sch` becomes the
+> source of truth — don't re-run `gen_sch.py` (it overwrites). The generated buffer is a
+> unity follower (clean + ERC-valid); the reference's gain/P-Z network is the documented
+> GUI refinement.
 
 ---
 
-## Track 5 — Schematic capture
+## Track 5 — Schematic capture  *(done by gen_sch.py; below = optional GUI refinement)*
 
 1. **Open the project** `multi-channel-cremat-amplifier.kicad_pro`. Confirm the `cremat`
    symbol lib resolves (Preferences → Manage Symbol Libraries → it's in the project table).

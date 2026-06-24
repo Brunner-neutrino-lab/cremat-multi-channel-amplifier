@@ -16,12 +16,17 @@ session) and progressed independently of its siblings.
 | 2 Circuit | ✅ done | [hardware/circuit-design.md](hardware/circuit-design.md) |
 | 3 Integration | ✅ done | [hardware/integration-notes.md](../hardware/integration-notes.md) |
 | 4 Mechanical | ✅ done | [hardware/mechanical.md](../hardware/mechanical.md) |
-| 5 Schematic | ⏳ KiCad GUI/human | guide: [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md) |
-| 6 Layout | ⏳ KiCad GUI/human | same guide |
+| 5 Schematic | ✅ generated, ERC 0 errors, netlist-verified | [hardware/gen_sch.py](../hardware/gen_sch.py) → `channel.kicad_sch` + `multi-channel-cremat-amplifier.kicad_sch` |
+| 6 Layout | ⏳ next (pcbnew/file-author + GUI route) | [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md) |
 | 7 Fab/Assembly | ⏳ after 6 | same guide + [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) |
 
-Tracks 5–7 are the eeschema/pcbnew GUI boundary (no scripting API for schematic capture);
-KiCad 10 is installed and the library/netlist/mechanical inputs are all ready.
+**Track 5 is done headless** (per [KICAD_WITH_CLAUDE_CODE.md](KICAD_WITH_CLAUDE_CODE.md)): a
+Python generator writes the `.kicad_sch` with net-labels at exact pin coords;
+`kicad-cli sch erc` → **0 errors** (4 warnings: MCX/screw-terminal footprint links, expected),
+and the exported netlist matches [integration-notes.md](../hardware/integration-notes.md)
+node-by-node (12 independent `/chN/FE` etc., global `+VDC/-VDC/GND`). Re-run:
+`python hardware/gen_sch.py && bash scripts/erc.sh`. Layout (6) is the remaining KiCad work
+— `pcbnew` *does* have a Python API for placement; dense routing → GUI, gated by DRC.
 
 ---
 

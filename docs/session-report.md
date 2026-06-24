@@ -76,12 +76,18 @@ off the one biased node. Full detail in [modifications.md](modifications.md) and
   `bom/` (fielded Full-variant BOM + CSV), `integration-notes.md` (golden netlist),
   `mechanical.md`. See [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md).
 
-**Open — Tracks 5/6/7 (KiCad GUI/human; toolchain is installed & ready):**
-1. **Schematic capture** (eeschema has no scripting API — done in GUI): capture the channel
-   from `integration-notes.md`, copy the P/Z+buffer sub-circuit from the reference channel,
-   instantiate 12×, ERC 0. Step-by-step in `hardware/BUILD-IN-KICAD.md`.
-2. **Layout** (placement/route/DRC 0) and **fab** (gerbers/drill/pos + BOM) follow from the
-   netlist — same guide. KiCad 10 at `C:\Program Files\KiCad\10.0\`.
+**Track 5 — schematic: DONE headless (ERC 0 errors).** The earlier "GUI boundary" call was
+wrong (corrected per [KICAD_WITH_CLAUDE_CODE.md](KICAD_WITH_CLAUDE_CODE.md)): a generator
+[hardware/gen_sch.py](../hardware/gen_sch.py) writes `channel.kicad_sch` + the 12× root by
+placing symbols at rotation 0 and dropping net-labels (local) / global-labels (rails) at
+exact pin coordinates. `kicad-cli sch erc` → **0 errors** (4 warnings = MCX + screw-terminal
+footprint links, expected); exported netlist matches integration-notes.md node-by-node
+(217 unique refs, 12 independent `/chN/FE`, global `+VDC/-VDC/GND`).
+
+**Open — Tracks 6/7 (KiCad; toolchain ready):**
+1. **MCX footprint** `MCX_CONMCX013_EdgeMount` (datasheet-verified) — the one to-create part.
+2. **Layout** (placement via `pcbnew` Python API or file-authoring; dense routing in GUI;
+   DRC 0) and **fab** (gerbers/drill/pos + BOM). Guide: `hardware/BUILD-IN-KICAD.md`.
 
 **Resolved this session:**
 - ✅ **CR-210 pin map.** Confirmed from `reference/cremat-CR-160-R7` (`CR-160-R7-cache.lib`
