@@ -12,6 +12,7 @@ Gate: kicad-cli pcb drc hardware/multi-channel-cremat-amplifier.kicad_pcb
 """
 import os, re, sys
 import pcbnew
+import gen_sch   # reuse the channel spec + reference-assignment logic
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 NET = os.path.join(HERE, "..", "sim", "netlists", "board.net")
@@ -58,37 +59,54 @@ def main():
         for ref, pad in nodes:
             pad_net[(ref, pad)] = name
 
-    # placement geometry: 12 channel rows in 2 columns of 6, MCX toward board edges
-    # board ~225 x 235 mm ; rows pitch ~ 18 mm
+    # --- per-channel ROW placement -------------------------------------------------
+    # Map each reference -> (channel index, role) by replaying gen_sch's ref assignment.
+    cnt = {}; ref2cr = {}
+    for n in range(12):
+        for role, *_ in gen_sch.CH:
+            pfx = gen_sch.prefix_of(role); cnt[pfx] = cnt.get(pfx, 0) + 1
+            ref2cr["%s%d" % (pfx, cnt[pfx])] = (n, role)
+    # role -> (x mm within the channel strip, rotation deg). Signal flows left->right:
+    # J_BIAS | filter | J_SIPM + Cc | CR-11X | CR-200 + P/Z | CR-210 | buffer | R_OUT | J_OUT
+    # NB: the SIP-8 (PinHeader_1x08) footprints have their origin at pin 1 and extend
+    # ~20 mm in +x, so modules are spaced ~26 mm; 0805/MCX origins are centered.
+    ROLE_X = {
+        "J_BIAS": (6, 0), "JP_Rf1": (18, 90), "Rf1": (24, 90), "Cf": (30, 90),
+        "Rf2": (36, 90), "JP_Rf2": (42, 90), "J_SIPM": (52, 0), "Cc": (62, 90),
+        "U_CSP": (70, 0), "U_SHAPER": (96, 0), "RV_PZ": (124, 0), "U_BLR": (134, 0),
+        "U_BUF": (160, 0), "R_OUT": (170, 90), "J_OUT": (184, 0),
+        "C_dvp": (196, 90), "C_dvn": (204, 90),
+    }
+    ROW_PITCH, TOP, XOFF = 18.0, 12.0, 4.0
+    MCX_ROLES = ("J_BIAS", "J_SIPM", "J_OUT")
     placed = miss = 0
-    order = sorted(comps)            # deterministic
-    # group components by channel via reference ranges is complex; place by simple grid
-    # so the netlist drives connectivity, layout is a clean starting grid for GUI routing.
-    cols, x0, y0, dx, dy = 12, 20.0, 20.0, 18.0, 11.0
-    # Assign each ref a slot: bucket by trailing-number parity not needed; grid fill.
-    i = 0
-    for ref in order:
+    for ref in sorted(comps):
         val, fpid = comps[ref]
         if ":" not in fpid:
             miss += 1; continue
         nick, fname = fpid.split(":", 1)
         fp = pcbnew.FootprintLoad(fp_dir(nick), fname)
         if fp is None:
-            miss += 1
-            print("MISS footprint:", fpid, "for", ref)
-            continue
-        fp.SetReference(ref)
-        fp.SetValue(val)
-        col = i % 18
-        row = i // 18
-        fp.SetPosition(V(x0 + col * 12.0, y0 + row * 14.0))
+            miss += 1; print("MISS footprint:", fpid, "for", ref); continue
+        fp.SetReference(ref); fp.SetValue(val)
+        if ref in ref2cr:
+            n, role = ref2cr[ref]
+            x, rot = ROLE_X.get(role, (210, 0))
+            fp.SetPosition(V(XOFF + x, TOP + n * ROW_PITCH))
+            if rot:
+                fp.SetOrientationDegrees(rot)
+            if role in MCX_ROLES:           # move the footprint's Edge.Cuts cutout to
+                for it in fp.GraphicalItems():   # Dwgs.User so the board outline stays one
+                    if it.GetLayer() == pcbnew.Edge_Cuts:  # clean rect (re-cut edges in GUI
+                        it.SetLayer(pcbnew.Dwgs_User)       # when mechanically placing jacks)
+        else:
+            fp.SetPosition(V(12, TOP + 12 * ROW_PITCH + 8))  # J_PWR below the channel array
         b.Add(fp)
         for pad in fp.Pads():
             key = (ref, pad.GetNumber())
             if key in pad_net:
                 pad.SetNet(netmap[pad_net[key]])
         placed += 1
-        i += 1
     print("placed %d footprints, %d missing" % (placed, miss))
 
     # board outline 225 x 235 mm (rectangle on Edge.Cuts)

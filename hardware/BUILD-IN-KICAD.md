@@ -77,7 +77,11 @@ grid, and the edge-launch MCX cutouts must be moved to the board edge. So the GU
    long edge, `J_OUT` on the other** (signal flows across). Keep each front-end node compact.
 4. **Net classes** apply automatically (`hv_bias` ~1.0 mm creepage on `BIAS*`/`SIPM*`/`FE*`;
    `signal` 0.33 mm for `OUT*`; `power` 0.5 mm). Guard the front-end node.
-5. **Route**, pour + stitch grounds. **DRC until 0 errors** (creepage is an error).
+5. **Route** — either the KiCad interactive router, or **autoroute with FreeRouting**:
+   clean placement (no clearance/short DRC) → `export_dsn.py` (or GUI Specctra DSN export)
+   → FreeRouting → `import_ses.py` (or GUI Specctra Session import). Full steps +
+   FreeRouting download in [../docs/FREEROUTING.md](../docs/FREEROUTING.md).
+6. Pour + stitch grounds (after routing). **DRC until 0 errors** (creepage is an error).
 
 > Gotcha (from `reference/ets-breakout`): headless `ZONE_FILLER.Fill()` segfaults — fill
 > zones as a separate pass / in the GUI. Run `kicad-cli pcb drc` as the gate.

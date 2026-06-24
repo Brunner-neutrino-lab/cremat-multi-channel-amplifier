@@ -23,6 +23,10 @@ out/
 reports/
 sim/netlists/
 
+# Routing intermediates (regenerate: export_dsn.py / FreeRouting / import_ses.py)
+*.dsn
+*.ses
+
 # Python
 __pycache__/
 *.pyc
