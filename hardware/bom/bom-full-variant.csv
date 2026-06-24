@@ -1,0 +1,20 @@
+Ref,Value,Footprint,MPN_or_Source,Qty_per_channel,Qty_x12,Populate_Full,Notes
+U_CSP,CR-112,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,Cremat CR-112,1,12,Y,Charge-sensitive preamp (SIP-8)
+U_SHAPER,CR-200-1us,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,Cremat CR-200-1us,1,12,Y,Gaussian shaper 1us (SIP-8)
+U_BLR,CR-210,Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical,Cremat CR-210,1,12,Y,Baseline restorer (SIP-8); optional
+U_BUF,EL5167,Package_TO_SOT_SMD:SOT-23-5,Renesas EL5167 / TI LM7321,1,12,Y,Output buffer / line driver
+Cc,0.22uF 100V X5R,Capacitor_SMD:C_0805_2012Metric,100V 0805 MLCC,1,12,Y,AC coupling; HV (>=bias)
+Rf1,10k,Resistor_SMD:R_0805_2012Metric,10k 1% 0805,1,12,Y,Bias filter series R
+Rf2,10k,Resistor_SMD:R_0805_2012Metric,10k 1% 0805,1,12,Y,Bias filter series R (SiPM-side)
+Cf,100nF 100V X7R,Capacitor_SMD:C_0805_2012Metric,100V 0805 MLCC,1,12,Y,Bias filter shunt C
+JP_Rf1,0R,Resistor_SMD:R_0805_2012Metric,0R 0805,1,12,N,Bias-filter bypass (DNP in Full)
+JP_Rf2,0R,Resistor_SMD:R_0805_2012Metric,0R 0805,1,12,N,Bias-filter bypass (DNP in Full)
+JP_BLR,0R,Resistor_SMD:R_0805_2012Metric,0R 0805,1,12,N,CR-210 bypass (DNP in Full)
+R_OUT,49.9,Resistor_SMD:R_0805_2012Metric,49.9R 1% 0805,1,12,Y,50ohm source termination
+RV_PZ,100k,Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical,Bourns 3296W-104,1,12,Y,Pole-zero trim
+RV_GAIN,per reference,Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical,per reference,1,12,Y,Buffer gain trim
+RV_OFS,per reference,Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical,per reference,1,12,Y,Buffer offset trim
+J_BIAS,MCX,cremat:MCX_CONMCX013_EdgeMount,TE Linx CONMCX013 (343-CONMCX013-ND),1,12,Y,Per-channel HV bias in (TO CREATE footprint)
+J_SIPM,MCX,cremat:MCX_CONMCX013_EdgeMount,TE Linx CONMCX013 (343-CONMCX013-ND),1,12,Y,Per-channel detector (DC bias+signal)
+J_OUT,MCX,cremat:MCX_CONMCX013_EdgeMount,TE Linx CONMCX013 (343-CONMCX013-ND),1,12,Y,Per-channel shaped output
+J_PWR,Screw terminal 3pos,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm",Phoenix MKDS 1.5/3,1,1,Y,Shared +Vs/-Vs/GND

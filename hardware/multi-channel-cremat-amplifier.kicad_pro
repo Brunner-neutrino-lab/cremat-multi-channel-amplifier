@@ -1,0 +1,117 @@
+{
+  "board": {
+    "design_settings": {
+      "defaults": {
+        "board_outline_line_width": 0.1,
+        "copper_line_width": 0.2,
+        "copper_text_size_h": 1.5,
+        "copper_text_size_v": 1.5,
+        "copper_text_thickness": 0.3,
+        "courtyard_line_width": 0.05,
+        "fab_line_width": 0.1,
+        "fab_text_size_h": 1.0,
+        "fab_text_size_v": 1.0,
+        "fab_text_thickness": 0.15,
+        "other_line_width": 0.15,
+        "silk_line_width": 0.15,
+        "silk_text_size_h": 1.0,
+        "silk_text_size_v": 1.0,
+        "silk_text_thickness": 0.15
+      },
+      "rule_severities": {
+        "annular_width": "error",
+        "clearance": "error",
+        "copper_edge_clearance": "error",
+        "courtyards_overlap": "error",
+        "creepage": "error",
+        "drill_out_of_range": "error",
+        "hole_clearance": "error",
+        "hole_near_hole": "error",
+        "invalid_outline": "error",
+        "item_on_disabled_layer": "error",
+        "items_not_allowed": "error",
+        "missing_courtyard": "ignore",
+        "npth_inside_courtyard": "ignore",
+        "silk_over_copper": "warning",
+        "silk_overlap": "warning",
+        "starved_thermal": "error",
+        "track_dangling": "warning",
+        "unconnected_items": "error"
+      },
+      "rules": {
+        "min_clearance": 0.0,
+        "min_copper_edge_clearance": 0.3,
+        "min_hole_clearance": 0.25,
+        "min_hole_to_hole": 0.25,
+        "min_through_hole_diameter": 0.3,
+        "min_track_width": 0.0,
+        "min_via_annular_width": 0.1,
+        "min_via_diameter": 0.5
+      }
+    }
+  },
+  "boards": [],
+  "cvpcb": {
+    "equivalence_files": []
+  },
+  "libraries": {
+    "pinned_footprint_libs": [],
+    "pinned_symbol_libs": []
+  },
+  "meta": {
+    "filename": "multi-channel-cremat-amplifier.kicad_pro",
+    "version": 1
+  },
+  "net_settings": {
+    "classes": [
+      {
+        "clearance": 0.2,
+        "name": "Default",
+        "track_width": 0.2032,
+        "via_diameter": 0.8,
+        "via_drill": 0.4
+      },
+      {
+        "clearance": 0.2,
+        "name": "power",
+        "track_width": 0.5,
+        "via_diameter": 0.8,
+        "via_drill": 0.4
+      },
+      {
+        "clearance": 1.0,
+        "name": "hv_bias",
+        "track_width": 0.4,
+        "via_diameter": 0.9,
+        "via_drill": 0.4
+      },
+      {
+        "clearance": 0.2,
+        "name": "signal",
+        "track_width": 0.33,
+        "via_diameter": 0.8,
+        "via_drill": 0.4
+      }
+    ],
+    "meta": {
+      "version": 3
+    },
+    "netclass_patterns": [
+      { "netclass": "hv_bias", "pattern": "*BIAS*" },
+      { "netclass": "hv_bias", "pattern": "*SIPM*" },
+      { "netclass": "hv_bias", "pattern": "*FE*" },
+      { "netclass": "signal", "pattern": "*OUT*" },
+      { "netclass": "power", "pattern": "GND" },
+      { "netclass": "power", "pattern": "+VDC" },
+      { "netclass": "power", "pattern": "-VDC" }
+    ]
+  },
+  "schematic": {
+    "annotate_start_num": 0,
+    "meta": {
+      "version": 1
+    }
+  },
+  "sheets": [],
+  "text_variables": {}
+}

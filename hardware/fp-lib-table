@@ -1,0 +1,4 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "cremat")(type "KiCad")(uri "${KIPRJMOD}/lib/cremat.pretty")(options "")(descr "Project-local footprints (MCX CONMCX013 edge jack, any custom). Most parts use KiCad stock libs — see docs/hardware/bom.md."))
+)
