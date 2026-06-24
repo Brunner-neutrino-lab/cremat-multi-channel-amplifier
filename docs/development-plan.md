@@ -92,10 +92,12 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 - **Polarity:** SiPM terminal (cathode/anode-bias) vs CR-11X input polarity.
 - **Power/decoupling:** per-module decoupling values, bulk caps, rail sizing.
 - **Output:** buffer gain, `49.9R` termination, P/Z and gain-trim ranges.
-- **Deliverable:** `docs/hardware/circuit-design.md` — values + calculations + rationale.
-- **Done when:** every passive value on the golden channel is fixed and justified, and the
-  HV ratings are pinned to the agreed bias range.
-- **Needs from user:** SiPM bias voltage range + detector capacitance/charge (see Decisions).
+- **Deliverable:** [hardware/circuit-design.md](hardware/circuit-design.md) — **done**:
+  values + calculations + rationale for the **Hamamatsu VUV4** (Rf1=Rf2=10 kΩ, Cf=100 nF,
+  Cc=0.22 µF; cathode-on-node +45–55 V; CR-112). Bench-verify items listed there.
+- **Done when:** ~~every passive value fixed~~ ✅ done on paper; remaining items are
+  bench-verify after first boards (CR-112 output sign, warm/cold OV offset, P/Z).
+- **Had from user (2026-06-24):** VUV4 S13370, 45–55 V reverse, ≈ 220 fC/V OV, Cdet ≈ 1.28 nF.
 
 ### Track 3 — Reference Integration & Channel Topology
 

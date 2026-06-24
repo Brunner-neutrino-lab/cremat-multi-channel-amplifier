@@ -55,12 +55,14 @@ stay unique across the 12 instances.
 
 ### 1. Bias front-end (NEW)
 
-| Ref | Value (starting point) | 0805? | Notes |
+Values below are designed for the Hamamatsu VUV4 in [circuit-design.md](circuit-design.md).
+
+| Ref | Value | 0805? | Notes |
 |---|---|---|---|
-| `Rf1`, `Rf2` | bias-filter series R (e.g. 10 kΩ; tune to detector) | yes | "R" of the RC+R filter; isolate + limit SiPM current |
-| `Cf` | bias-filter shunt C (e.g. 100 nF, **rated ≥ bias V**) | yes | "C" of the RC; shunts supply noise to GND |
+| `Rf1`, `Rf2` | **10 kΩ** each | yes | "R" of the RC+R filter; `Rf2` isolates the SiPM node so the fast charge flows to `Cc` (cold-only boards may raise to 100 kΩ–1 MΩ) |
+| `Cf` | **100 nF, 100 V, X7R** | yes | "C" of the RC; `fc≈159 Hz` with `Rf1`; supply-noise bypass |
 | `JP_Rf1`, `JP_Rf2` | 0R | yes | bypass links across `Rf1`/`Rf2` |
-| `Cc` | AC-coupling cap (ref: `0.22 µF 100 V X5R`) | yes (HV part) | blocks DC bias, passes pulse to CSP |
+| `Cc` | **0.22 µF, 100 V, X5R** | yes (HV part) | blocks DC bias; ≫ `Cdet`(1.28 nF) → ~99 % charge into CSP |
 
 - **`BIAS_IN → Rf1 → (Cf to GND) → Rf2 → front-end node`** is the RC-in-series-with-R
   filter. Corner frequency ≈ `1 / (2π·Rf·Cf)`; choose `Rf`,`Cf` for the detector's bias
@@ -72,15 +74,16 @@ stay unique across the 12 instances.
 - **Bypass:** fit `JP_Rf1`/`JP_Rf2` and DNP `Rf1`/`Rf2`/`Cf` to feed `BIAS_IN` straight
   to the node (see [bom.md](bom.md) DNP table).
 
-> **Polarity / which SiPM terminal:** the reference board is agnostic (signal in on
-> coax). Decide cathode-bias vs anode-bias from the detector and the CR-11X input polarity
-> when implementing; the topology above is drawn terminal-agnostic. Tracked in
-> [session-report.md](../session-report.md).
+> **Polarity (decided):** front-end node = SiPM **cathode**, biased **+45…+55 V**; anode →
+> GND; read the cathode through `Cc`. Uses a positive bias supply. The CR-112 output-step
+> sign is fixed by this and is a bench-confirm item — see
+> [circuit-design.md](circuit-design.md#front-end-polarity-decision).
 
 ### 2. Charge-sensitive preamp — Cremat CR-11X (`U_CSP`)
 
-- 8-pin SIP module. Reference board populates **CR-113**; the CR-11X family
-  (CR-110/-111/-112/-113) is pin-compatible — pick per detector charge/capacitance.
+- 8-pin SIP module. This build uses **CR-112** (13 mV/pC; D4) — suited to the VUV4's large
+  per-p.e. charge; the reference board used CR-113. The CR-11X family is pin-compatible, so
+  CR-113 is a drop-in if larger signals saturate the CR-112 (see [circuit-design.md](circuit-design.md)).
 - Pinout (from the reference symbol `CR-11X`): `1=input`, `2=GND`, `3=NC`, `4=GND`,
   `5=-Vs`, `6=+Vs`, `7=GND`, `8=output`.
 - Local decoupling on `+Vs`/`-Vs` (the reference uses values like 0.1 µF / 1 µF / 10 µF

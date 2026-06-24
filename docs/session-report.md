@@ -83,10 +83,17 @@ off the one biased node. Full detail in [modifications.md](modifications.md) and
   integration: a jumper (`JU1`) across the module's input/output nodes — exactly our
   `JP_BLR` 0R scheme.
 
-**Open — verification (must close before fab):**
-1. **Bias filter R/C values.** Pick `Rf`,`Cf` for the detector's bias current + the noise
-   to reject (docs give 10 kΩ / 100 nF as a *placeholder*, not a final value). [Track 2]
-2. **SiPM terminal polarity** (cathode- vs anode-bias) and CR-11X input polarity. [Track 2/3]
+**Resolved — Track 2 front-end design** (target = Hamamatsu VUV4 S13370, 6 mm/75 µm;
+45–55 V reverse, ≈ 220 fC/V OV, `Cdet` ≈ 1.28 nF — see
+[hardware/circuit-design.md](hardware/circuit-design.md)):
+- ✅ **Bias filter values:** `Rf1=Rf2=10 kΩ`, `Cf=100 nF/100 V` (`fc≈159 Hz`; cold-only
+  boards may raise `Rf` to 100 kΩ–1 MΩ). `Cc=0.22 µF/100 V` (≫ `Cdet` → ~99 % charge transfer).
+- ✅ **Polarity:** cathode on the front-end node, **+45…55 V**; anode → GND; positive bias
+  supply. CR-112 (13 mV/pC) confirmed appropriate for the VUV4 charge.
+
+**Open — bench-verify (Track 2 checklist, after first boards):** CR-112 output-step sign;
+warm-vs-cold OV offset from the 20 kΩ drop; single-p.e. amplitude / CR-112-vs-CR-113 range;
+pole-zero trim.
 
 **Resolved — product decisions (D1–D6, 2026-06-24):** bias ≤ 60 V / 100 V parts; all
 per-channel I/O is MCX `CONMCX013`; **`BIAS_IN` is per-channel** (architecture correction —

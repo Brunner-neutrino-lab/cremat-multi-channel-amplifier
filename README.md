@@ -50,6 +50,7 @@ Full detail: [docs/hardware/channel.md](docs/hardware/channel.md).
 | [docs/architecture.md](docs/architecture.md) | System/board block diagram, channel signal chain, design partitioning |
 | [docs/modifications.md](docs/modifications.md) | **The four changes vs. `cremat-x6-board`, with rationale + the optional/DNP jumper scheme** |
 | [docs/hardware/channel.md](docs/hardware/channel.md) | Per-channel circuit: bias front-end, AC/DC coupling, CSP/shaper/BLR/buffer, jumpers |
+| [docs/hardware/circuit-design.md](docs/hardware/circuit-design.md) | **Front-end values for the Hamamatsu VUV4** — bias filter, coupling, polarity, CR-112 gain/range |
 | [docs/hardware/board.md](docs/hardware/board.md) | 12-channel board: power distribution, connectors, layout intent |
 | [docs/hardware/bom.md](docs/hardware/bom.md) | 0805 strategy, Cremat modules, optional-population (DNP) variants |
 | [docs/hardware/pcb-design-rules.md](docs/hardware/pcb-design-rules.md) | Net classes, trace widths, HV creepage, guard rings |
@@ -88,5 +89,8 @@ git submodule update --init --recursive
   per-channel I/O is **MCX `CONMCX013`** (`BIAS_IN`, `SIPM`, `OUT` — **`BIAS_IN` is
   per-channel**, 36 MCX/board); modules **CR-112** + **CR-200-1µs** (+ CR-210); rack-mounted,
   two boards per box; first build = Full.
-- **Open items**: bias-filter R/C values and SiPM terminal polarity (Track 2/3 — need the
-  detector's bias current/capacitance), and the rack box's exact internal dimensions (D5).
+- **Front-end designed for the Hamamatsu VUV4** (S13370, 45–55 V, ≈220 fC/V, Cdet≈1.28 nF):
+  bias filter `Rf1=Rf2=10 kΩ`, `Cf=100 nF`, `Cc=0.22 µF`; cathode-on-node +45–55 V; CR-112
+  ([docs/hardware/circuit-design.md](docs/hardware/circuit-design.md)).
+- **Open items**: bench-verify (CR-112 output sign, warm/cold OV offset, single-p.e.
+  range, P/Z trim) and the rack box's exact internal dimensions (D5).

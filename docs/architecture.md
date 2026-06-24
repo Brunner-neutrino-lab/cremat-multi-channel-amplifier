@@ -17,6 +17,10 @@ Brunner Neutrino Lab, 2023) with the four modifications listed in
 [modifications.md](modifications.md). Unlike the reference board — which took an already
 externally-biased detector signal in on coax — this board **biases the detector itself**.
 
+The **target detector is the Hamamatsu VUV4 MPPC** (S13370, 6 mm / 75 µm; 45–55 V reverse
+bias, ≈ 220 fC per V overvoltage, `Cdet` ≈ 1.28 nF). Per-channel component values are
+designed for it in [circuit-design.md](hardware/circuit-design.md).
+
 ---
 
 ## Board Block Diagram

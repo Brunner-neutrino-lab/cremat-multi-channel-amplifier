@@ -33,8 +33,8 @@ flag), the same convention `ets-breakout` and the reference board use.
 | Baseline restorer | `U_BLR` | Cremat **CR-210** | SIP-8 TH | **optional** |
 | Output buffer | `U_BUF` | EL5167 / LM7321 | SOT-23-5 / SO-8 | yes |
 | AC coupling | `Cc` | 0.22 µF 100 V X5R (bias ≤ 60 V; keep 100 V) | 0805 | yes |
-| Bias filter R | `Rf1`,`Rf2` | series R (tune; e.g. 10 kΩ) | 0805 | **optional** |
-| Bias filter C | `Cf` | shunt C (e.g. 100 nF, 100 V) | 0805 | **optional** |
+| Bias filter R | `Rf1`,`Rf2` | **10 kΩ** each (VUV4; [circuit-design.md](circuit-design.md)) | 0805 | **optional** |
+| Bias filter C | `Cf` | **100 nF, 100 V, X7R** | 0805 | **optional** |
 | Bias-filter bypass | `JP_Rf1`,`JP_Rf2` | 0R | 0805 | **optional** |
 | BLR bypass | `JP_BLR` | 0R | 0805 | **optional** |
 | P/Z trim | `RV_PZ` | trimpot ~100 kΩ | TH/SMD trim | yes |
