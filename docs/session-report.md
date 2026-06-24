@@ -97,8 +97,9 @@ pole-zero trim.
 
 **Resolved — product decisions (D1–D6, 2026-06-24):** bias ≤ 60 V / 100 V parts; all
 per-channel I/O is MCX `CONMCX013`; **`BIAS_IN` is per-channel** (architecture correction —
-not a shared rail); modules CR-112 + CR-200-1µs (+ CR-210); rack box ≈ 482 × 244 mm with
-two boards side-by-side (per-board outline ≈ 225 × 235 mm); first build = Full. Details + the D6 explanation in
+not a shared rail); modules CR-112 + CR-200-1µs (+ CR-210); **1U** open rack tray
+≈ 482 × 244 mm, two boards side-by-side on standoffs (per-board ≈ 225 × 235 mm, tall parts
+< ~35 mm, no panel/cutouts); first build = Full. Details + the D6 explanation in
 [development-plan.md](development-plan.md#decisions--resolved-2026-06-24).
 
 ---

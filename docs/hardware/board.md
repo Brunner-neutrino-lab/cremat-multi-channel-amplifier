@@ -76,25 +76,28 @@ single distribution network on the root sheet feeds every channel.
 
 ---
 
-## Mechanical (D5 — rack box ≈ 482 × 244 mm, two boards side-by-side)
+## Mechanical (D5 — 1U rack tray ≈ 482 × 244 mm, two open boards side-by-side)
 
-- **Enclosure ≈ 482 mm × 244 mm** (482 mm ≈ 19" rack width; 244 mm deep), holding **two
-  12-channel boards side-by-side** across the 482 mm width.
-- **Per-board outline budget ≈ 225 mm (W) × ~235 mm (D):** 482 mm ÷ 2 = 241 mm, minus
-  enclosure walls, the center gap/divider, and board-to-wall clearance. **Confirm against
-  the actual interior width, depth, and any card-guide/divider before fixing the outline.**
-  The board height (rack U) is not yet specified — needed if the MCX exit through a front
-  panel (see below).
-- **Connector density is the dominant constraint.** 36 board-edge MCX (`CONMCX013`,
-  ~6.4 mm body) do **not** fit single-row on a ~225 mm front edge (225/36 ≈ 6.3 mm pitch).
-  Resolve in Track 4 by one of:
-  - **Front/rear split (recommended):** `BIAS_IN` + `SIPM` (24) on the front edge
-    (~9.4 mm pitch — detector + bias cabling at the front), `OUT` (12) on the rear edge
-    (~19 mm pitch — outputs to DAQ at the back). Clean and roomy.
-  - **Two staggered rows** on the front edge (~18/row, ~12 mm pitch).
-  - **Per-channel clusters** of 3 (`BIAS_IN`/`SIPM`/`OUT`) grouped by channel.
-- The **power** connector goes on a free edge (e.g. rear), shared by the one board.
-- Provide **M3 mounting holes / card-guide edges** matched to the box's rails/divider.
+- **Box ≈ 482 mm × 244 mm × 1U** (482 mm ≈ 19" rack width, 244 mm deep, 1U ≈ 44.45 mm tall).
+- **Open mounting — the boards are NOT enclosed.** Each board is **mounted flat to the box
+  base** with the edge jacks exposed for **direct cable access from above/around. No front
+  panel, no bulkhead cutouts.** This removes the panel-alignment constraint entirely.
+- **Two 12-channel boards side-by-side** across the 482 mm → per-board outline budget
+  **≈ 225 (W) × 235 (D) mm** (482 ÷ 2 minus walls / center gap / clearance). Confirm against
+  the real interior.
+- **Height (1U):** every part — the vertical Cremat SIP-8 modules, trimpots, electrolytics,
+  and the MCX + its mated cable — must clear **~44.45 mm** above the base, minus
+  mounting-standoff height (~5–10 mm) → **keep the tallest parts under ~35 mm.** Board-edge
+  MCX with **horizontal cable exit** is a good fit for an open 1U tray (no vertical jacks).
+- **Connectors — the open tray relaxes the density problem.** With no single front panel,
+  jacks line **any edge** and cables exit directly. Recommended split (also matches signal
+  flow):
+  - **One long (~235 mm) edge = inputs:** 24 jacks (`BIAS_IN` + `SIPM`), ~9.8 mm pitch.
+  - **Opposite long edge = outputs:** 12 `OUT`, ~19.6 mm pitch.
+  This lays each channel out as **input-edge → amplifier chain → output-edge**. (36 MCX on a
+  single ~225 mm edge would be ~6.3 mm pitch — too tight — so split across the two long edges.)
+- **Power** connector on a free (short) edge.
+- **Mounting:** M3 standoffs from the board to the box base plate (no card guides needed).
 - This drives Track 4 (mechanical) and constrains Track 6 (layout).
 
 > Board dimensions, exact jack placement, and the outline are defined in the KiCad PCB

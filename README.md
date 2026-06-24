@@ -92,8 +92,8 @@ git submodule update --init --recursive
 - **Front-end designed for the Hamamatsu VUV4** (S13370, 45–55 V, ≈220 fC/V, Cdet≈1.28 nF):
   bias filter `Rf1=Rf2=10 kΩ`, `Cf=100 nF`, `Cc=0.22 µF`; cathode-on-node +45–55 V; CR-112
   ([docs/hardware/circuit-design.md](docs/hardware/circuit-design.md)).
-- **Enclosure (D5):** rack box ≈ 482 × 244 mm, two boards side-by-side → per-board outline
-  ≈ 225 × 235 mm. 36 MCX won't fit single-row; recommended front/rear split (24 `BIAS_IN`+
-  `SIPM` front, 12 `OUT` rear).
-- **Open items**: rack U / front-panel height + final connector placement (Track 4), and
+- **Enclosure (D5):** **1U** rack tray ≈ 482 × 244 mm; boards **open** (no panel/cutouts),
+  two side-by-side on standoffs → per-board outline ≈ 225 × 235 mm, tall parts < ~35 mm.
+  Inputs (`BIAS_IN`+`SIPM`) on one long edge, outputs (`OUT`) on the other.
+- **Open items**: power-connector choice + final jack/outline placement (Track 4), and
   bench-verify (CR-112 output sign, warm/cold OV offset, single-p.e. range, P/Z trim).

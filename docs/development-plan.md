@@ -113,13 +113,12 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 
 ### Track 4 — Mechanical, Connectors & I/O
 
-- Connectors are decided (D2/D3): all per-channel I/O is MCX `CONMCX013`. Remaining work:
-  the **power** connector, and the rack **U height / front-panel** (the box footprint
-  ≈ 482 × 244 mm is now known, D5).
-- Board **outline ≈ 225 × 235 mm** (two side-by-side in the 482 mm box), 12-channel
-  **pitch/arrangement**, mounting/card-guide edges, and the **36 MCX** placement — which
-  doesn't fit single-row, so resolve the front/rear split (recommended: 24 `BIAS_IN`+`SIPM`
-  front, 12 `OUT` rear) per [hardware/board.md](hardware/board.md).
+- Mostly specified now (D2/D3/D5): MCX `CONMCX013` I/O; **1U open tray**, board ≈ 225 × 235 mm
+  on M3 standoffs, tall parts < ~35 mm. Remaining: pick the **power** connector and finalize
+  jack placement + outline.
+- **Jack placement:** inputs (24 `BIAS_IN`+`SIPM`) on one long edge, outputs (12 `OUT`) on
+  the opposite long edge → channel flows input-edge → amplifier → output-edge
+  ([hardware/board.md](hardware/board.md)). No bulkhead cutouts (open tray).
 - **Deliverable:** `docs/hardware/mechanical.md` + an outline/placement constraint sketch.
 - **Done when:** Track 6 has fixed connector parts, an outline, and a placement strategy.
 - **Needs from user:** cabling standard (MCX/SMA), enclosure intent (see Decisions).
@@ -187,7 +186,7 @@ are this board's additions on top of the single-channel CR-160-R7 reference.
 | D2 | `SIPM`/`OUT` jack | **MCX edge-mount, TE Connectivity Linx `CONMCX013`** (DK `343-CONMCX013-ND`), 50 Ω SMT board-edge | T1, T4 |
 | D3 | `BIAS_IN` connector | **Same MCX `CONMCX013`** — *not* SHV | T1, T4 |
 | D4 | Modules to order | shaper **CR-200-1µs**; CSP **CR-112** (reference x6-board used CR-113) | T1 (BOM) |
-| D5 | Enclosure | **Rack box ≈ 482 × 244 mm** (19" wide), two 12-ch boards side-by-side → per-board outline **≈ 225 (W) × 235 (D) mm**; rack U / front-panel height still TBD. See [hardware/board.md](hardware/board.md) | T4 |
+| D5 | Enclosure | **1U rack tray ≈ 482 × 244 mm**; boards **open** (no enclosure / panel / bulkhead cutouts), mounted flat on standoffs → per-board outline **≈ 225 × 235 mm**, tall parts **< ~35 mm** (1U). See [hardware/board.md](hardware/board.md) | T4 |
 | D6 | First-build variant | **Full (bias filter fitted + CR-210 fitted)** — confirmed; changeable per build | T7 |
 
 ### ⚠ Connector clarification (architecture-affecting)
