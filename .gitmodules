@@ -1,0 +1,6 @@
+[submodule "reference/cremat-x6-board"]
+	path = reference/cremat-x6-board
+	url = https://github.com/Brunner-neutrino-lab/cremat-x6-board.git
+[submodule "reference/ets-breakout"]
+	path = reference/ets-breakout
+	url = https://github.com/Brunner-neutrino-lab/ets-breakout.git
