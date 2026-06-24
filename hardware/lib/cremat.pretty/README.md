@@ -1,13 +1,11 @@
 # cremat.pretty — project-local footprints
 
 Most parts use **KiCad stock footprint libraries** (see the footprint column in
-[../../../docs/hardware/bom.md](../../../docs/hardware/bom.md)). This library is only for
-parts that have no suitable stock footprint:
+[../../../docs/hardware/bom.md](../../../docs/hardware/bom.md)). This library holds parts
+with no suitable stock footprint:
 
-| Footprint | Part | Status |
+| Footprint | Part | Source / status |
 |---|---|---|
-| `MCX_CONMCX013_EdgeMount` | TE Connectivity Linx `CONMCX013` 50 Ω MCX board-edge jack (×36) | **TO CREATE — import datasheet-verified.** Pad/cutout geometry must come from the TE drawing (or a vetted SnapEDA/Ultra-Librarian part). Not auto-generated here to avoid shipping wrong pad geometry. |
+| `MCX_CONMCX013_EdgeMount` | TE Connectivity / Linx `CONMCX013` 50 Ω MCX board-edge jack (×36) | **Present.** From SnapMagic/SnapEDA (`CONMCX013.step` 3D model, license in `CONMCX013-LICENSE.txt`), migrated to KiCad 10. Pad 1 = signal; the two shell tabs merged to **pad 2 = shield/GND** to match the `Conn_Coaxial` symbol (pin 1 In, pin 2 Ext). Carries an `Edge.Cuts` cutout (±2.5 × 6.3 mm) — place at the board edge so the cutout merges with the outline. |
 
-To add it: in KiCad Footprint Editor create `MCX_CONMCX013_EdgeMount.kicad_mod` here, verify
-against the TE `CONMCX013` mechanical drawing (signal pad, ground pads, board edge cutout,
-courtyard), then assign it to `J_BIAS*`, `J_SIPM*`, `J_OUT*` in the schematic.
+Files: `MCX_CONMCX013_EdgeMount.kicad_mod`, `CONMCX013.step`, `CONMCX013-LICENSE.txt`.
