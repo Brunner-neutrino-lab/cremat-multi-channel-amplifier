@@ -2575,7 +2575,7 @@
 			(at 41.37 182.34 0)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm"
+		(property "Footprint" "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal"
 			(at 39.37 180.34 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))

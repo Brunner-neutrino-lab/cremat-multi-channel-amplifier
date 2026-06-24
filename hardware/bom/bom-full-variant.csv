@@ -17,4 +17,4 @@ RV_OFS,per reference,Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical,per r
 J_BIAS,MCX,cremat:MCX_CONMCX013_EdgeMount,TE Linx CONMCX013 (343-CONMCX013-ND),1,12,Y,Per-channel HV bias in (TO CREATE footprint)
 J_SIPM,MCX,cremat:MCX_CONMCX013_EdgeMount,TE Linx CONMCX013 (343-CONMCX013-ND),1,12,Y,Per-channel detector (DC bias+signal)
 J_OUT,MCX,cremat:MCX_CONMCX013_EdgeMount,TE Linx CONMCX013 (343-CONMCX013-ND),1,12,Y,Per-channel shaped output
-J_PWR,Screw terminal 3pos,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm",Phoenix MKDS 1.5/3,1,1,Y,Shared +Vs/-Vs/GND
+J_PWR,Screw terminal 3pos,"TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal",Phoenix MKDS 1.5/3,1,1,Y,Shared +Vs/-Vs/GND

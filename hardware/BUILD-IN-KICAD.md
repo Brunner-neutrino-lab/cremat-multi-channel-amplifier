@@ -59,7 +59,17 @@ buffer for the reference's exact gain/P-Z network, or tidying placement). **Trac
 
 ## Track 6 — PCB layout
 
-1. **Update PCB from schematic** (import the netlist). Set the **stackup** (4-layer 1.6 mm
+**The board is scaffolded headless** by [gen_pcb.py](gen_pcb.py) (KiCad bundled python):
+```
+"C:/Program Files/KiCad/10.0/bin/python.exe" hardware/gen_pcb.py   # 217 footprints + nets + outline + M3 + GND zone
+bash scripts/drc.sh                                                # DRC -> reports/drc.json
+```
+That gives a `.kicad_pcb` with **every footprint placed and every net assigned** (from the
+verified netlist), a 225×235 mm outline, 4× M3 holes, and an (unfilled) GND zone. **What it is
+NOT:** routed, or arranged for manufacture — `pcbnew` has no autorouter, the parts sit on a
+grid, and the edge-launch MCX cutouts must be moved to the board edge. So the GUI work is:
+
+1. (Already done by gen_pcb.py: parts + nets imported.) Set the **stackup** (4-layer 1.6 mm
    recommended; ground plane under the analog chain).
 2. **Outline ≈ 225 × 235 mm**, 4× M3 holes — per [mechanical.md](mechanical.md). Confirm
    against the real tray interior first.

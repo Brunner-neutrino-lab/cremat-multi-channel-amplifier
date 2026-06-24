@@ -289,7 +289,7 @@ def build_all():
     jx, jy = G(40), G(180)
     jiu = uid("root", "jpwr")
     rnodes.append(sym_instance("Connector:Screw_Terminal_01x03", "J_PWR", "+Vs/-Vs/GND",
-                  "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm",
+                  "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal",
                   False, jx, jy, [("/" + ROOT, "J_PWR")], jiu))
     jp = pins_of("Connector:Screw_Terminal_01x03")
     fpx, fpy = pins_of("power:PWR_FLAG")["1"]          # flag pin offset (lib coords)

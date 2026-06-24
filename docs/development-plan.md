@@ -17,8 +17,16 @@ session) and progressed independently of its siblings.
 | 3 Integration | ✅ done | [hardware/integration-notes.md](../hardware/integration-notes.md) |
 | 4 Mechanical | ✅ done | [hardware/mechanical.md](../hardware/mechanical.md) |
 | 5 Schematic | ✅ generated, ERC 0 errors, netlist-verified | [hardware/gen_sch.py](../hardware/gen_sch.py) → `channel.kicad_sch` + `multi-channel-cremat-amplifier.kicad_sch` |
-| 6 Layout | ⏳ next (pcbnew/file-author + GUI route) | [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md) |
-| 7 Fab/Assembly | ⏳ after 6 | same guide + [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) |
+| 6 Layout | ◑ board scaffolded headless ([gen_pcb.py](../hardware/gen_pcb.py): 217 footprints + nets + outline + M3 + GND zone); **arrange + route in GUI** | [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md) |
+| 7 Fab/Assembly | ⏳ after routing | same guide + [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) |
+
+**Track 6 reality:** `pcbnew` *does* place footprints + assign nets + draw outline/zones
+headless ([gen_pcb.py](../hardware/gen_pcb.py) builds the board from the netlist), but it has
+**no autorouter** — signal routing and a manufacturable arrangement (MCX edge-cutouts aligned
+to the outline, no courtyard overlap) are the **KiCad GUI** push-and-shove router (or external
+FreeRouting via DSN/SES). The generated board is a net-assigned starting point, not a routed
+layout; `bash scripts/drc.sh` reports the ratsnest (499 unconnected) + grid-placement overlaps
+to resolve in the GUI.
 
 **Track 5 is done headless** (per [KICAD_WITH_CLAUDE_CODE.md](KICAD_WITH_CLAUDE_CODE.md)): a
 Python generator writes the `.kicad_sch` with net-labels at exact pin coords;
