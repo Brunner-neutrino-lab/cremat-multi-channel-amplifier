@@ -46,7 +46,8 @@ Full detail: [docs/hardware/channel.md](docs/hardware/channel.md).
 
 | Doc | Contents |
 |-----|----------|
-| [docs/development-plan.md](docs/development-plan.md) | **Work-track breakdown** (parts/models/BOM, circuit, integration, mechanical → schematic → layout → fab), dependencies, decisions needed |
+| [docs/agent-project/](docs/agent-project/) | **Parallel agent-developed build** — bottom-up (per-chip eval boards → single channel → 12-ch board), 12 tracks with briefs, conventions, session-log/report protocol. **Start at [docs/agent-project/README.md](docs/agent-project/README.md).** |
+| [docs/development-plan.md](docs/development-plan.md) | Earlier work-track breakdown (the rapid top-down build in `hardware/`); superseded by the agent-project for the final design |
 | [docs/architecture.md](docs/architecture.md) | System/board block diagram, channel signal chain, design partitioning |
 | [docs/modifications.md](docs/modifications.md) | **The four changes vs. `cremat-x6-board`, with rationale + the optional/DNP jumper scheme** |
 | [docs/hardware/channel.md](docs/hardware/channel.md) | Per-channel circuit: bias front-end, AC/DC coupling, CSP/shaper/BLR/buffer, jumpers |
