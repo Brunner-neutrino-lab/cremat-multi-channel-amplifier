@@ -1,0 +1,234 @@
+===== PAGE 1 =====
+CR-113-R2.1 charge sensitive preamplifier:         application guide
+General Description
+Cremat's CR-113-R2.1 is a single channel charge sensitive preamplifier 
+module intended for use with various types of radiation detectors including 
+SiPM photodiodes, photomultiplier tubes, and some gas-based detectors. 
+The    CR-113-R2.1 is one of a series of four charge sensitive preamplifiers 
+offered by Cremat, which differ from each other most notably by their 
+gain. As with all Cremat's preamplifier modules, the CR-113-R2.1 is small 
+(less than one square inch in area), allowing for compact multichannel 
+detection systems to be constructed using a modular design. 
+Package specifications
+The CR-113-R2.1 circuit is in an 8-pin SIP package (0.100" spacing). Pin 
+1 is marked with a white dot for identification.
+Detector coupling
+The CR-113-R2.1 can be used 
+either in a direct coupled (DC) 
+mode or an AC coupled mode. 
+If the detector current exceeds 
+10A, we recommend that an AC coupled mode be used to prevent the 
+resulting DC offset of the preamplifier output from saturating. more 
+information can be found at:
+http://www.cremat.com/applications/csp-application-notes/
+Typical setup
+The CR-113-R2.1 is often 
+AC-coupled to a detector in 
+the way shown here. This 
+circuit is available in the form 
+of 
+Cremat’s 
+CR-150-R5 
+evaluation board, providing a 
+socket for the CR-113-R2.1 
+module, BNC connectors, and 
+circuitry for powering the preamplifier. For more information see:
+http://www.cremat.com/home/cr-150-r5-csp-evaluation-board/
+A diagram showing how to connect the CR-113-R2.1 to a PMT is here:
+http://www.cremat.com/applications/pmts/
+Equivalent circuit diagram
+This figure shows a simplified equivalent 
+circuit diagram of the CR-113-R2.1. Pin 
+numbers 
+corresponding 
+with 
+the 
+CR-113-R2.1 preamplifier are shown.  
+Rf (68k) and Cf (750pF) are the 
+feedback 
+resistor 
+and 
+capacitor 
+respectively. 
+Input and output waveforms
+Charge sensitive preamplifiers are used when radiation is detected as a 
+series of pulses of current. These pulses of current flow into (or out of) the 
+preamplifier input. Depending on the type of detector, these pulses are 
+typically in the range of a few ns to a few s in duration. Each current 
+pulse is integrated by the feedback capacitor within the preamplifier 
+resulting in a voltage pulse at the output that is proportional to the total 
+charge in the pulse. The feedback resistor (in parallel with the feedback 
+capacitor) slowly discharges (resets) the feedback capacitor, producing an 
+exponential decay of each pulse with a time constant of 750pF x 68k = 
+50s. For this reason the pulses of current from the detector should be 
+limited in duration to only a few microseconds as longer pulses would see 
+a distortion due to this exponential decay.
+The rise time of the CR-113-R2.1 output pulses is approximately 1 ns, however the rise time 
+may be further slowed by a couple of factors. Added capacitance at the preamplifier input 
+(i.e. detector capacitance) slows the rise time at a rate of 0.09 ns/pF. The output rise time will 
+also be limited by the speed of the detector. For example, the detection current pulse from a 
+CsI(Tl)/photodiode scintillation detector has a duration of approximately a couple s, so in 
+this case the rise time of the charge sensitive preamplifier output will be at least that long.
+The output waveform of the CR-113 using a plastic scintillator/PMT detector is shown below 
+to the left. At long time domains, the output decays due to the discharge of the feedback 
+capacitor through the feedback resistor, with an RC time constant of 50 s. This decay of the 
+output waveform is also shown below, to the right. Both waveforms below show the 
+preamplifier output, but at different time domains.
+Oct. 2018
+bias in
++V
+-V
+output
+CR-113
+detector
+200M
+0.01uF
+0.01uF
+10M
+test input
+input
+GND
+GND
+GND
+output
+-V
++V
+NC
+47
+1pF
+1
+2
+3
+4
+5
+6
+7
+8
+input
+output
+GND
+GND
+GND
+NC
+-Vs
++Vs
+0.020” 0.100”
+0.12”
+0.010”
+0.82”
+0.87”
+Cremat, Inc
+CR-113
+rev. 2.1
+0.15”
+1.02”
+c r e m a t
+Cremat Inc, 950 Watertown St., Suite 3
+West Newton, MA 02465 USA
++1(617) 527-6590
+http://cremat.com
+1
+8
+6
+2, 4, 7
+Cf
+Rf
+5
++
+G= -3000
+3
+NC
+(GND)
+50
+The power dissipation of the CR-113-R2.1 is shown to 
+the left as a function of supply voltage. The minimum 
+supply voltage for good operation is +/- 6V. Any 
+supply voltage applied in excess of this figure does not 
+change or improve CR-113-R2.1 performance, but 
+instead results in unnecessary power dissipation.
+0
+100
+200
+300
+6
+7
+8
+9
+10
+11
+12
+13
+supply voltage (+/- V)
+power dissipation (mW)
+50 mV/div
+50 mV/div
+40 s/div
+40 ns/div
+*
+**
+Assume temp =20 oC, Vs =    6V, unloaded output
+CR-113-R2.1
+units
+Preamplification channels
+1
+Equivalent noise charge (ENC)*
+ENC RMS
+18,000
+electrons
+ENC slope
+30
+elect. RMS /pF
+Gain
+1.3
+mV / picoCoul.
+Rise time **
+1
+ns
+Decay time constant
+50
+s
+Unsaturated output swing
+volts
+Maximum charge detectable per event
+1.3 x1010
+electrons
+2.1
+nanoCoul.
+Output impedance
+50
+ohms
+Power supply voltage (Vs)
+maximum
+volts
+volts
+Power supply current (pos)
+mA
+Vs =   13
+Vs =   6
+-3 to +3
+minimum
+Measured with input unconnected, using Gaussian shaping amplifier with time constant =1 s.  
+With a detector attached to the input, noise from the detector capacitance, leakage current, and 
+dielectric losses will add to this figure.
+Pulse rise time (defined as the time to attain 90% of maximum value) has a linear relationship 
+with input capacitance.  Value cited in the table assumes zero added input capacitance.  To 
+calculate pulse rise time for practical situations, use the equation: tr =0.09 Cd + 1 ns, where tr 
+is the pulse rise time in ns, and Cd is the added capacitance (e.g. detector capacitance) in pF. 
+Keep in mind that others factors within the detection system may further limit this value.
+Specifications
+Output offset
++0.2 to -0.2
+3
+femtoCoul.
+volts
+Operating temperature
+-40 to +85
+oC
+5
+Power dissipation with no load
+70
+(neg)
+mA
+5
+mW
+

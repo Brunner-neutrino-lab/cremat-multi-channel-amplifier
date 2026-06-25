@@ -1,0 +1,8 @@
+# Regenerable LTspice artifacts (per 01-CONVENTIONS §8) -- reproduce with
+#   powershell -File run_ltspice.ps1 <deck>; python analyze.py <deck>
+*.raw
+*.log
+*.op.raw
+# committed SOURCE that must NOT be ignored (root .gitignore ignores *.net):
+!cr11x_csp.cir
+!cr110_validate.cir

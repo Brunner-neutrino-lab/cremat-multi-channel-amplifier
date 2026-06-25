@@ -1,0 +1,196 @@
+----- page 1 -----
+Assume temp =20 oC, Vs =    12V, unloaded output
+unless stated otherwise
+CR-210
+units
+Number of channels
+1
+Signal gain
+1
+Maximum output current
+35
+mA
+Maximum output voltage
+volts
+Output impedance
+50
+ohms
+Power supply voltage (Vs)
+maximum
+volts
+volts
+Power supply current (pos)
+mA
+Vs =   13
+Vs =   6
++Vs-0.6V
+minimum
+CR-210-R0 baseline restoration module (BLR):  application guide
+General Description
+Cremat's CR-210-R0 is a single channel baseline restoration (BLR) 
+module, intended for use with pulsed signals such as those produced by 
+nuclear detection instrumentation. The CR-210-R0 corrects the baseline 
+shift occurring in AC-coupled pulse amplifiers that may degrade the 
+resolution of the acquired pulse height spectra.
+An illustration of the problem can be seen in the scope traces below, 
+showing the output of a Gaussian shaping amplifier detecting pulses from 
+a tail pulse generator. Most pulse detection electronics utilize AC-coupled 
+amplification stages. As a result, the DC gain of these shaping amplifiers is 
+zero and thus the time averaged output from the amplifier is at ground 
+potential. While this is generally not a problem for detection instruments at 
+low or perhaps medium count rates, at high count rates the baseline of the 
+signal becomes significantly depressed, reducing the pulse height of the 
+signals with respect to ground and degrading the pulse height spectrum. 
+The scope traces below show the effect of the baseline depression with 
+increasing counting rate, and the restorative effects of the CR-210-R0 
+BLR. The input of the CR-210-R0 BLR is connected to the output of an 
+uncorrected Gaussian shaping amplifier (in this example a CR-200-1s 
+shaping amplifier module). As can be seen, the baseline of the signal at the 
+CR-210-R0 output remains at ground potential even as the count rate 
+increases to 50k/sec.
+ 
+Package Specifications
+The CR-210-R0 circuit is contacted via an 8-pin SIP connection (0.100" 
+spacing). Pin 1 is marked with a white dot for identification.
+Equivalent circuit diagram
+The figure to the right shows a 
+simplified equivalent circuit 
+diagram of the CR-210-R0.
+Implementation
+The CR-210-R0 BLR stage should be configured to follow the shaping amplifier stage. The 
+CR-210-R0 can be used with any of Cremat’s shaping amplifiers, preserving the Gaussian 
+signals with shaping times from 50 ns through 8 s. Any DC offset present at the shaping 
+amplifier output will be lost as the baseline is redefined in the CR-210-R0 circuitry. The 
+CR-210-R0 works only with signals containing positive pulses. 
+Response to changing count rates
+In situations where the count rate is changing, the baseline is of course redefined to 
+accommodate this. The scope traces below show how quickly the baseline is redefined as a 
+result of increasing count rate (correction increases the baseline with a time constant of 200 
+s), and as a result of decreasing count rates (correction decreases the baseline with a time 
+constant of 20 ms).
+ 
+BLR Efficacy
+The figure on the right shows the 
+efficacy of the CR-210-R0 circuit 
+when implemented after a CR-200-1s 
+shaper amplifier. At count rates of 
+approximately 120 kHz or more the 
+Gaussian pulses start running together 
+and the baseline can no longer be 
+preserved.
+For other shaping times, this figure can 
+be used with the count rate scaled 
+proportionately.
+Specifications
+Operating temperature
+-40 to +85
+oC
+17
+(neg)
+mA
+13
+1
+8
+5
+2,3,6,7
+4
++
++
+G=+1
+(GND)
+50
+10k
+R(large)
+G=+1
+R(small)
+C(large)
+closed when Vo
+is negative.
+Vo
+Noise
+50
+nV Hz-1/2
+without BLR
+with BLR
+low count rate
+medium count rate
+high count rate
+low count rate
+medium count rate
+high count rate
+500 mV
+20 s
+500 mV
+20 s
+500 mV
+20 s
+500 mV
+20 s
+500 mV
+20 s
+500 mV
+20 s
+500 mV
+100 s
+500 mV
+10 ms
+increasing count rate
+decreasing count rate
+Input impedance
+10k
+ohms
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+200
+count rate (kHz) (1s shaping)
+normalized pulse height
+no BLR
+implemented
+with
+CR-210 BLR
+c r e m a t
+Cremat Inc, 950 Watertown St., Suite 3
+West Newton, MA 02465 USA
++1(617) 527-6590
+http://cremat.com
+Oct. 2018
+1
+2
+3
+4
+5
+6
+7
+8
+input
+output
+GND
+GND
+GND
+-Vs
++Vs
+0.020” 0.100”
+0.145”
+0.010”
+0.82”
+0.87”
+Cremat, Inc
+CR-210
+rev. 0
+0.15”
+1.02”
+GND

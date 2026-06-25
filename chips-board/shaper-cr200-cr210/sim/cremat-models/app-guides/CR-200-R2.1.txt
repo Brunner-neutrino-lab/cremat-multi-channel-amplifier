@@ -1,0 +1,274 @@
+----- page 1 -----
+CR-200 Gaussian shaping amplifier:                    application guide
+input pulse shape
+output pulse shape
+100 mV
+1.0 V
+Figure 1. Comparison of sample input and output pulse shapes
+General Description
+The CR-200 is a Gaussian shaping amplifier module, and is used to read out the 
+“tail pulse” signals such as from charge sensitive preamplifiers, PMTs, and other 
+similar detection circuits. Gaussian shaping amplifiers are also known as ‘pulse 
+amplifiers’, ‘linear amplifiers’, or ‘spectroscopy amplifiers’ in the general literature. 
+They accept a step-like input pulse and produce an output pulse shaped like a 
+Gaussian function (bell curve). The purpose of these amplifiers is not only to 
+transform the shape of the event pulse from a tail pulse to a bell curve, but also to 
+filter much of the noise from the signal of interest. Use of shaping amplifiers will  
+reduce the fall time of the pulse signals, reducing the incidence of pulse ‘pile up’, 
+and improve the signal-to-noise of the detection system.
+The CR-200 is available in 8 different shaping times, from 50 ns to 8 s. The gain 
+and shaping times of these amplifiers are fixed. If additional gain is desired, it is 
+recommended that this be done with the application of an additional broadband 
+amplifier between the preamplifier and the CR-200 shaping amplifier. Cremat 
+offers an evaluation board (CR-160-R7) which includes a multi-stage variable-gain 
+amplifier, as well as all necessary connectors. More information on the CR-160-R7 
+evaluation board can be found at http://cremat.com
+The shaping time is defined as the time-equivalent of the "standard deviation" of the 
+Gaussian output pulse. A simpler measurement to make in the laboratory is the full 
+width of the pulse at half of it's maximum value (FWHM). This value is greater 
+than the shaping time by a factor of 2.4. For example, a Gaussian shaping amplifier 
+with a shaping time of 1.0 s would have a FWHM of 2.4 s.
+Equivalent circuit diagram
+Figure 2 shows an equivalent circuit.  Pin numbers corresponding with the CR-200 
+shaping amplifier are shown. Input components Cin and Rin form a differentiating 
+circuit. The following circuitry consists of two Sallen and Key filters, providing 4 
+poles of integration and signal gain. The numerous integration stages produce an 
+output pulse that approximates a Gaussian function.
+Pole/Zero Correction
+The long decay time of the input pulse creates a small overshoot in the shape of the 
+output pulse unless a pole/zero correction is utilized. This can be done by 
+connecting a resistor (RP/Z) between pin 1 (input) and pin 2 (P/Z). This resistor is in 
+parallel with the input capacitor (internal to the CR-200 circuit) and creates a 'zero' 
+in the amplifier's transfer function which cancels the 'pole' created by the charge 
+sensitive preamplifier's feedback resistor. To achieve proper pole/zero cancellation, 
+RP/Z should be selected so that RP/Z*Cin is equal to the decay time constant of the 
+preceding charge sensitive preamplifier output signal. Use the equation RP/Z 
+=Rf*Cf/Cin where Rf and Cf are the feedback resistor and feedback capacitor of the 
+charge sensitive preamplifier and Cin is the value of the input capacitor in the 
+CR-200. The value of Cin for the CR-200 circuit can be found in the provided table. 
+You may wish to realize RP/Z as a potentiometer so to adjust the value precisely. 
+The effect of RP/Z on the pulse shape can be seen in the pulse waveforms shown in 
+Figure 3.
+Baseline Restoration (BLR)
+The CR-200 does not contain active baseline restoration circuitry. For this reason 
+there will be a negative 'baseline shift' (change in the output DC offset) at high 
+counting rates. In order to determine whether this will be a problem for your 
+application, use the equation (valid for small baseline shifts):
+S/H = R *  * 2.5 x10-6 
+where S is the negative baseline shift, H is the pulse height, R is the count rate 
+(counts/sec), and  is the shaping time of the shaping amplifier (in s).  For 
+example, using a 1 s shaping amplifier we would predict a 0.025 (2.5%) shift in 
+the baseline at a count rate of 10,000 counts per second.
+To address this potential problem, Cremat offers the CR-210 baseline restorer. 
+More information on this circuit can be found at the cremat.com web site.
+Package Specifications
+The CR-200 circuit is contacted via an 8-pin SIP connection (0.100" spacing).  Pin 
+1 is marked with a white dot for identification.
+ 
+Typical Application
+Figure 5 shows the CR-200 in a typical application, coupled to a detector via a 
+CR-110 charge sensitive preamplifier. Depending on the requirements of your 
+application, an AC-coupled amplifier may be added between the preamplifier and 
+shaping amplifier to further increase the signal size. An optional CR-210 baseline 
+restore circuit has been added as well.
+rev. 2.1, Jan. 2017
+RP/Z resistance too high
+RP/Z resistance too low
+RP/Z resistance proper
+Figure 3
+0.85"
+0.88"
+thickness: 0.14"
+1
+2
+3 4
+5
+6
+7
+8
+Figure 4
+input
+GND
+GND
+GND
+Vs
++Vs
+P/Z
+output
+Figure 5
+broadband amplifier
+(optional)
+charge preamplifier
+shaping amplifier
+-Det bias
+input
++Vpower
+-Vpower
++Vpower
+-Vpower
+CR-110
+1 2 3 4 5 6 7 8
+detector
+CR-200
+1 2 3 4 5 6 7 8
+RP/Z
+baseline restore
+(optional)
+CR-210
+1 2 3 4 5 6 7 8
++Vpower
+-Vpower
+output
+output
+pulse
+width
+(FWHM)
+shaping
+time
+part #
+CR-200-100ns     100 ns      240 ns     220       470 pF        10
+CR-200-250ns     250 ns      590 ns     240      1000 pF       10
+CR-200-500ns     500 ns      1.2 s      510      1000 pF       10
+CR-200-1s            1 s       2.4 s      1.0 k    1000 pF       10
+CR-200-2s            2 s       4.7 s      2.0 k    1000 pF       10
+CR-200-4s            4 s       9.4 s      1.2 k    3300 pF       10
+CR-200-8s            8 s       19 s       2.4 k    3300 pF       10
+Rin
+Cin
+CR-200-50ns         50 ns      120 ns     220       220 pF          8
+gain
+Figure 2
+1
+8
+3, 6, 7
+2
+Cin
+Rin
+RP/Z
+(external)
+Cremat Inc
+CR-200-1s
+rev 2.1
+c r e m a t
+Cremat Inc, 950 Watertown St., Suite 3
+West Newton, MA 02465 USA
++1(617) 527-6590
+http://cremat.com
+----- page 2 -----
+Choosing the Optimal Shaping Time for your Application
+There are a number of considerations in the choice of the optimal shaping time for 
+your application. Consider:
+1. The shaping time must be long enough to collect the charge from the detector. 
+This may be a limiting factor in slow detectors such as gas-based drift chambers or 
+when collecting the light from slow-decay scintillators.
+2. The shaping time must be short enough to achieve the high counting rates you 
+require. Assuming randomly spaced pulses, long-shaped pulses have a higher 
+probability of 'piling up' than short pulses. Note that 'pile-up' will only be a problem 
+at very high count rates; 'Baseline shift' will start to be a problem at somewhat 
+lower count rates. See the previous section regarding 'Baseline Restoration'.
+3. Choose a shaping time that filters as much of the electronic noise as possible. 
+Electronic noise at the preamplifier output is created by a number of different 
+aspects of the detection system. Many of these 'noise components' have different 
+power spectra, allowing us to use the filtering capability of the shaping amplifier to 
+choose a shaping time that minimizes the noise for the particular detection system 
+under design. Keep in mind it may be difficult to precisely predict the shaping time 
+at which the noise will be minimum. The surest method may be to determine this 
+noise minimum experimentally by measuring the noise using a variety of shaping 
+times. 
+Example: Shaping Amplifier used in Nuclear Pulse Detection
+Shown below are two oscilloscope traces: the input (blue) and output (yellow) of 
+a Gaussian shaping amplifier (1s shaping time) reading pulses from a charge 
+sensitive preamplifier in the presence of noise. Not only does the shaping 
+amplifier amplify the pulses, but the fall time is quickened, greatly reducing the 
+problem of pulses ‘piling up’ on the tails of preceding pulses. Also, the filtering 
+effects of the shaping amplifier significantly filters the noise. This allows for 
+pulses to be clearly detected that would be otherwise buried within the noise.
+Output Characteristics
+The CR-200 shaping amplifiers have low output impedance (<5) and can 
+source/sink 20 mA of output current. This may not be sufficient to drive a 
+terminated cable in your application, depending on the size of the signal. For this 
+reason it is best to use a cable driver circuit at the CR-200 output to make 
+maximum use of the CR-200 output voltage swing capability. The unloaded 
+output voltage swing comes to within 0.5 volt of the power supply rails. There is 
+an exception to this: the CR-200-50ns becomes somewhat non-linear for output 
+pulses exceeding +/-6V.
+0.01
+0.1
+10
+freq. (MHz)
+gain
+0.1
+10
+0.001
+8s
+4s 2s 1s 500ns
+250ns
+100ns
+50ns
+CR-200 Bandpass filtering properties 
+Assume temp =20°C, Vs =     9V, unloaded output
+CR-200
+units
+amplification channels
+1
+input noise voltage
+V RMS
+output impedance
+<5
+
+power supply voltage (Vs)
+absolute maximum
+volts
+volts
+quiescent power supply current
+Vs =   13
+minimum
+Specifications
+output offset
+-40 to +40
+mV
+mA
+polarity
+operating temperature range
+non-inverting
+-40 C to 85 C
+7
+CR-200-100ns
+CR-200-250ns
+CR-200-1s
+CR-200-4s
+90
+60
+36
+24
+V RMS
+V RMS
+V RMS
+maximum output current
+mA
+20
+output temperature coefficient
+-60 to +60
+V /  C
+Vs =    5
+maximum output swing*
+* for CR-200-50ns maximum output is +/-6V or Vs-0.5, whichever is less.
+volts
+Vs-0.5
+CR-200-500ns
+47
+V RMS
+CR-200-2s
+30
+V RMS
+CR-200-8s
+22
+V RMS
+CR-200-50ns
+115
+V RMS
+c r e m a t
+Cremat Inc, 950 Watertown St., Suite 3
+West Newton, MA 02465 USA
++1(617) 527-6590
+http://cremat.com

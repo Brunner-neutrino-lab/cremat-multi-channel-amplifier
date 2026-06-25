@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "cremat")(type "KiCad")(uri "${KIPRJMOD}/lib/cremat.kicad_sym")(options "")(descr "Cremat SIP-8 modules (CR-11X/CR-112) for the standalone CSP eval board"))
+)

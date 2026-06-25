@@ -1,0 +1,241 @@
+Measured with input unconnected, using Gaussian shaping amplifier with time constant =1 s.  
+With a detector attached to the input, noise from the detector capacitance, leakage current, and 
+dielectric losses will add to this figure.
+Pulse rise time (defined as the time to attain 90% of maximum value) has a linear relationship 
+with input capacitance.  Value cited in the table assumes zero added input capacitance.  To 
+calculate pulse rise time for practical situations, use the equation: tr =0.22 Cd + 3 ns, where tr 
+is the pulse rise time in ns, and Cd is the added capacitance (e.g. detector capacitance) in pF. 
+Others factors within the detection system may further limit this value.
+CR-110-R2.2 charge sensitive preamplifier:        application guide
+General Description
+Cremat's CR-110-R2.2 is a single channel charge sensitive preamplifier 
+module intended for use with various types of radiation detectors including 
+semiconductor detectors (e.g. CdTe and CZT), p-i-n photodiodes, 
+avalanche photodiodes (APDs), and various gas-based detectors. The    
+CR-110-R2.2 is one of a series of four charge sensitive preamplifiers 
+offered by Cremat, which differ from each other most notably by their 
+gain. As with all Cremat's preamplifier modules, the CR-110-R2.2 is small 
+(less than one square inch in area), allowing for compact multichannel 
+detection systems to be constructed using a modular design. 
+Package specifications
+The CR-110-R2.2 circuit is in an 8-pin SIP package (0.100" spacing). Pin 
+1 is marked with a white dot for identification.
+Detector coupling
+The CR-110-R2.2 can be used 
+either in a direct coupled (DC) 
+mode or an AC coupled mode. If the detector current exceeds 1 nA, it is 
+recommended that an AC coupled mode be used to prevent the resulting 
+DC offset of the preamplifier output from saturating. more information can 
+be found at:
+https://www.cremat.com/applications/csp-application-notes/
+Typical setup
+The CR-110-R2.2 is often 
+AC-coupled to a detector in 
+the way shown here. This 
+circuit is available in the form 
+of 
+Cremat’s 
+CR-150-R6 
+evaluation board, providing a 
+socket for the CR-110-R2.2 
+module, BNC connectors, and 
+circuitry for powering the preamplifier. For more information see:
+https://www.cremat.com/CR-150-R6/
+Equivalent circuit diagram
+This 
+figure 
+shows 
+a 
+simplified 
+equivalent circuit diagram of the      
+CR-110-R2.2, which is a two stage 
+amplifier. The first stage is a high gain, 
+charge sensitive preamplifier and the 
+second stage is low gain voltage 
+amplifier. Pin numbers corresponding 
+with the CR-110-R2.2 preamplifier are 
+shown. Rf (100M) and Cf (1.4pF) are the feedback resistor and capacitor 
+respectively. An LTspice model of the CR-110-R2.2 is available on the 
+Cremat web site. LTspice is freeware computer software implementing a 
+SPICE simulator of electronic circuits, produced by semiconductor 
+manufacturer Analog Devices. 
+Input and output waveforms
+Charge sensitive preamplifiers are used when radiation is detected as a 
+series of pulses of current. These pulses of current flow into (or out of) the 
+preamplifier input. Depending on the type of detector, these pulses are 
+typically in the range of a few ns to a few s in duration. Each current 
+pulse is integrated by the feedback capacitor within the preamplifier 
+resulting in a voltage pulse at the output that is proportional to the total 
+charge in the pulse. The feedback resistor (in parallel with the feedback 
+capacitor) slowly discharges (resets) the feedback capacitor, producing an 
+exponential decay of each pulse with a time constant = 1.4pF x 100Mohms 
+= 140s. For this reason the pulses of current from the detector should be limited in duration 
+to only a few microseconds as longer pulses see a distortion due to this exponential decay.
+The rise time of the CR-110-R2.2 output pulses is approximately 3 ns, however the rise time 
+may be further slowed by a couple of factors. Added capacitance at the preamplifier input 
+(i.e. detector capacitance) slows the rise time at a rate of 0.22 ns/pF. The output rise time will 
+also be limited by the speed of the detector. For example, the detection current pulse from a 
+CsI(Tl)/photodiode scintillation detector has a duration of approximately a couple s, so in 
+this case the rise time of the charge sensitive preamplifier output will be at least that long.
+The output waveform of the CR-110-R2.2 using a capacitively-coupled fast square wave 
+pulser at the input is shown below in two figures. The rise time of the preamplifier is evident 
+in the figure on the left. At long time domains, the 140 s output decay is evident in the 
+figure on the right. Both figures below show the same preamplifier output. They differ 
+only in the time domain. 
+July 2023
+1
+8
+6
+2, 4, 7
+Cf
+Rf
+5
++
++
+G= -3k
+G=+2
+3
+NC
+50
+Cremat Inc, 950 Watertown St., Suite 3
+West Newton, MA 02465 USA
++1(617) 527-6590
+https://www.cremat.com
+bias in
++V
+-V
+output
+CR-110
+detector
+200M
+0.01uF
+0.01uF
+10M
+test input
+input
+GND
+GND
+GND
+output
+-V
++V
+NC
+47
+1pF
+1
+2
+3
+4
+5
+6
+7
+8
+input
+output
+GND
+GND
+GND
+NC
+-Vs
++Vs
+0.020” 0.100”
+0.12”
+0.010”
+0.82”
+0.87”
+Cremat, Inc
+CR-110
+rev. 2.2
+0.15”
+1.02”
+*
+**
+Assume temp =20 oC, Vs =    6V, unloaded output
+CR-110-R2.2
+units
+Preamplification channels
+1
+Equivalent noise charge (ENC)*
+ENC RMS
+200
+electrons
+Equivalent noise in silicon
+1.7
+keV (FWHM)
+2.4
+keV (FWHM)
+ENC slope
+3.8
+elect. RMS /pF
+Gain
+1.4
+volts /pC
+Rise time **
+3
+ns
+Decay time constant
+140
+s
+Unsaturated output swing
+volts
+Maximum charge detectable per event
+1.3 x107
+electrons
+2.1
+pC
+Output impedance
+50
+ohms
+Power supply voltage (Vs)
+maximum
+volts
+volts
+Power supply current (pos)
+mA
+Vs =   13
+Vs =   6
+-3 to +3
+minimum
+Equivalent noise in CdZnTe
+Specifications
+Output offset
++0.2 to -0.2
+0.03
+femtoCoul.
+volts
+Operating temperature
+-40 to +85
+oC
+9
+Power dissipation with no load
+85
+(neg)
+mA
+6
+mW
+0
+100
+200
+300
+400
+6
+7
+8
+9
+10
+11
+12
+13
+supply voltage (+/- V)
+The power dissipation of the CR-110-R2.2 is shown to 
+the left as a function of supply voltage. The minimum 
+supply voltage for good operation is +/- 6V. Any 
+supply voltage applied in excess of this figure does not 
+change or improve CR-110-R2.2 performance, but 
+instead results in unnecessary power dissipation.
+10 ns
+100 mV
+100 s
+100 mV
+62
+mV / MeV (Si)

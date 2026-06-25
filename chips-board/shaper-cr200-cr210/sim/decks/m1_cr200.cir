@@ -1,0 +1,35 @@
+* ============================================================================
+* A5 shaper-sim  M1 : CR-200-1us shaper, single CSP-event response
+* Genuine Cremat CR-200-1us LTspice model (cremat.com, retrieved 2026-06-25).
+* Stimulus = representative CR-112 CSP output for a 0.5 pC event:
+*   step 6.5 mV (= 13 mV/pC x 0.5 pC), rise ~3 ns, exp decay tau_csp = 51 us (Rf*Cf).
+* Pole-zero resistor RP/Z = Rf*Cf/Cin = 51us/1nF = 51 k (datasheet rule) across pins 1-2.
+* Three OUT nodes compared:
+*   OUTPZ  -> CR-200 with correct P/Z 51 k   (the as-built channel)
+*   OUTNOP -> CR-200 with NO P/Z (open)        (shows the decay-induced overshoot/undershoot)
+*   OUTLOW -> CR-200 with too-low RP/Z = 10 k  (datasheet "RP/Z too low" case)
+* ============================================================================
+.include models.inc
+.include cr200_1us.sub
+
+* ---- supplies (datasheet/eval board +/-12 V) ----
+Vp VP 0 12
+Vn VN 0 -12
+
+* ---- representative CR-112 CSP output: 6.5 mV step, 3 ns rise, 51 us decay ----
+* B-source: turns on at t0=1us; (1-exp(-(t-t0)/3ns)) edge times exp(-(t-t0)/51us) tail.
+.param t0=1u  Vstep=6.5m  trise=3n  tdec=51u
+Bcsp CSP 0 V = (time<t0) ? 0 : Vstep*(1-exp(-(time-t0)/trise))*exp(-(time-t0)/tdec)
+Rcsp CSP 0 1G
+
+* ---- three CR-200 instances sharing the same CSP stimulus ----
+* ports: IN OUT PZ VN VP
+XA CSP OUTPZ  PZA VN VP CR200_1US
+RpzA CSP PZA 51k
+XB CSP OUTNOP PZB VN VP CR200_1US
+RpzB PZB 0 1G
+XC CSP OUTLOW PZC VN VP CR200_1US
+RpzC CSP PZC 10k
+
+.tran 0 20u 0 5n
+.end

@@ -27,6 +27,9 @@ sim/netlists/
 *.dsn
 *.ses
 
+# Local toolchain binaries (portable Java runtime + FreeRouting jar; re-download per docs/FREEROUTING.md)
+tools/
+
 # Python
 __pycache__/
 *.pyc

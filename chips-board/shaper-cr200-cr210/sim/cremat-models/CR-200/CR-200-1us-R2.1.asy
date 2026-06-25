@@ -1,0 +1,20 @@
+Version 4
+SymbolType BLOCK
+RECTANGLE Normal -80 -48 80 80
+TEXT -89 -86 Left 2 CR-200-1us-R2.1
+WINDOW 0 2 -49 Bottom 2
+PIN -64 80 VLEFT 8
+PINATTR PinName input
+PINATTR SpiceOrder 1
+PIN 64 80 VLEFT 8
+PINATTR PinName output
+PINATTR SpiceOrder 2
+PIN -32 80 VLEFT 8
+PINATTR PinName pole-zero
+PINATTR SpiceOrder 3
+PIN 0 80 VLEFT 8
+PINATTR PinName -Vsupply
+PINATTR SpiceOrder 4
+PIN 32 80 VLEFT 8
+PINATTR PinName +Vsupply
+PINATTR SpiceOrder 5

@@ -1,0 +1,55 @@
+* ============================================================================
+* A5 shaper-sim  M2 : CR-200 -> CR-210 baseline restorer, with JU1 bypass (populate-XOR)
+* Genuine Cremat CR-200-1us + CR-210-R0 LTspice models (cremat.com, 2026-06-25).
+*
+* Goal: reproduce the CR-210 datasheet result -- at high count rate an AC-coupled shaper
+* baseline droops; the CR-210 restores it to ground. Two parallel paths fed by the SAME
+* CR-200 shaper output through identical AC coupling, modelling the CR-160-R7 JU1 jumper:
+*   BLR OFF (JU1 shorted): CR-200 -> Cc -> 10k load           -> OUT_OFF (baseline droops)
+*   BLR ON  (JU1 open)   : CR-200 -> Cc -> CR-210 (10k Zin)   -> OUT_ON  (baseline held)
+*
+* CSP train physically synthesized so tails SUPERPOSE (true pile-up): a train of 0.5 pC
+* charge impulses into a CR-112 feedback node (Cf=75p, Rf=680k => 6.67 mV step, 51 us decay).
+* Count rate 100 kHz (Tper 10 us). Datasheet predicts S/H = R*tau*2.5e-6 ~ 25% at this rate.
+* ============================================================================
+.include models.inc
+.include cr200_1us.sub
+.include cr210.sub
+
+* ---- supplies ----
+Vp VP 0 12
+Vn VN 0 -12
+
+* ---- CR-112-style CSP output train, analytic pile-up superposition (B-source) ----
+* Each 0.5 pC event => Vstep = 0.5pC/75pF = 6.667 mV step that decays with tau_csp = 51 us
+* (= Rf*Cf, CR-112 datasheet). At 100 kHz the tails SUPERPOSE; the exact response to a
+* periodic impulse train switched on at t0 is the buildup of a geometric series:
+*   CSP(t) = Vstep * exp(-phi/tau) * (1 - r^(n+1)) / (1 - r)
+* where, for t>=t0: n = floor((t-t0)/Tper) = #events so far, phi = (t-t0) - n*Tper = time
+* since the last event, and r = exp(-Tper/tau) is the per-period decay. This is exact and
+* step-independent (no charge-integration / timestep sensitivity), and shows the baseline
+* building up over ~5 tau_csp just like the physical CSP. (Cross-checked vs the RC-integrator
+* charge-injection model at fine timestep: identical step height & decay.)
+.param Vstep=6.667m tau=51u Tper=10u t0=1u
+.param r=exp(-Tper/tau)
+Bcsp CSP 0 V = (time<t0) ? 0 :
++   Vstep*exp(-( (time-t0) - floor((time-t0)/Tper)*Tper )/tau)
++        *(1 - pow(r, floor((time-t0)/Tper)+1))/(1-r)
+Rcsp CSP 0 1G
+
+* ---- CR-200 shaper, correct P/Z 51 k ----
+Xsh CSP SHOUT PZ VN VP CR200_1US
+Rpz CSP PZ 51k
+
+* ---- identical AC coupling into each path (100 V-rated Cc on the real HV board) ----
+* BLR-OFF reference path: Cc into a 10k load (= the CR-210 input impedance, for fairness)
+Coff SHOUT NOFF 100n
+Roff NOFF 0 10k
+Eoff OUT_OFF 0 NOFF 0 1      ; ideal buffer just to name/observe the drooping node
+
+* BLR-ON path: identical Cc into the genuine CR-210 (its R1=10k is the 10k input load)
+Con SHOUT NON 100n
+Xblr NON OUT_ON VN VP CR210
+
+.tran 0 4m 0 20n
+.end

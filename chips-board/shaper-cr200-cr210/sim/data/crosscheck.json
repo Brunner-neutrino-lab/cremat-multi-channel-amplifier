@@ -1,0 +1,10 @@
+{
+  "tau_s_us": 0.5047205893000937,
+  "beh_peaking_us": 2.0188823572003747,
+  "beh_fwhm_us": 2.4000002254079513,
+  "model_peaking_us": 2.500345080302642,
+  "model_fwhm_us": 2.5018826185010976,
+  "peaking_agree_pct": 19.255850998134665,
+  "fwhm_agree_pct": 4.07222914215636,
+  "verdict": "CONSISTENT on FWHM (shaping time); peaking-time offset expected from the idealised equal-pole assumption"
+}

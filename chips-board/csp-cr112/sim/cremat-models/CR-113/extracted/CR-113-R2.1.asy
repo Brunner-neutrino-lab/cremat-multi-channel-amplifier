@@ -1,0 +1,17 @@
+Version 4
+SymbolType BLOCK
+RECTANGLE Normal -112 -80 16 48
+TEXT -117 -117 Left 2 CR-113-R2.1
+WINDOW 0 -47 -80 Bottom 2
+PIN -96 48 VLEFT 8
+PINATTR PinName input
+PINATTR SpiceOrder 1
+PIN -32 48 VLEFT 8
+PINATTR PinName +Vsupply
+PINATTR SpiceOrder 2
+PIN -64 48 VLEFT 8
+PINATTR PinName -Vsupply
+PINATTR SpiceOrder 3
+PIN 0 48 VLEFT 8
+PINATTR PinName output
+PINATTR SpiceOrder 4

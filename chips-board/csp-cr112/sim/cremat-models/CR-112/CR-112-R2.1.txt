@@ -1,0 +1,233 @@
+===== PAGE 1 =====
+CR-112-R2.1 charge sensitive preamplifier:         application guide
+General Description
+Cremat's CR-112-R2.1 is a single channel charge sensitive preamplifier 
+module intended for use with various types of radiation detectors including 
+silicon photodiodes, avalanche photodiodes (APDs), and various gas-based 
+detectors. The CR-112-R2.1 is one of a series of four charge sensitive 
+preamplifiers offered by Cremat, which differ from each other most 
+notably by their gain. As with all Cremat's preamplifier modules, the 
+CR-112-R2.1 is small (less than one square inch in area), allowing for 
+compact multichannel detection systems to be constructed using a modular 
+design. 
+Package specifications
+The CR-112-R2.1 circuit is in an 8-pin SIP package (0.100" spacing). Pin 
+1 is marked with a white dot for identification.
+Detector coupling
+The CR-112-R2.1 can be used 
+either in a direct coupled (DC) 
+mode or an AC coupled mode. 
+If the detector current exceeds 1A, it is recommended that an AC coupled 
+mode be used to prevent the resulting DC offset of the preamplifier output 
+from saturating. more information can be found at:
+http://www.cremat.com/applications/csp-application-notes/
+Typical setup
+The CR-112-R2.1 is often 
+AC-coupled to a detector in 
+the way shown here. This 
+circuit is available in the form 
+of 
+Cremat’s 
+CR-150-R5 
+evaluation board, providing a 
+socket for the CR-112-R2.1 
+module, BNC connectors, and 
+circuitry for powering the preamplifier. For more information see:
+http://www.cremat.com/home/cr-150-r5-csp-evaluation-board/
+Equivalent circuit diagram
+This figure shows a simplified equivalent 
+circuit diagram of the CR-112-R2.1. Pin 
+numbers 
+corresponding 
+with 
+the 
+CR-112-R2.1 preamplifier are shown.  
+Rf (680k) and Cf (75pF) are the 
+feedback 
+resistor 
+and 
+capacitor 
+respectively. 
+Input and output waveforms
+Charge sensitive preamplifiers are used when radiation is detected as a 
+series of pulses of current. These pulses of current flow into (or out of) the 
+preamplifier input. Depending on the type of detector, these pulses are 
+typically in the range of a few ns to a few s in duration. Each current 
+pulse is integrated by the feedback capacitor within the preamplifier 
+resulting in a voltage pulse at the output that is proportional to the total 
+charge in the pulse. The feedback resistor (in parallel with the feedback 
+capacitor) slowly discharges (resets) the feedback capacitor, producing an 
+exponential decay of each pulse with a time constant of 75pF x 680k = 
+50s. For this reason the pulses of current from the detector should be 
+limited in duration to only a few microseconds as longer pulses would see 
+a distortion due to this exponential decay.
+The rise time of the CR-112-R2.1 output pulses is approximately 3 ns, 
+however the rise time may be further slowed by a couple of factors. Added 
+capacitance at the preamplifier input (i.e. detector capacitance) slows the rise time at a rate of 
+0.13 ns/pF. The output rise time will also be limited by the speed of the detector. For 
+example, the detection current pulse from a CsI(Tl)/photodiode scintillation detector has a 
+duration of approximately a couple s, so in this case the rise time of the charge sensitive 
+preamplifier output will be at least that long.
+The output waveform of the CR-112-R2.1 using a capacitively-coupled fast square wave 
+pulser at the input is shown below in two figures. The rise time of the preamplifier is evident 
+in the figure on the left. At long time domains, the 50 s output decay is evident in the figure 
+on the right. Both figures below show the same preamplifier output. They differ only in 
+the time domain. 
+Oct. 2018
+bias in
++V
+-V
+output
+CR-112
+detector
+200M
+0.01uF
+0.01uF
+10M
+test input
+input
+GND
+GND
+GND
+output
+-V
++V
+NC
+47
+1pF
+1
+2
+3
+4
+5
+6
+7
+8
+input
+output
+GND
+GND
+GND
+NC
+-Vs
++Vs
+0.020” 0.100”
+0.12”
+0.010”
+0.82”
+0.87”
+Cremat, Inc
+CR-112
+rev. 2.1
+0.15”
+1.02”
+*
+**
+Assume temp =20 oC, Vs =    6V, unloaded output
+CR-112-R2.1
+units
+Preamplification channels
+1
+Equivalent noise charge (ENC)*
+ENC RMS
+7000
+electrons
+ENC slope
+30
+elect. RMS /pF
+Gain
+13
+mV / picoCoul.
+Rise time **
+3
+ns
+Decay time constant
+50
+s
+Unsaturated output swing
+volts
+Maximum charge detectable per event
+1.3 x109
+electrons
+210
+pC
+Output impedance
+50
+ohms
+Power supply voltage (Vs)
+maximum
+volts
+volts
+Power supply current (pos)
+mA
+Vs =   13
+Vs =   6
+-3 to +3
+minimum
+Measured with input unconnected, using Gaussian shaping amplifier with time constant =1 s.  
+With a detector attached to the input, noise from the detector capacitance, leakage current, and 
+dielectric losses will add to this figure.
+Pulse rise time (defined as the time to attain 90% of maximum value) has a linear relationship 
+with input capacitance.  Value cited in the table assumes zero added input capacitance.  To 
+calculate pulse rise time for practical situations, use the equation: tr =0.13 Cd + 3 ns, where tr 
+is the pulse rise time in ns, and Cd is the added capacitance (e.g. detector capacitance) in pF. 
+Others factors within the detection system may further limit this value.
+Specifications
+Output offset
++0.2 to -0.2
+1.1
+femtoCoul.
+volts
+Operating temperature
+-40 to +85
+oC
+5
+Power dissipation with no load
+70
+(neg)
+mA
+5
+mW
+c r e m a t
+Cremat Inc, 950 Watertown St., Suite 3
+West Newton, MA 02465 USA
++1(617) 527-6590
+http://cremat.com
+1
+8
+6
+2, 4, 7
+Cf
+Rf
+5
++
+G= -3000
+3
+NC
+(GND)
+50
+10 mV/div
+10 ns/div
+10 mV/div
+40 s/div
+The power dissipation of the CR-112-R2.1 is shown to 
+the left as a function of supply voltage. The minimum 
+supply voltage for good operation is +/- 6V. Any 
+supply voltage applied in excess of this figure does not 
+change or improve CR-112-R2.1 performance, but 
+instead results in unnecessary power dissipation.
+0
+100
+200
+300
+6
+7
+8
+9
+10
+11
+12
+13
+supply voltage (+/- V)
+power dissipation (mW)
+

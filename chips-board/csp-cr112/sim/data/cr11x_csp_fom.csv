@@ -1,0 +1,7 @@
+metric,value
+peak_amplitude_mV,-6.66405
+charge_gain_mV_per_pC,-13.3281
+rise_time_10_90_ns,3.35971
+decay_tau_us,51.0034
+peak_time_us,1.012
+Q_injected_pC,0.5
