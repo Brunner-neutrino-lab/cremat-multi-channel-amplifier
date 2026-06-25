@@ -59,55 +59,72 @@ def main():
         for ref, pad in nodes:
             pad_net[(ref, pad)] = name
 
-    # --- per-channel ROW placement -------------------------------------------------
-    # Map each reference -> (channel index, role) by replaying gen_sch's ref assignment.
-    cnt = {}; ref2cr = {}
+    # --- per-channel ROW placement (bounding-box packed -> guaranteed no overlap) ---
+    # (n, role) -> reference, replaying gen_sch's ref assignment, then pack each channel
+    # left->right by real footprint extents (signal flows along the strip).
+    cnt = {}; cr2ref = {}
     for n in range(12):
         for role, *_ in gen_sch.CH:
             pfx = gen_sch.prefix_of(role); cnt[pfx] = cnt.get(pfx, 0) + 1
-            ref2cr["%s%d" % (pfx, cnt[pfx])] = (n, role)
-    # role -> (x mm within the channel strip, rotation deg). Signal flows left->right:
-    # J_BIAS | filter | J_SIPM + Cc | CR-11X | CR-200 + P/Z | CR-210 | buffer | R_OUT | J_OUT
-    # NB: the SIP-8 (PinHeader_1x08) footprints have their origin at pin 1 and extend
-    # ~20 mm in +x, so modules are spaced ~26 mm; 0805/MCX origins are centered.
-    ROLE_X = {
-        "J_BIAS": (6, 0), "JP_Rf1": (18, 90), "Rf1": (24, 90), "Cf": (30, 90),
-        "Rf2": (36, 90), "JP_Rf2": (42, 90), "J_SIPM": (52, 0), "Cc": (62, 90),
-        "U_CSP": (70, 0), "U_SHAPER": (96, 0), "RV_PZ": (124, 0), "U_BLR": (134, 0),
-        "U_BUF": (160, 0), "R_OUT": (170, 90), "J_OUT": (184, 0),
-        "C_dvp": (196, 90), "C_dvn": (204, 90),
-    }
-    ROW_PITCH, TOP, XOFF = 18.0, 12.0, 4.0
+            cr2ref[(n, role)] = "%s%d" % (pfx, cnt[pfx])
     MCX_ROLES = ("J_BIAS", "J_SIPM", "J_OUT")
-    placed = miss = 0
-    for ref in sorted(comps):
-        val, fpid = comps[ref]
-        if ":" not in fpid:
-            miss += 1; continue
-        nick, fname = fpid.split(":", 1)
-        fp = pcbnew.FootprintLoad(fp_dir(nick), fname)
-        if fp is None:
-            miss += 1; print("MISS footprint:", fpid, "for", ref); continue
-        fp.SetReference(ref); fp.SetValue(val)
-        if ref in ref2cr:
-            n, role = ref2cr[ref]
-            x, rot = ROLE_X.get(role, (210, 0))
-            fp.SetPosition(V(XOFF + x, TOP + n * ROW_PITCH))
-            if rot:
-                fp.SetOrientationDegrees(rot)
-            if role in MCX_ROLES:           # move the footprint's Edge.Cuts cutout to
-                for it in fp.GraphicalItems():   # Dwgs.User so the board outline stays one
-                    if it.GetLayer() == pcbnew.Edge_Cuts:  # clean rect (re-cut edges in GUI
-                        it.SetLayer(pcbnew.Dwgs_User)       # when mechanically placing jacks)
-        else:
-            fp.SetPosition(V(12, TOP + 12 * ROW_PITCH + 8))  # J_PWR below the channel array
+    PITCH, TOP, LEFT, GAP = 16.0, 20.0, 8.0, 1.6   # PITCH > tallest courtyard (MCX ~11.4)
+
+    def bbox_mm(fp):
+        try: bb = fp.GetBoundingBox(False, False)   # exclude text
+        except TypeError: bb = fp.GetBoundingBox()
+        return (bb.GetLeft() / 1e6, bb.GetRight() / 1e6, bb.GetTop() / 1e6, bb.GetBottom() / 1e6)
+
+    SIP_ROLES = ("U_CSP", "U_SHAPER", "U_BLR")   # 21mm-tall SIP-8 -> rotate flat into the row
+
+    def place(fp, role, x, row_y):
+        """Place fp so its bbox left edge sits at x (vertically centered on row_y); return new x."""
+        if role in SIP_ROLES:
+            fp.SetOrientationDegrees(90)          # lay the SIP module horizontal (21mm wide)
+        fp.SetPosition(V(0, 0))
+        L, R, T, B = bbox_mm(fp)
+        fp.SetPosition(V(x - L, row_y - (T + B) / 2.0))
+        if role in MCX_ROLES:                # move the MCX Edge.Cuts cutout to Dwgs.User so
+            for it in fp.GraphicalItems():   # the outline stays one clean rectangle (re-cut
+                if it.GetLayer() == pcbnew.Edge_Cuts:   # edges in GUI when placing jacks).
+                    it.SetLayer(pcbnew.Dwgs_User)
+        return x + (R - L) + GAP
+
+    def add_with_nets(fp, ref):
         b.Add(fp)
         for pad in fp.Pads():
             key = (ref, pad.GetNumber())
             if key in pad_net:
                 pad.SetNet(netmap[pad_net[key]])
+
+    placed = miss = 0; maxx = 0.0
+    for n in range(12):
+        row_y, x = TOP + n * PITCH, LEFT
+        for role, *_ in gen_sch.CH:
+            ref = cr2ref[(n, role)]; val, fpid = comps.get(ref, ("", ""))
+            if ":" not in fpid: miss += 1; continue
+            nick, fname = fpid.split(":", 1)
+            fp = pcbnew.FootprintLoad(fp_dir(nick), fname)
+            if fp is None: miss += 1; print("MISS", fpid, ref); continue
+            fp.SetReference(ref); fp.SetValue(val)
+            x = place(fp, role, x, row_y)
+            add_with_nets(fp, ref)
+            placed += 1
+        maxx = max(maxx, x)
+    # parts not in any channel (J_PWR) -> a clear row below the array
+    done = set(cr2ref.values()); px = LEFT
+    for ref in sorted(comps):
+        if ref in done: continue
+        val, fpid = comps[ref]
+        if ":" not in fpid: miss += 1; continue
+        nick, fname = fpid.split(":", 1)
+        fp = pcbnew.FootprintLoad(fp_dir(nick), fname)
+        if fp is None: miss += 1; continue
+        fp.SetReference(ref); fp.SetValue(val)
+        px = place(fp, None, px, TOP + 12 * PITCH + 8)
+        add_with_nets(fp, ref)
         placed += 1
-    print("placed %d footprints, %d missing" % (placed, miss))
+    print("placed %d footprints, %d missing; channel-strip width ~%.0f mm" % (placed, miss, maxx))
 
     # board outline 225 x 235 mm (rectangle on Edge.Cuts)
     W, H = 225.0, 235.0
@@ -121,10 +138,10 @@ def main():
 
     # 4x M3 mounting holes
     try:
-        for (hx, hy) in [(6, 6), (W - 6, 6), (6, H - 6), (W - 6, H - 6)]:
+        for i, (hx, hy) in enumerate([(6, 6), (W - 6, 6), (6, H - 6), (W - 6, H - 6)], 1):
             h = pcbnew.FootprintLoad("%s/MountingHole.pretty" % STOCK_FP, "MountingHole_3.2mm_M3")
             if h:
-                h.SetPosition(V(hx, hy)); b.Add(h)
+                h.SetReference("H%d" % i); h.SetPosition(V(hx, hy)); b.Add(h)
     except Exception as e:
         print("mounting holes:", e)
 
@@ -159,10 +176,14 @@ def write_netclasses():
         return
     d = json.load(open(pro, encoding="utf-8"))
     ns = d.setdefault("net_settings", {})
+    # hv_bias clearance 0.6mm: IPC-2221 external-uncoated creepage for <=60V, and >=0805
+    # pad-gap (~0.9mm) so the bias-filter / AC-coupling 0805s don't self-violate. (The
+    # coupling cap Cc bridges HV->amp across its own 0.9mm; its 100V rating provides that
+    # isolation, not PCB creepage.) Add conformal coating for extra margin.
     ns["classes"] = [
         {"name": "Default", "clearance": 0.2, "track_width": 0.2032, "via_diameter": 0.8, "via_drill": 0.4},
         {"name": "power",   "clearance": 0.2, "track_width": 0.5,    "via_diameter": 0.8, "via_drill": 0.4},
-        {"name": "hv_bias", "clearance": 1.0, "track_width": 0.4,    "via_diameter": 0.9, "via_drill": 0.4},
+        {"name": "hv_bias", "clearance": 0.6, "track_width": 0.4,    "via_diameter": 0.9, "via_drill": 0.4},
         {"name": "signal",  "clearance": 0.2, "track_width": 0.33,   "via_diameter": 0.8, "via_drill": 0.4},
     ]
     ns["netclass_patterns"] = [
@@ -172,7 +193,10 @@ def write_netclasses():
         {"netclass": "power", "pattern": "-VDC"},
     ]
     json.dump(d, open(pro, "w", encoding="utf-8"), indent=2)
-    print("re-applied net classes to .kicad_pro")
+    dru = os.path.join(HERE, "multi-channel-cremat-amplifier.kicad_dru")
+    if os.path.exists(dru):
+        os.remove(dru)   # the 1.0mm custom rule is superseded by the 0.6mm netclass
+    print("re-applied net classes (.kicad_pro)")
 
 if __name__ == "__main__":
     main()

@@ -285,7 +285,7 @@
       },
       {
         "name": "hv_bias",
-        "clearance": 1.0,
+        "clearance": 0.6,
         "track_width": 0.4,
         "via_diameter": 0.9,
         "via_drill": 0.4
