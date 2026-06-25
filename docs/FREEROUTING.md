@@ -4,6 +4,22 @@ KiCad has no built-in autorouter. The standard route is: **KiCad → Specctra `.
 FreeRouting (autoroute) → Specctra `.ses` → KiCad**. This repo provides scripts for the
 KiCad ends; FreeRouting is a separate free tool.
 
+> **This board was autorouted this way — DRC 0/0/0, 0 unconnected** (see
+> [../hardware/routed-top.png](../hardware/routed-top.png)). Verified recipe:
+> **FreeRouting v2.2.4** (`freerouting-2.2.4.jar`, needs **Java 25**) +
+> **4-layer board with GND plane (In1) and −VDC plane (In2)** so both outer layers are
+> free to route. That combination routed all 480 nets; on 2 layers it left ~9 −VDC
+> unrouted. Exact commands:
+> ```
+> "C:/Program Files/KiCad/10.0/bin/python.exe" hardware/gen_pcb.py     # 4-layer, planes
+> "C:/Program Files/KiCad/10.0/bin/python.exe" hardware/export_dsn.py  # -> .dsn
+> java -jar freerouting-2.2.4.jar -de hardware/...dsn -do hardware/...ses   # ~45 s
+> "C:/Program Files/KiCad/10.0/bin/python.exe" hardware/import_ses.py hardware/...ses
+> "C:/Program Files/KiCad/10.0/bin/python.exe" hardware/fill_zones.py  # planes + outer GND fill
+> bash scripts/drc.sh                                                  # 0/0/0
+> ```
+> Get Java 25 (Temurin JRE) from adoptium.net; the FreeRouting jar from the releases below.
+
 > **Prerequisite — clean placement first.** The Specctra `.dsn` exporter (and a good
 > autoroute) require **no overlapping copper**. The headless auto-placement in
 > [hardware/gen_pcb.py](../hardware/gen_pcb.py) groups the 12 channels into rows but still

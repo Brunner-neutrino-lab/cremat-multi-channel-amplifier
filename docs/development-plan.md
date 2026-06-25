@@ -17,16 +17,16 @@ session) and progressed independently of its siblings.
 | 3 Integration | ✅ done | [hardware/integration-notes.md](../hardware/integration-notes.md) |
 | 4 Mechanical | ✅ done | [hardware/mechanical.md](../hardware/mechanical.md) |
 | 5 Schematic | ✅ generated, ERC 0 errors, netlist-verified | [hardware/gen_sch.py](../hardware/gen_sch.py) → `channel.kicad_sch` + `multi-channel-cremat-amplifier.kicad_sch` |
-| 6 Layout | ◑ board scaffolded headless ([gen_pcb.py](../hardware/gen_pcb.py): 217 footprints + nets + outline + M3 + GND zone); **arrange + route in GUI** | [hardware/BUILD-IN-KICAD.md](../hardware/BUILD-IN-KICAD.md) |
-| 7 Fab/Assembly | ⏳ after routing | same guide + [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) |
+| 6 Layout | ✅ placed + **autorouted, DRC 0/0/0, 0 unconnected** ([routed-top.png](../hardware/routed-top.png)) | [gen_pcb.py](../hardware/gen_pcb.py)+[FREEROUTING.md](FREEROUTING.md) |
+| 7 Fab/Assembly | ◑ gerbers/drill/pos generated from the routed board | `kicad-cli pcb export` → `fab/` + [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md) |
 
-**Track 6 reality:** `pcbnew` *does* place footprints + assign nets + draw outline/zones
-headless ([gen_pcb.py](../hardware/gen_pcb.py) builds the board from the netlist), but it has
-**no autorouter** — signal routing and a manufacturable arrangement (MCX edge-cutouts aligned
-to the outline, no courtyard overlap) are the **KiCad GUI** push-and-shove router (or external
-FreeRouting via DSN/SES). The generated board is a net-assigned starting point, not a routed
-layout; `bash scripts/drc.sh` reports the ratsnest (499 unconnected) + grid-placement overlaps
-to resolve in the GUI.
+**Track 6 done (headless, no GUI):** `gen_pcb.py` packs the 12 channels into rows by real
+footprint bounding boxes (DRC-clean placement, 4-layer with GND plane on In1 + −VDC plane on
+In2), `export_dsn.py` → Specctra DSN → **FreeRouting v2.2.4** autoroutes all 480 nets →
+`import_ses.py` → `fill_zones.py` (planes + outer GND ground-fill, solid pad connection).
+Final `scripts/drc.sh`: **0 errors, 0 warnings, 0 unconnected.** Recipe in
+[FREEROUTING.md](FREEROUTING.md). Remaining polish (GUI): restore the MCX `Edge.Cuts`
+cutouts (moved to `Dwgs.User` for routing) when fixing jacks to the board edge.
 
 **Track 5 is done headless** (per [KICAD_WITH_CLAUDE_CODE.md](KICAD_WITH_CLAUDE_CODE.md)): a
 Python generator writes the `.kicad_sch` with net-labels at exact pin coords;

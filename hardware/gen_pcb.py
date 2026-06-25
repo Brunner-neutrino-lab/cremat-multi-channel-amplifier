@@ -47,6 +47,7 @@ def parse_netlist(path):
 def main():
     comps, nets = parse_netlist(NET)
     b = pcbnew.CreateEmptyBoard()
+    b.SetCopperLayerCount(4)   # F.Cu / In1.Cu(GND plane) / In2.Cu / B.Cu -> routing room
 
     # nets
     netmap = {}
@@ -145,22 +146,24 @@ def main():
     except Exception as e:
         print("mounting holes:", e)
 
-    # GND pour on B.Cu (routes the ground net via copper)
+    # Plane pours: GND on In1.Cu, -VDC on In2.Cu (both are large nets -> give them planes
+    # so the autorouter only has to route signals + the +VDC tree on F.Cu/B.Cu).
+    def add_plane(net_name, layer):
+        ni = netmap.get(net_name)
+        if not ni:
+            return
+        zc = pcbnew.ZONE(b)
+        zc.SetLayer(layer)
+        zc.SetNetCode(ni.GetNetCode())
+        zc.SetIsFilled(True)
+        ch = zc.Outline(); ch.NewOutline()
+        for (px, py) in [(2, 2), (W - 2, 2), (W - 2, H - 2), (2, H - 2)]:
+            ch.Append(mm(px), mm(py))
+        b.Add(zc)
+        print("%s plane added on layer %d (fill via fill_zones.py)" % (net_name, layer))
     try:
-        gnd = netmap.get("GND")
-        if gnd:
-            zc = pcbnew.ZONE(b)
-            zc.SetLayer(pcbnew.B_Cu)
-            zc.SetNetCode(gnd.GetNetCode())
-            zc.SetIsFilled(True)
-            poly = [(2, 2), (W - 2, 2), (W - 2, H - 2), (2, H - 2)]
-            ch = zc.Outline()
-            ch.NewOutline()
-            for (px, py) in poly:
-                ch.Append(mm(px), mm(py))
-            b.Add(zc)
-            print("GND zone added (unfilled; fill in GUI or fill_zones pass -- "
-                  "headless in-memory Fill segfaults)")
+        add_plane("GND", pcbnew.In1_Cu)
+        add_plane("-VDC", pcbnew.In2_Cu)
     except Exception as e:
         print("zone:", e)
 
