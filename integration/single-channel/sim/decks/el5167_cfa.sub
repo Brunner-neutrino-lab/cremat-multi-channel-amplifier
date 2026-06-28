@@ -1,0 +1,71 @@
+* ============================================================================
+* EL5167 -- current-feedback amplifier (CFA) behavioral macromodel
+* track B2 chan-sim.  Datasheet-anchored (Renesas/Intersil FN7365 Rev 6.00,
+* EL5166/EL5167).  Renesas publishes NO public SPICE/PSpice model for this part
+* (product page lists only the datasheet; any SPICE sits behind the login-gated
+* EDA portal -- exact link in SESSION_REPORT "open issues").  Per the §5 fallback
+* rule this is the CFA behavioral model built from the datasheet, and is the
+* model of record until a vendor netlist is dropped in.
+*
+* CFA topology captured (what makes a CFA a CFA):
+*   - + input : high impedance (Rin 130k || Cin 1.5p).
+*   - input buffer (the CFA buffer between +IN and -IN) drives -IN through a low
+*     output impedance Rbuf, so the feedback error at -IN is a CURRENT.
+*   - that error current flows into an open-loop TRANSIMPEDANCE ROL=1.1Meg
+*     (datasheet typ) with a single dominant pole -> the output voltage.
+*     => closed-loop bandwidth is set by Rf (the CFA signature), not by gain.
+*   - slew rate 6000 V/us (datasheet) limits the output rate of change.
+*   - output: rail-limited, low-Z, current-capable (Iout +/-160 mA typ, RL=10).
+*
+* Datasheet numbers used (FN7365, VS=+/-5V test; here on +/-12V rails):
+*   ROL = 1.1 Meg ; Rin(+) = 130k ; Cin = 1.5p ; SR = 6000 V/us ;
+*   Iout = +/-160 mA typ ; Vos = -0.5 mV ; recommended Rf = 392 (G1) / 250 (G2);
+*   gain-of-1 BW = 1.4 GHz, gain-of-2 BW = 800 MHz (BW set by Rf).
+*
+* For the us-scale shaper pulse the 1.4 GHz BW / 6000 V/us slew are effectively
+* infinite -> the buffer is ideal in band; this model still carries them so the
+* same deck is valid for stability/AC checks and for any future fast input.
+*
+* Ports:  .subckt EL5167  inp inn out vcc vee   (+IN, -IN, OUT, V+, V-)
+* ============================================================================
+.subckt EL5167 inp inn out vcc vee
+.param ROL=1.1e6        ; open-loop transimpedance, V per A of -IN error current
+.param BWG1=1.4e9       ; gain-of-1 -3dB BW at Rf=392 (datasheet)
+.param Rf_ref=392       ; Rf the BW spec is quoted at
+.param Rbuf=20          ; CFA input-buffer output impedance (low-Z -IN node)
+.param Rinp=130e3 Cinp=1.5p Vos=-0.5m
+.param SR=6e9           ; 6000 V/us
+* dominant-pole cap on the transimpedance node so the closed-loop -3dB with the
+* reference Rf equals BWG1:  closed-loop pole f = 1/(2*pi*Rf*Ctz)  ->  Ctz set so
+* that with R(node)=ROL the loop gives BWG1 at Rf_ref.  In a CFA the relevant
+* time constant is Rf*Ctz (feedback-R x node-C), independent of ROL, so:
+.param Ctz={1/(6.283185*Rf_ref*BWG1)}    ; ~0.29 pF
+
+* + input network
+Rin inp 0 {Rinp}
+Cin inp 0 {Cinp}
+
+* input buffer: nbuf = inp + Vos, low-Z out (Rbuf) to the inverting node -IN
+Eb  nb 0 inp 0 1
+Vo  nbuf nb {Vos}
+Rb  nbuf inn {Rbuf}
+
+* error current out of -IN = (V(nbuf)-V(inn))/Rbuf ; transimpedance to node ntz.
+* G pumps that current into a 1-ohm-normalised resistor of value ROL, with the
+* dominant-pole cap Ctz across the *feedback-referred* node.  Node R = ROL so
+* the open-loop DC transimpedance is ROL; the pole at Rf*Ctz is realised in the
+* closed loop because the feedback divides the node by ~Rf/ROL.
+Gtz 0 ntz VALUE = { (V(nbuf)-V(inn))/Rbuf }
+Rtz ntz 0 {ROL}
+Ctz ntz 0 {Ctz}
+
+* slew-rate limit: pass ntz to nsl, limiting d/dt to +/-SR via a 1nF integrator
+.param Cs=1n
+Gsl 0 nsl VALUE = { limit( (V(ntz)-V(nsl))*1e6, -SR*Cs, SR*Cs ) }
+Csl nsl 0 {Cs}
+Rsl nsl 0 1e12
+
+* rail-limited, low-Z, current-capable output buffer
+Bo  no 0 V = limit( V(nsl), V(vee)+1.0, V(vcc)-1.0 )   ; swings to ~1V of rails
+Ro  no out 0.5                                          ; low output impedance
+.ends EL5167

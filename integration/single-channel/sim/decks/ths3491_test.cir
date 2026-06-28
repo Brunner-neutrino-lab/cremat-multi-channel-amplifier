@@ -1,0 +1,21 @@
+* THS3491 official TI model -- standalone buffer test (gain +2, 50-ohm back-term)
+.include ths3491_rgt.lib
+Vp VP 0 12
+Vn VN 0 -12
+* enable (PD_not high), GND ref at 0
+Vpd PDN 0 12
+* step into +input through 49.9 series R (like the chain)
+Vin SRC 0 PULSE(0 0.05 100n 1n 1n 5u 10u 3)
+Rs SRC INP 49.9
+* THS3491RGT ports: INP INN FB OUT PD_not VCC VEE GND
+XU INP INN FB OUTX PDN VP VN 0 THS3491RGT
+* feedback: Rf FB->INN, Rg INN->GND; gain +2 -> Rf=Rg. TI G=2 rec Rf=976.
+* (FB is the internal feedback pin, tied to OUT by a 1u trace inside the model.)
+Rfb FB INN 976
+Rg  INN 0 976
+Rterm OUTX OUT_50 49.9
+Rload OUT_50 0 50
+.options plotwinsize=0
+.tran 0 30u 0 0.5n
+.save V(OUT_50) V(OUTX) V(INP)
+.end

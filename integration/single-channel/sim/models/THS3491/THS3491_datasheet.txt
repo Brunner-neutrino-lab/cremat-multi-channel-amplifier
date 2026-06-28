@@ -1,0 +1,4893 @@
+THS3491 900-MHz, 500-mA High-Power Output Current Feedback Amplifier
+1 Features
+•
+Bandwidth:
+–
+900 MHz (VO = 2 VPP, AV = 5 V/V)
+–
+320 MHz (VO = 10 VPP, AV = 5 V/V)
+•
+Slew rate: 8000 V/µs (VO = 20 VPP)
+•
+Input voltage noise: 1.7 nV/√ Hz
+•
+Bipolar supply range: ±7 V to ±16 V
+•
+Single-supply range: 14 V to 32 V
+•
+Output swing: 28 VPP (±16-V supplies, 100-Ω load)
+•
+Linear output current: ±420 mA (typical)
+•
+16.8-mA trimmed supply current (low temperature 
+coefficient)
+•
+HD2 and HD3: less than –75 dBc (50 MHz, VO = 
+10 VPP, 100-Ω load)
+•
+Rise and fall time: 1.3 ns (10-V step)
+•
+Overshoot: 1.5% (10-V step, AV = 5 V/V)
+•
+Current limit and thermal shutdown protection
+•
+Power down feature
+2 Applications
+•
+High-voltage, arbitrary waveform generators
+•
+Pattern generators for LCD testers
+•
+Output drivers for LCR meters
+•
+Power FET drivers
+•
+High capacitive load piezo element drivers
+•
+VDSL line drivers
+•
+Pin-compatible upgrade to THS3095 (DDA)
+3 Description
+The THS3491 current feedback amplifier (CFA) 
+provides a new level of performance for applications 
+requiring the lowest distortion at high output power 
+levels from DC through values greater than 100 MHz 
+at 100-Ω loads. Although specified at a gain of 5 
+V/V, this current feedback design holds near constant 
+bandwidth and distortion over a wide range of gains.
+The 8000 V/µs of slew rate delivers an output of 10 
+VPP into demanding loads with low distortion through 
+100 MHz. The 900-MHz, small-signal bandwidth 
+delivers a low overshoot of less than 1.5% for a 10-
+V step, and rise and fall times of less than 1.3 ns. 
+Peak output current drive values greater than 500 
+mA enable driving heavy capacitive loads with fast 
+signals.
+New designs benefit from the lowest distortion using 
+the VQFN-16 (RGT) package, whereas the 8-pin 
+HSOIC (DDA) package (with PowerPAD™) upgrades 
+existing THS3091 or THS3095 designs. Lower output 
+headroom for the THS3491 provides more output 
+swing on the same ±15-V supplies versus legacy 
+THS3091 or THS3095 options.
+Package Information(1)(2) 
+PART NUMBER
+PACKAGE
+BODY SIZE (NOM)
+THS3491
+RGT (VQFN, 16)
+3.00 mm × 3.00 mm
+DDA (HSOIC, 8)
+4.89 mm × 3.90 mm
+Device Information
+PART NUMBER
+PACKAGE
+DIE SIZE (NOM)
+THS3491
+Bare die
+1.02 mm × 1.06 mm
+(1)
+For all available packages, see the package option 
+addendum at the end of the data sheet.
+(2)
+See the Device Comparison Table
+THS3217 
+Output
+49.9 
+250 
+Passive
+Filter
+576 
+143 
+40.2 
++
+±
++VS
+±VS
+THS3491
+576 
+143 
+40.2 
++
+±
++VS
+±VS
+THS3491
+30 
+50-Ÿ
+Load 
+13 VPP maximum
+available at 
+matched 50-Ÿ
+load
+High power gain of 
+5 V/V output driver 
+with load sharing
+15 V
++VS
+±15 V
+±VS
+Typical Arbitrary Waveform Generator Output 
+Drive Circuit
+Frequency (MHz)
+Harmonic Distortion (dBc)
+0.1
+1
+10
+100
+200
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+VOUT = 10 VPP
+D071
+HD2
+HD3
+Harmonic Distortion vs Frequency
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+An IMPORTANT NOTICE at the end of this data sheet addresses availability, warranty, changes, use in safety-critical applications, 
+intellectual property matters and other important disclaimers. PRODUCTION DATA.
+Table of Contents
+1 Features............................................................................1
+2 Applications.....................................................................1
+3 Description.......................................................................1
+4 Revision History.............................................................. 2
+5 Device Comparison Table...............................................4
+6 Pin Configuration and Functions...................................5
+7 Bare Die Information....................................................... 6
+8 Specifications.................................................................. 7
+8.1 Absolute Maximum Ratings........................................ 7
+8.2 ESD Ratings............................................................... 7
+8.3 Recommended Operating Conditions.........................7
+8.4 Thermal Information....................................................7
+8.5 Electrical Characteristics: VS = ±15 V......................... 8
+8.6 Electrical Characteristics: VS = ±7.5 V...................... 11
+8.7 Typical Characteristics: ±15 V...................................13
+8.8 Typical Characteristics: ±7.5 V..................................20
+9 Detailed Description......................................................24
+9.1 Overview...................................................................24
+9.2 Functional Block Diagram.........................................24
+9.3 Feature Description...................................................25
+9.4 Device Functional Modes..........................................27
+10 Application and Implementation................................30
+10.1 Application Information........................................... 30
+10.2 Typical Application.................................................. 32
+10.3 Power Supply Recommendations...........................34
+10.4 Layout..................................................................... 35
+11 Device and Documentation Support..........................40
+11.1 Documentation Support.......................................... 40
+11.2 Receiving Notification of Documentation Updates..40
+11.3 Support Resources................................................. 40
+11.4 Trademarks............................................................. 40
+11.5 Electrostatic Discharge Caution..............................40
+11.6 Glossary..................................................................40
+12 Mechanical, Packaging, and Orderable 
+Information.................................................................... 40
+4 Revision History
+NOTE: Page numbers for previous revisions may differ from page numbers in the current version.
+Changes from Revision B (July 2018) to Revision C (February 2023)
+Page
+•
+Added bare die package details to the data sheet..............................................................................................1
+•
+Removed bipolar-supply operating range and single-supply operating range specifications from Electrical 
+Characteristics: VS = ±15 V ............................................................................................................................... 8
+•
+Added new test level A2 that is clarifies what is tested for die sales..................................................................8
+Changes from Revision A (March 2018) to Revision B (July 2018)
+Page
+•
+Changed resistor values in Typical Arbitrary Waveform Generator Output Drive Circuit from 49.9 Ω to 40.2 Ω1
+•
+Changed resistor values in Typical Arbitrary Waveform Generator Output Drive Circuit from 24.9 Ω to 30 Ω...1
+•
+Changed TA = 25°C to TA ≅ 25°C in Electrical Characteristics: ±15 V condition statement............................... 8
+•
+Changed 100% tested at 25°C to 100% tested at ≅ 25°C in the footnote of Electrical Characteristics: ±15 V ...
+8
+•
+Added DDA package only in Test Conditions column for "VOS" specification.....................................................8
+•
+Added new VOS specifiction line for RGT package.............................................................................................8
+•
+Added min/max values to RFB_TRACE specification ............................................................................................8
+•
+Changed units from: pF || kΩ to: kΩ || pF and changed typical spec accordingly.............................................. 8
+•
+Added min/max values to TJ_SENSE 25℃ value specification............................................................................. 8
+•
+Changed TJ_SENSE temperature coefficient specification's typical value from 3 mV/℃ to 3.2 mV/℃ ................8
+•
+Added min/max values to TJ_SENSE input impedance specification....................................................................8
+•
+Changed "TA = 25°C" to "TA ≅ 25°C" in Electrical Characteristics: ±7.5 V condition statement....................... 11
+•
+Changed "100% tested at 25°C" to "100% tested at ≅ 25°C" in the footnote of Electrical Characteristics: ±7.5 
+V .......................................................................................................................................................................11
+•
+Added "DDA package only" in Test Conditions column for "VOS" specification ............................................... 11
+•
+Added new VOS specifiction line for RGT package...........................................................................................11
+•
+Changed units from "pF || kΩ" to "kΩ || pF" and changed typical values accordingly ......................................11
+•
+Added min/max values to "TJ_SENSE 25℃ value" specification.........................................................................11
+•
+Added min/max values to "TJ_SENSE input impedance" specification................................................................11
+•
+Changed "TA = 25°C" to "TA ≅ 25°C" in Typical Characteristics: ±15 V condition statement............................13
+•
+Changed ZOL low frequency value from 160 dB to 138 dB in Open-Loop Transimpedance Gain and Phase vs 
+Frequency ........................................................................................................................................................13
+•
+Changed Overdrive Recovery Time grid lines and added gain information..................................................... 13
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+2
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+•
+Added TJ_SENSE Voltage vs Ambient Temperature .......................................................................................... 13
+•
+Changed "TA = 25°C" to "TA ≅ 25°C" in Typical Characteristics: ±7.5 V condition statement...........................20
+•
+Changed Overdrive Recovery Time grid lines and added gain information..................................................... 20
+•
+Corrected polarity of negative supply capacitor in Wideband Noninverting Gain Configuration (5 V/V) ......... 27
+•
+Corrected negative supply capacitor polarity in Wideband Inverting Gain Configuration (5 V/V) ....................28
+•
+Added "RISO" to "1 Ω" in Driving a Large Capacitive Load Using an Output Series Isolation Resistor ............30
+•
+Added 1-kΩ resistor to Driving a Large Capacitive Load Using an Output Series Isolation Resistor ..............30
+•
+Changed supply values from ±15 V to ±7.5 V in Video Distribution Amplifier Application ...............................31
+•
+Changed RS2 values from 100 Ω to 40.2 Ω in Load-Sharing Driver Application ..............................................32
+•
+Added 30-Ω resistor to Load-Sharing Driver Application .................................................................................32
+•
+Added text to Design Requirements and Detailed Design Procedure sections ...............................................33
+•
+Added Application Curves section ...................................................................................................................34
+Changes from Revision * (August 2017) to Revision A (March 2018)
+Page
+•
+Changed device status from Advance Information to Production Data ............................................................. 1
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+3
+Product Folder Links: THS3491
+5 Device Comparison Table
+DEVICE
+SUPPLY, VS
+(V)
+SSBW,
+AV = 5
+(MHz)
+MAXIMUM ICC 
+AT 25°C
+(mA)
+INPUT NOISE 
+Vn
+(nV/√ Hz)
+HD2/3,
+10 VPP AT 50 MHz, 
+G = 5 V/V
+(dBc)
+SLEW RATE
+(V/µs)
+LINEAR 
+OUTPUT 
+CURRENT 
+(mA)
+THS3491
+±15
+900
+17.3
+1.7
+–76/–75
+7100(1)
+±420
+THS3095
+±15
+190
+9.5
+1.6
+–40/–42
+1200(2)
+±250
+THS3001
+±15
+350
+9
+1.6
+N/A
+1400(3)
+±120
+THS3061
+±15
+260
+8.3
+2.6
+N/A
+1060(4)
+±140
+(1)
+Slew rate from FPBW of 320 MHz, 10 VPP
+(2)
+Slew rate from FPBW of 135 MHz, 4 VPP
+(3)
+Slew rate from FPBW of 32 MHz, 20 VPP
+(4)
+Slew rate from FPBW of 120 MHz, 4 VPP
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+4
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+6 Pin Configuration and Functions
+REF
+VIN±
+1
+2
+3
+4
+VIN+
+±VS
+PD
+8
+7
+6
+5
++VS
+VOUT
+NC
+NC - no internal connection
+Figure 6-1. DDA Package, 8-Pin HSOIC With 
+PowerPAD (Top View)
+16
+PD
+NC
++VS
+GND TJ_SENSE ±VS
+VOUT
+VOUT
+NC
+FB
+NC
+VIN±
+VIN+
+15
+14
+13
+1
+2
+3
+4
+5
+6
+7
+8
+12
+11
+10
+9
+±VS
+NC
++VS
++
+±
+NC - no internal connection
+Figure 6-2. RGT Package, 16-Pin VQFN With 
+Exposed Thermal Pad (Top View)
+Table 6-1. Pin Functions
+PIN (1)
+TYPE (2)
+DESCRIPTION
+NAME
+HSOIC
+VQFN
+FB
+—
+1
+O
+Input side feedback pin
+GND
+—
+5
+GND
+Ground, PD logic reference on the VQFN-16 (RGT) package
+NC
+5
+2, 9, 12, 15
+—
+No connect (there is no internal connection). Recommended connection to 
+a heat spreading plane, typically GND.
+PD
+8
+16
+I
+Amplifier power down: low = amplifier disabled, high (default) = amplifier 
+enabled
+REF
+1
+—
+I
+PD logic reference on the SOIC-8 (DDA) package. Typically connected to 
+GND.
+TJ _SENSE
+—
+6
+O
+Voltage proportional to die temperature
+VIN–
+2
+3
+I
+Inverting input
+VIN+
+3
+4
+I
+Noninverting input
+VOUT
+6
+10, 11
+O
+Amplifier output
+–VS
+4
+7, 8
+P
+Negative power supply
++VS
+7
+13, 14
+P
+Positive power supply
+Thermal pad
+—
+Thermal pad. Electrically isolated from the device. Recommended 
+connection to a heat spreading plane, typically GND.
+(1)
+Both packages include a backside thermal pad. The thermal pad can be connected to a heat spreading plane that can be at any 
+voltage because the device die is electrically isolated from this metal plate. The thermal pad can also be unused (not connected to any 
+heat spreading plane or voltage) giving higher thermal impedance.
+(2)
+GND = ground, I = input, O = output, P = power
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+5
+Product Folder Links: THS3491
+7 Bare Die Information
+DIE THICKNESS
+BACKSIDE FINISH
+BACKSIDE POTENTIAL
+BOND PAD METALLIZATION
+BOND PAD DIMENSIONS
+15 mils (381 μm)
+Silicon with backgrind
+Wafer backside is electrically 
+connected to -VS
+Al
+76.0 µm × 76.0 µm
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+19
+18
+55.31
+49.37
+1.57
+1.57
+00
+Bond Pad Coordinates in Microns
+NAME
+PAD NUMBER
+X MIN
+Y MIN
+X MAX
+Y MAX
+FB
+1
+26.9
+887
+103
+963
+VIN-
+2
+26.9
+549
+103
+625
+VIN+
+3
+26.9
+211
+103
+287
+REF
+4
+180
+23.7
+256
+99.7
+DNC
+5
+431
+23.7
+507
+99.7
+TJ_SENSE
+6
+601
+23.7
+677
+99.7
+-VS
+7
+760
+23.7
+836
+99.7
+-VS
+8
+862
+23.7
+938
+99.7
+-VS
+9
+993
+23.7
+1069
+99.7
+-VS
+10
+1222
+292
+1298
+368
+VOUT
+11
+1222
+459
+1298
+535
+VOUT
+12
+1222
+639
+1298
+715
++VS
+13
+1222
+806
+1298
+882
++VS
+14
+993
+1074
+1069
+1150
++VS
+15
+862
+1074
+938
+1150
++VS
+16
+760
+1074
+836
+1150
+DNC
+17
+601
+1074
+677
+1150
+PD
+18
+431
+1074
+507
+1150
+REF
+19
+180
+1074
+256
+1150
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+6
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8 Specifications
+8.1 Absolute Maximum Ratings
+over operating free-air temperature range (unless otherwise noted)(1)
+MIN
+MAX
+UNIT
+Voltage
+Supply voltage, (+VS) – (–VS)
+33
+V
+Supply voltage turnon, turnoff maximum dV/dT (2)
+1
+V/µs
+Input/output voltage range
+(–VS) – 0.5
+(+VS) + 0.5
+V
+Differential input voltage
+±0.5
+Current
+Continuous input current (3)
+±10
+mA
+Continuous output current (3)
+±100
+Temperature
+Junction temperature, TJ (4)
+Maximum
+150
+°C
+Continuous operation, long-term reliability
+125
+Storage temperature, Tstg (5)
+–65
+150
+(1)
+Stresses beyond those listed under Absolute Maximum Ratings may cause permanent damage to the device. These are stress 
+ratings only, which do not imply functional operation of the device at these or any other conditions beyond those indicated under 
+Recommended Operating Conditions. Exposure to absolute-maximum-rated conditions for extended periods may affect device 
+reliability.
+(2)
+Stay below this dV/dT supply turnon and turnoff edge rate to make sure that the edge-triggered ESD absorption device across the 
+supply pins remains open. Exceeding this supply edge rate may transiently show a short circuit across the supplies.
+(3)
+Long-term continuous current for electro-migration limits.
+(4)
+Thermal shutdown at approximately 160°C junction temperature and recovery at approximately 145°C.
+(5)
+See the MSL or reflow rating information provided with the material or see https://www.ti.com for the latest information.
+8.2 ESD Ratings
+VALUE
+UNIT
+V(ESD)
+Electrostatic 
+discharge
+Human-body model (HBM), per ANSI/ESDA/JEDEC JS-001(1)
+±2500
+V
+Charged-device model (CDM), per JEDEC specification JESD22-C101(2)
+±1000
+(1)
+JEDEC document JEP155 states that 500-V HBM allows safe manufacturing with a standard ESD control process.
+(2)
+JEDEC document JEP157 states that 250-V CDM allows safe manufacturing with a standard ESD control process.
+8.3 Recommended Operating Conditions
+over operating free-air temperature range (unless otherwise noted)
+MIN
+NOM
+MAX
+UNIT
+(+VS) – (–VS)
+Supply voltage
+Dual-supply
+±7
+±15
+±16
+V
+Single-supply
+14
+30
+32
+TA
+Operating free-air temperature
+–40
+85
+°C
+8.4 Thermal Information
+THERMAL METRIC(1)
+THS3491
+UNIT
+DDA (HSOIC)
+RGT (VQFN)
+8 PINS
+8 PINS
+RθJA
+Junction-to-ambient thermal resistance
+44.5
+49.6
+°C/W
+RθJC(top)
+Junction-to-case (top) thermal resistance
+66.8
+55.4
+°C/W
+RθJB
+Junction-to-board thermal resistance
+19.2
+23.1
+°C/W
+ψJT
+Junction-to-top characterization parameter
+6.4
+1.8
+°C/W
+ψJB
+Junction-to-board characterization parameter
+19.5
+23.2
+°C/W
+RθJC(bot)
+Junction-to-case (bottom) thermal resistance
+7.5
+7.8
+°C/W
+(1)
+For more information about traditional and new thermalmetrics, see the Semiconductor and IC Package ThermalMetrics application 
+report.
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+7
+Product Folder Links: THS3491
+8.5 Electrical Characteristics: VS = ±15 V
+at +VS = +15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V, and RGT package: RF = 
+576 Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+PARAMETER
+TEST CONDITIONS
+MIN
+TYP
+MAX
+UNIT
+Test 
+Level(1)
+AC PERFORMANCE
+SSBW
+Small-signal bandwidth
+VO = 2 VPP, < 0.5-dB peaking
+900
+MHz
+C
+LSBW
+Large-signal bandwidth
+VO = 10 VPP, < 1-dB peaking
+320
+MHz
+C
+Bandwidth for 0.2-dB flatness
+VO = 2 VPP
+350
+MHz
+C
+SR
+Slew rate (20% – 80%)
+VO = 20 VPP
+8000
+V/µs
+C
+Overshoot and undershoot
+VO = 10-V step (input tr/tf = 1.0 ns)
+1.5%
+C
+tr/tf
+Rise and fall time
+VO = 10-V step (input tr/tf = 1.0 ns)
+1.3
+ns
+C
+ts
+Settling time to 0.1%
+VO = 10-V step (input tr/tf = 1.0 ns)
+7
+ns
+C
+HD2
+Second-order harmonic distortion
+f = 20 MHz, VO = 10 VPP
+–78
+dBc
+C
+f = 50 MHz, VO = 10 VPP
+–76
+f = 70 MHz, VO = 10 VPP
+–68
+f = 100 MHz, VO = 10 VPP
+–60
+f = 20 MHz, VO = 20 VPP
+–75
+f = 50 MHz, VO = 20 VPP
+–65
+f = 70 MHz, VO = 20 VPP
+–61
+f = 100 MHz, VO = 20 VPP
+–51
+HD3
+Third-order harmonic distortion
+f = 20 MHz, VO = 10 VPP
+–81
+dBc
+C
+f = 50 MHz, VO = 10 VPP
+–75
+f = 70 MHz, VO = 10 VPP
+–61
+f = 100 MHz, VO = 10 VPP
+–51
+f = 20 MHz, VO = 20 VPP
+–64
+f = 50 MHz, VO = 20 VPP
+–55
+f = 70 MHz, VO = 20 VPP
+–48
+f = 100 MHz, VO = 20 VPP
+–47
+IMD2
+2nd-order two-tone intermodulation 
+distortion
+f = 20 MHz, VO = 5 VPP per tone,
+100-kHz tone spacing
+–79
+dBc
+C
+IMD3
+3rd-order two-tone intermodulation 
+distortion
+f = 20 MHz, VO = 5 VPP per tone,
+100-kHz tone spacing
+–68
+dBc
+C
+en
+Input-referred voltage noise
+f ≥ 100 kHz
+1.7
+nV/√Hz
+C
+inp
+Noninverting, input-referred current 
+noise
+f ≥ 100 kHz
+15
+pA/√Hz
+C
+inn
+Inverting, input-referred current 
+noise
+f ≥ 100 kHz
+20
+pA/√Hz
+C
+ZOUT
+Closed-loop output impedance
+f = 50 MHz
+1
+Ω
+C
+DC PERFORMANCE
+ZOL
+Open-loop transimpedance gain
+VO = ±10 V, RLOAD = 500 Ω
+5
+8
+MΩ
+A1
+VOS
+Input offset voltage
+DDA package only
+–2
+1
+2
+mV
+A1
+RGT package & DIE sales
+–2.5
+1
+2.5
+mV
+A1
+Input offset voltage drift(2)
+–40°C ≤ TJ ≤ +125°C
+3
+µV/°C
+B
+IB+
+Noninverting input bias current(3)
+–7
+–2
+7
+µA
+A1
+Noninverting input bias current 
+drift(2)
+–40°C ≤ TJ ≤ +125°C
+–8
+nA/°C
+B
+IB-
+Inverting input bias current(3)
+–20
+–7
+20
+µA
+A1
+Inverting input bias current drift(2)
+–40°C ≤ TJ ≤ +125°C
+–116
+nA/°C
+B
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+8
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.5 Electrical Characteristics: VS = ±15 V (continued)
+at +VS = +15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V, and RGT package: RF = 
+576 Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+PARAMETER
+TEST CONDITIONS
+MIN
+TYP
+MAX
+UNIT
+Test 
+Level(1)
+RFB_TRACE
+Internal trace resistance to 
+feedback pin
+RGT only, pins 10 and 11 to pin 1
+1.1
+1.5
+1.9
+Ω
+A2
+CMRR
+Common-mode rejection ratio
+f = DC
+69
+75
+dB
+A1
+INPUT
+HRIN
+Headroom to either supply
+CMRR > 60 dB
+4.1
+4.3
+V
+A2
+ZIN+
+Noninverting input impedance
+Closed-loop measurement
+ 50 || 1.2
+kΩ || pF
+C
+ZIN-
+Inverting input impedance
+Open-loop measurement
+8
+15
+18
+Ω
+B
+OUTPUT
+HROUT
+Headroom to either supply
+1.2
+1.5
+1.7
+V
+A1
+IoutMAX
+Maximum current output
+RLOAD = 24 Ω, VO = ±12.67 V, 
+magnitude, both polarities
+480
+520
+550
+mA
+A2
+IoutLINEAR
+Linear output current
+RLOAD = 24 Ω, VO = ±9.4 V,
+ZOL > 1 MΩ, source and sink
+380
+420
+mA
+A2
+IoutPEAK
+Peak output current in transition 
+(transition peak at zero-crossing 
+IOUT)
+VO = 0 V, RO < 0.5 Ω, magnitude, 
+both polarities
+500
+540
+mA
+B
+ISC
+Output short-circuit current
+VS = ±9 V, VO = ±6 V, magnitude, 
+both polarities
+550
+620
+mA
+B
+ZOUT
+DC output impedance
+Closed-loop (±50 mA)
+0.17
+Ω
+C
+POWER SUPPLY
+IQ
+Quiescent current
+VS = ±15 V, No load
+16.1
+16.7
+17.3
+mA
+A1
+VS = ±16 V, No load
+16.2
+16.8
+17.4
+mA
+A2
+VS = ±7 V, No load
+15.2
+15.8
+16.3
+mA
+A1
+IQ TC
+VS = ±15 V, TJ = –40°C to +125°C,
+No load
+5
+µA/°C
+B
+PSRR+
+Positive power supply rejection ratio +VS ± 1.5 V, –VS
+78
+82
+dB
+A1
+PSRR–
+Negative power supply rejection 
+ratio
++VS, –VS ± 1.5 V
+77
+80
+dB
+A1
+POWER DOWN
+REFRANGE
+REF pin voltage range
+Do NOT float the REF pin.
+–Vs GND     +Vs – 5 V
+V
+A2
+IREF_BIAS
+REF pin bias current
+REF = 0 V, PD = REF + 3 V,
+positive out of the pin.
+35
+46
+52
+µA
+A2
+VIL
+Disable voltage threshold
+REF = 0 V, guaranteed off below
+0.8
+V
+A1
+VIH
+Enable voltage threshold
+REF = 0 V, guaranteed on above
+1.5
+V
+A1
+PD LOW_BIAS
+PD pin low input bias current
+PD = REF = GND,
+positive out of the pin.
+17
+21
+25
+µA
+A2
+PD HIGH_BIAS
+PD pin high input bias current
+PD = REF + 3 V, REF = GND,
+positive out of the pin.
+–1
+0
+1
+µA
+A2
+IQ_OFF_+VS
++Vs disabled supply current
+650
+780
+880
+µA
+A1
+IQ_OFF_–VS
+–Vs disabled supply current
+600
+723
+820
+µA
+A2
+tON
+Turnon time delay
+DC output to 90% of final value
+50
+ns
+C
+tOFF
+Turnoff time delay
+DC output to 10% of final value
+4
+µs
+C
+JUNCTION-TEMPERATURE SENSE, TJ_SENSE (QFN-16 ONLY, PIN 6)
+TJ_ SENSE 25°C value
+Device disabled (22°C to 32°C ATE 
+ambient temperature)  
+0.915
+1.06
+1.15
+V
+A2
+TJ_ SENSE temperature coefficient
+TJ = 0°C to 125°C
+3.2
+mV/°C
+B
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+9
+Product Folder Links: THS3491
+8.5 Electrical Characteristics: VS = ±15 V (continued)
+at +VS = +15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V, and RGT package: RF = 
+576 Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+PARAMETER
+TEST CONDITIONS
+MIN
+TYP
+MAX
+UNIT
+Test 
+Level(1)
+TJ_ SENSE input impedance
+Internally connected to REF pin
+32.4
+35
+38
+kΩ
+A2
+(1)
+Test levels (all values set by characterization and simulation): (A1) 100% tested at ≈ 25°C for all devices, overtemperature limits by 
+characterization and simulation; (A2) 100% tested at ≈ 25°C for packaged devices, not tested in production for die sales (B) Not tested 
+in production, limits set by characterization and simulation; (C) Typical value only for information;
+(2)
+Input offset voltage drift and input bias current drift are average values calculated by taking data at the end points, computing the 
+difference, and dividing by the temperature range.
+(3)
+Current is considered positive out of the pin.
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+10
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.6 Electrical Characteristics: VS = ±7.5 V
+at +VS = +7.5 V, –VS = –7.5 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V, and RGT package: RF 
+= 576 Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+PARAMETER
+TEST CONDITIONS
+MIN
+TYP
+MAX
+UNIT
+Test 
+Level(1)
+AC PERFORMANCE
+SSBW
+Small-signal bandwidth
+VO = 2 VPP, < 0.5-dB peaking
+800
+MHz
+C
+LSBW
+Large-signal bandwidth
+VO = 5 VPP, < 1-dB peaking
+550
+MHz
+C
+SR
+Slew rate (20%-80%)
+VO = 10 VPP
+6000
+V/µs
+C
+HD2
+Second-order harmonic distortion
+f = 20 MHz, VO = 5 VPP
+–83
+dBc
+C
+HD3
+Third-order harmonic distortion
+f = 20 MHz, VO = 5 VPP
+–78
+dBc
+C
+en
+Input-referred voltage noise
+f ≥ 100 kHz
+1.7
+nV/√Hz
+C
+inp
+Noninverting, input-referred current 
+noise
+f ≥ 100 kHz
+15
+pA/√Hz
+C
+inn
+Inverting, input-referred current 
+noise
+f ≥= 100 kHz
+20
+pA/√Hz
+C
+ZOUT
+Closed-loop output impedance
+f = 50 MHz
+1
+Ω
+C
+DC PERFORMANCE
+ZOL
+Open-loop transimpedance gain
+VO = ±2.5 V, RLOAD = 500 Ω
+6
+14
+MΩ
+A1
+VOS
+Input offset voltage
+DDA package limits
+–2
+1
+2
+mV
+A1
+RGT package & die sales limits
+–2.5
+1
+2.5
+mV
+A1
+Input offset-voltage drift(2)
+–40°C ≤ TJ ≤ +125°C
+3
+µV/°C
+B
+IB+
+Noninverting input bias current(3)
+–7
+-2
+7
+µA
+A1
+Noninverting input bias current 
+drift(2)
+–40°C ≤ TJ ≤ +125°C
+–10
+nA/°C
+B
+IB–
+Inverting input bias current(3)
+–19
+–6
+19
+µA
+A1
+Inverting input bias current drift(2)
+–40°C ≤ TJ ≤ +125°C
+–112
+nA/°C
+B
+INPUT
+ZIN+
+Noninverting input impedance
+Closed-loop measurement
+35 || 1.2
+kΩ || pF
+C
+ZIN–
+Inverting input impedance
+Open-loop measurement
+15
+Ω
+C
+HRIN
+Headroom to either supply
+CMRR > 60 dB
+4.1
+4.3
+V
+B
+OUTPUT
+HROUT
+Headroom to either supply
+1.2
+1.5
+1.7
+V
+A1
+IoutLINEAR
+Linear output current
+RLOAD = 24 Ω, VO = ±5 V,
+ZOL > 1 MΩ, source and sink
+200
+230
+mA
+A2
+POWER SUPPLY
+IQ
+Quiescent current
+No load
+15.2
+15.8
+16.4
+mA
+A1
+POWER DOWN
+REFRANGE
+REF pin voltage range
+Do NOT float the REF pin.
+–Vs GND    +Vs – 5 V
+V
+B
+IREF_BIAS
+REF pin bias current
+REF = 0 V, PD = REF + 3 V,
+positive out of the pin
+35
+37
+52
+µA
+A2
+VIL
+Disable voltage threshold
+REF = 0 V, guaranteed off below
+0.8
+V
+A1
+VIH
+Enable voltage threshold
+REF = 0 V, guaranteed on above
+1.5
+V
+A1
+PD LOW_BIAS
+PD pin low input bias current
+PD = REF = GND,
+positive out of the pin.
+17
+21
+25
+µA
+A2
+PD HIGH_BIAS
+PD pin high input bias current
+PD = REF + 3 V, REF = GND,
+positive out of the pin.
+–1
+0
+1
+µA
+A2
+IQ_OFF_+VS
++Vs disabled supply current
+600
+700
+850
+µA
+A1
+IQ_OFF_–VS
+–Vs disabled supply current
+550
+642
+770
+µA
+A2
+JUNCTION-TEMPERATURE SENSE, TJ_SENSE (QFN-16 ONLY, PIN 6)
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+11
+Product Folder Links: THS3491
+8.6 Electrical Characteristics: VS = ±7.5 V (continued)
+at +VS = +7.5 V, –VS = –7.5 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V, and RGT package: RF 
+= 576 Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+PARAMETER
+TEST CONDITIONS
+MIN
+TYP
+MAX
+UNIT
+Test 
+Level(1)
+TJ_ SENSE 25°C value
+Device disabled (22°C to 32°C ATE 
+ambient temperature)
+0.915
+1.06
+1.15
+V
+A2
+TJ_SENSE temperature coefficient
+TJ = 0°C to 125°C
+3.2
+mV/°C
+B
+TJ_SENSE input impedance
+Internally connected to REF pin
+32.4
+35
+38
+kΩ
+B
+(1)
+Test levels (all values set by characterization and simulation): (A1) 100% tested at ≅ 25°C for all devices, overtemperature limits by 
+characterization and simulation; (A2) 100% tested at ≅ 25°C for packaged devices, not tested in production for die sales (B) Not tested 
+in production, limits set by characterization and simulation; (C) Typical value only for information;
+(2)
+Input offset voltage drift and input bias current drift are average values calculated by taking data at the end points, computing the 
+difference, and dividing by the temperature range.
+(3)
+Current is considered positive out of the pin.
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+12
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.7 Typical Characteristics: ±15 V
+at +VS = 15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V. RGT package : RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Frequency (MHz)
+Normalized Gain (dB)
+1
+10
+100
+1000
+4000
+4000
+-15
+-12
+-9
+-6
+-3
+0
+3
+D001
+D001
+G = 2 V/V, RF = 976 :
+G = 5 V/V, RF = 576 :
+G = 10 V/V, RF = 499 :
+G = 20 V/V, RF = 383 :
+VO = 2 VPP
+RGT package
+Figure 8-1. Noninverting Small-Signal Frequency Response
+Frequency (MHz)
+Normalized Gain (dB)
+1
+10
+100
+1000
+4000
+4000
+-15
+-12
+-9
+-6
+-3
+0
+3
+D006
+D006
+G = 2 V/V, RF = 2100 :
+G = 5 V/V, RF = 798 :
+G = 10 V/V, RF = 704 :
+G = 20 V/V, RF = 564 :
+VO = 2 VPP
+DDA package
+Figure 8-2. Noninverting Small-Signal Frequency Response
+Frequency (MHz)
+Normalized Gain (dB)
+10
+100
+1000
+4000
+4000
+-18
+-15
+-12
+-9
+-6
+-3
+0
+3
+D018
+G = -2 V/V, RF = 604 :
+G = -5 V/V, RF = 576 :
+G = -10 V/V, RF = 549 :
+VO = 2 VPP
+Figure 8-3. Inverting Small-Signal Frequency Response
+Frequency (MHz)
+Non-Inverting Gain (dB)
+1
+10
+100
+1000
+4000
+4000
+0
+3
+6
+9
+12
+15
+18
+D002
+VO = 2 VPP
+VO = 5 VPP
+VO = 10 VPP
+VO = 20 VPP
+VO = 26 VPP
+RGT package; see Section 9.4.4 section for more details
+Figure 8-4. Frequency Response vs Output Swing
+Frequency (MHz)
+Non-Inverting Gain (dB)
+10
+100
+1000
+4000
+4000
+-9
+-6
+-3
+0
+3
+6
+9
+12
+15
+18
+D016
+RS = 20-:, CL = 10 pF
+RS = 15-:, CL = 22 pF
+RS = 10-:, CL = 47 pF
+RS = 7.5-:, CL = 100 pF
+RGT package; see Figure 10-1 for setup information
+Figure 8-5. Frequency Response vs CLOAD 
+Frequency (MHz)
+Non-Inverting Gain (dB)
+10
+100
+1000
+4000
+4000
+0
+3
+6
+9
+12
+15
+18
+D017
+T = -40qC
+T = 25qC
+T = 85qC
+T = 105qC
+VO = 2 VPP
+RGT package
+Figure 8-6. Frequency Response vs Temperature
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+13
+Product Folder Links: THS3491
+8.7 Typical Characteristics: ±15 V (continued)
+at +VS = 15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V. RGT package : RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Frequency (MHz)
+HD2 (dBc)
+0.1
+1
+10
+100
+200
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D065
+VO = 2 VPP
+VO = 10 VPP
+VO = 20 VPP
+DDA package
+Figure 8-7. HD2 vs Frequency
+Frequency (MHz)
+HD3 (dBc)
+0.1
+1
+10
+100
+200
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D066
+VO = 2 VPP
+VO = 10 VPP
+VO = 20 VPP
+DDA package
+Figure 8-8. HD3 vs Frequency
+Frequency (MHz)
+HD2 (dBc)
+0.1
+1
+10
+100
+500
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D007
+D007
+G = 5 V/V
+G = -5 V/V
+G = 2 V/V
+VO = 2 VPP
+RGT package
+Figure 8-9. HD2 vs Frequency
+Frequency (MHz)
+HD3 (dBc)
+0.1
+1
+10
+100
+500
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D008
+D008
+G = 5 V/V
+G = -5 V/V
+G = 2 V/V
+VO = 2 VPP
+RGT package
+Figure 8-10. HD3 vs Frequency
+Frequency (MHz)
+HD2 (dBc)
+0.1
+1
+10
+100
+200
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D009
+D009
+G = 5 V/V, VO = 10 VPP
+G = -5 V/V, VO = 10 VPP
+G = 5 V/V, VO = 20 VPP
+G = -5 V/V, VO = 20 VPP
+Figure 8-11. HD2 vs Frequency Across Output Swing
+Frequency (MHz)
+HD3 (dBc)
+0.1
+1
+10
+100
+200
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D010
+D010
+G = 5 V/V, VO = 10 VPP
+G = -5 V/V, VO = 10 VPP
+G = 5 V/V, VO = 20 VPP
+G = -5 V/V, VO = 20 VPP
+Figure 8-12. HD3 vs Frequency Across Output Swing
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+14
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.7 Typical Characteristics: ±15 V (continued)
+at +VS = 15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V. RGT package : RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Output Voltage Swing (VPP)
+HD2 (dBc)
+0
+2.5
+5
+7.5
+10
+12.5
+15
+17.5
+20
+22.5
+25
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D011
+f = 10 MHz, RL = 100 :
+f = 100 MHz, RL = 100 :
+f = 10 MHz, RL = 1 k:
+f = 100 MHz, RL = 1 k:
+Figure 8-13. HD2 vs Output Swing
+Output Voltage Swing (VPP)
+HD3 (dBc)
+0
+2.5
+5
+7.5
+10
+12.5
+15
+17.5
+20
+22.5
+25
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D012
+f = 10 MHz, RL = 100 :
+f = 100 MHz, RL = 100 :
+f = 10 MHz, RL = 1 k:
+f = 100 MHz, RL = 1 k:
+Figure 8-14. HD3 vs Output Swing
+Frequency (MHz)
+HD2 (dBc)
+0.1
+1
+10
+100
+500
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+D013
+T = -40qC
+T = 25qC
+T = 85qC
+T = 105qC
+VO = 2 VPP
+Figure 8-15. HD2 vs Frequency Across Temperature
+Frequency (MHz)
+HD3 (dBc)
+0.1
+1
+10
+100
+500
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+D014
+T = -40qC
+T = 25qC
+T = 85qC
+T = 105qC
+VO = 2 VPP
+Figure 8-16. HD3 vs Frequency Across Temperature
+Frequency (MHz)
+Harmonic Distortion (dBc)
+0.1
+1
+10
+100
+500
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+D015
+HD2
+HD3
+VO = 2 VPP
+RLoad = 1 kΩ
+Figure 8-17. Harmonic Distortion vs Frequency
+Frequency (MHz)
+Inter-modulation Distortion (dBc)
+1
+10
+100
+500
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+D038
+IMD2
+IMD3
+VO = 5 VPP per tone
+±100-kHz frequency spacing
+Figure 8-18. Intermodulation Distortion vs Frequency
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+15
+Product Folder Links: THS3491
+8.7 Typical Characteristics: ±15 V (continued)
+at +VS = 15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V. RGT package : RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Output Voltage Swing per tone (VPP)
+IMD2 (dBc)
+2
+4
+6
+8
+10
+12
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D061
+f = 20 MHz
+f = 50 MHz
+f = 100 MHz
+±100-kHz frequency spacing
+Figure 8-19. IMD2 vs Output Voltage Swing
+Output Voltage Swing per tone (VPP)
+IMD3 (dBc)
+2
+4
+6
+8
+10
+12
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D062
+f = 20 MHz
+f = 50 MHz
+f = 100 MHz
+±100-kHz frequency spacing
+Figure 8-20. IMD3 vs Output Voltage Swing
+Frequency (Hz)
+Voltage Noise (nV/—Hz)
+Current Noise (pA/—Hz)
+100
+1000
+10000
+100000
+1000000
+1E+7
+1
+1
+10
+10
+100
+100
+1000
+1000
+D003
+Vn
+Inp
+Inm
+Figure 8-21. Spot Input Noise vs Frequency
+Frequency (Hz)
+ZOL (dB:)
+Open-loop Phase (deg)
+40
+-150
+50
+-135
+60
+-120
+70
+-105
+80
+-90
+90
+-75
+100
+-60
+110
+-45
+120
+-30
+130
+-15
+140
+0
+100
+1k
+10k
+100k
+1M
+10M
+100M
+1G
+D072
+ZOL (dB:)
+Phase (deg)
+No load
+Figure 8-22. Open-Loop Transimpedance Gain and Phase vs 
+Frequency
+Time (4 nsec/div)
+Output Voltage (V)
+-6
+-5
+-4
+-3
+-2
+-1
+0
+1
+2
+3
+4
+5
+6
+D005
+VIN
+VOUT
+VO = 10 VPP
+Figure 8-23. G = 5 V/V Pulse Response
+Time (4 nsec/div)
+Output Voltage (V)
+-12
+-10
+-8
+-6
+-4
+-2
+0
+2
+4
+6
+8
+10
+12
+D004
+VIN
+VOUT
+VO = 20 VPP
+Figure 8-24. G = 5 V/V Pulse Response
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+16
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.7 Typical Characteristics: ±15 V (continued)
+at +VS = 15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V. RGT package : RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Time (4 nsec/div)
+Input/Output Voltage (V)
+-6
+-5
+-4
+-3
+-2
+-1
+0
+1
+2
+3
+4
+5
+6
+D032
+D032
+VIN
+VOUT
+VO = 10 VPP
+Figure 8-25. G = –5 V/V Pulse Response
+Time (4 nsec/div)
+Input/Output Voltage (V)
+-12
+-10
+-8
+-6
+-4
+-2
+0
+2
+4
+6
+8
+10
+12
+D033
+D033
+VIN
+VOUT
+VO = 20 VPP
+Figure 8-26. G = –5 V/V Pulse Response
+Frequency (MHz)
+Output Impedance (:)
+10
+100
+1000
+0.05
+0.1
+1
+10
+100
+500
+D019
+Figure 8-27. Output Impedance vs Frequency
+Time (100 nsec/div)
+Output Voltage (V)
+Input Voltage (V)
+-16
+-4.8
+-14
+-4.2
+-12
+-3.6
+-10
+-3
+-8
+-2.4
+-6
+-1.8
+-4
+-1.2
+-2
+-0.6
+0
+0
+2
+0.6
+4
+1.2
+6
+1.8
+8
+2.4
+10
+3
+12
+3.6
+14
+4.2
+16
+4.8
+D021
+VOUT (AV = +5)
+VIN x 5 gain
+Figure 8-28. Overdrive Recovery Time
+Frequency (MHz)
+Shutdown Feedthrough (dB)
+0.1
+1
+10
+100
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+D031
+G = 5 V/V
+G = -5 V/V
+VIN = 2 VPP
+Figure 8-29. Shutdown Feedthrough vs Frequency
+Single-supply Voltage VS (V)
+Quiescent Current IQ (mA)
+12
+14
+16
+18
+20
+22
+24
+26
+28
+30
+32
+34
+14
+14.4
+14.8
+15.2
+15.6
+16
+16.4
+16.8
+17.2
+17.6
+D041
+TA = 40qC
+TA = 25qC
+TA = 85qC
+Figure 8-30. Quiescent Current vs Supply Voltage
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+17
+Product Folder Links: THS3491
+8.7 Typical Characteristics: ±15 V (continued)
+at +VS = 15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V. RGT package : RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+IOUT (mA)
+VOUT (V)
+0
+50
+100 150 200 250 300 350 400 450 500 550 600
+-15
+-12
+-9
+-6
+-3
+0
+3
+6
+9
+12
+15
+D043
+Source, TA = -40qC
+Source, TA = 25qC
+Source, TA = 85qC
+Sink, TA = -40qC
+Sink, TA = 25qC
+Sink, TA = 85qC
+A.
+Measured with devices soldered on TI EVM. Devices not 
+turned off at any read points but load applied for a few 
+milliseconds to measure VOUT and then removed.
+Figure 8-31. Output Voltage Swing vs Output Current
+ 
+ Input Offset Voltage (mV)
+No. of Units in Each Bin
+0
+500
+1000
+1500
+2000
+2500
+3000
+3500
+4000
+4500
+-2
+-1.75
+-1.5
+-1.25
+-1
+-0.75
+-0.5
+-0.25
+0
+0.25
+0.5
+0.75
+1
+1.25
+1.5
+1.75
+2
+D045
+30-V Supply
+15-V Supply
+7100 units at each supply
+Figure 8-32. Input Offset Voltage Distribution
+Inverting IB (PA)
+No. of Units in Each Bin
+0
+500
+1000
+1500
+2000
+2500
+3000
+3500
+4000
+4500
+5000
+-20
+-16
+-12
+-8
+-4
+0
+4
+8
+12
+16
+20
+D046
+30-V Supply
+15-V Supply
+7100 units at each supply
+Figure 8-33. Inverting IB Distribution
+Non-inverting IB (PA)
+No. of Units in Each Bin
+0
+250
+500
+750
+1000
+1250
+1500
+1750
+2000
+2250
+2500
+2750
+3000
+3250
+3500
+3750
+4000
+-7
+-6
+-5
+-4
+-3
+-2
+-1
+0
+1
+2
+3
+4
+5
+6
+7
+D047
+30-V Supply
+15-V Supply
+7100 units at each supply
+Figure 8-34. Noninverting IB Distribution
+TA Temperature (qC)
+Input Offset Voltage (mV)
+-40
+-25
+-10
+5
+20
+35
+50
+65
+80
+95
+110
+125
+0
+0.2
+0.4
+0.6
+0.8
+1
+1.2
+1.4
+1.6
+1.8
+2
+D048
+Flash tested to keep TJ as close to TA as possible
+Figure 8-35. Input Offset Voltage Over Temperature
+TA Temperature (qC)
+-IB (PA)
+-40
+-25
+-10
+5
+20
+35
+50
+65
+80
+95
+110
+125
+-20
+-17.5
+-15
+-12.5
+-10
+-7.5
+-5
+-2.5
+0
+2.5
+5
+7.5
+10
+12.5
+15
+D050
+Flash tested to keep TJ as close to TA as possible
+Figure 8-36. Inverting IB Over Temperature
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+18
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.7 Typical Characteristics: ±15 V (continued)
+at +VS = 15 V, –VS = –15 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V. RGT package : RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+TA Temperature (qC)
++IB (PA)
+-40
+-25
+-10
+5
+20
+35
+50
+65
+80
+95
+110
+125
+-5.5
+-5
+-4.5
+-4
+-3.5
+-3
+-2.5
+-2
+-1.5
+-1
+-0.5
+D051
+Flash tested to keep TJ as close to TA as possible
+Figure 8-37. Noninverting IB Over Temperature
+Input Offset Voltage Drift (PV/qC)
+No. of Units in Each Bin
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+50
+55
+60
+65
+-10
+-8
+-6
+-4
+-2
+0
+2
+4
+6
+8
+10
+D052
+30-V Supply
+15-V Supply
+90 units at each supply
+Figure 8-38. Input Offset Voltage Drift Histogram
+Ib Drift (nA/qC)
+No. of Units in Each Bin
+0
+5
+10
+15
+20
+25
+30
+35
+40
+45
+-165 -150 -135 -120 -105 -90
+-75
+-60
+-45
+-30
+-15
+0
+D053
+30-V Supply
+15-V Supply
+90 units at each supply
+Figure 8-39. Inverting IB Drift Histogram
++Ib Drift (nA/qC)
+No. of Units in Each Bin
+0
+3
+6
+9
+12
+15
+18
+21
+24
+27
+30
+33
+36
+-40
+-35
+-30
+-25
+-20
+-15
+-10
+-5
+0
+5
+10
+15
+D054
+30-V Supply
+15-V Supply
+90 units at each supply
+Figure 8-40. Noninverting IB Drift Histogram
+Ambient Temperature TA (qC)
+TJ_SENSE Voltage (V)
+-40
+-25
+-10
+5
+20
+35
+50
+65
+80
+95
+110
+125
+0.75
+0.8
+0.85
+0.9
+0.95
+1
+1.05
+1.1
+1.15
+1.2
+1.25
+1.3
+1.35
+D075
+Device in shutdown mode to minimize self-heating, RGT package
+Figure 8-41. TJ_SENSE Voltage vs Ambient Temperature
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+19
+Product Folder Links: THS3491
+8.8 Typical Characteristics: ±7.5 V
+at +VS = 7.5 V, –VS = –7.5 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V  RGT package: RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Frequency (MHz)
+Normalized Gain (dB)
+10
+100
+1000
+4000
+4000
+-18
+-15
+-12
+-9
+-6
+-3
+0
+3
+D023
+D023
+G = 2, RF = 976-:
+G = 5, RF = 576-:
+G = 10, RF = 499-:
+G = 20, RF = 383-:
+VO = 2 VPP
+Figure 8-42. Noninverting Small-Signal Frequency Response
+Frequency (MHz)
+Normalized Gain (dB)
+10
+100
+1000
+4000
+4000
+-18
+-15
+-12
+-9
+-6
+-3
+0
+3
+D068
+G = -2 V/V, RF = 832 :
+G = -5 V/V, RF = 749 :
+G = -10 V/V, RF = 719 :
+VO = 2 VPP
+Figure 8-43. Inverting Small-Signal Frequency Response
+Frequency (MHz)
+HD2 (dBc)
+0.1
+1
+10
+100
+500
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D024
+G = 5 V/V
+G = -5 V/V
+G = 2 V/V
+VO = 2 VPP
+Figure 8-44. HD2 vs Frequency
+Frequency (MHz)
+HD3 (dBc)
+0.1
+1
+10
+100
+500
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D025
+G = 5 V/V
+G = -5 V/V
+G = 2 V/V
+VO = 2 VPP
+Figure 8-45. HD3 vs Frequency
+Frequency (MHz)
+HD2 (dBc)
+0.1
+1
+10
+100
+200
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D026
+VO = 5 VPP
+VO = 10 VPP
+Figure 8-46. HD2 vs Frequency Across Output Swing
+Frequency (MHz)
+HD3 (dBc)
+0.1
+1
+10
+100
+200
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+D027
+VO = 5 VPP
+VO = 10 VPP
+Figure 8-47. HD3 vs Frequency Across Output Swing
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+20
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.8 Typical Characteristics: ±7.5 V (continued)
+at +VS = 7.5 V, –VS = –7.5 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V  RGT package: RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Output Voltage Swing (VPP)
+HD2 (dBc)
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D028
+D028
+f = 10 MHz, RL = 100 :
+f = 100 MHz, RL = 100 :
+f = 10 MHz, RL = 1 k:
+f = 100 MHz, RL = 1 k:
+Figure 8-48. HD2 vs Output Swing
+Output Voltage Swing (VPP)
+HD3 (dBc)
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D029
+f = 10 MHz, RL = 100 :
+f = 100 MHz, RL = 100 :
+f = 10 MHz, RL = 1 k:
+f = 100 MHz, RL = 1 k:
+Figure 8-49. HD3 vs Output Swing
+Frequency (MHz)
+Harmonic Distortion (dBc)
+0.1
+1
+10
+100
+500
+-120
+-110
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+D030
+D030
+HD2
+HD3
+VO = 2 VPP
+RLOAD = 1 kΩ
+Figure 8-50. Harmonic Distortion vs Frequency
+Frequency (MHz)
+Inter-modulation Distortion (dBc)
+1
+10
+100
+500
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+D039
+IMD2
+IMD3
+VO = 2.5 VPP per tone
+±100-kHz frequency spacing
+Figure 8-51. Intermodulation Distortion vs Frequency
+Output Voltage Swing per tone (VPP)
+IMD2 (dBc)
+0
+1
+2
+3
+4
+5
+6
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D063
+f = 20 MHz
+f = 50 MHz
+f = 100 MHz
+±100-kHz frequency spacing
+Figure 8-52. IMD2 vs Output Voltage Swing
+Output Voltage Swing per tone (VPP)
+IMD3 (dBc)
+0
+1
+2
+3
+4
+5
+6
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+-10
+0
+D064
+f = 20 MHz
+f = 50 MHz
+f = 100 MHz
+±100-kHz frequency spacing
+Figure 8-53. IMD3 vs Output Voltage Swing
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+21
+Product Folder Links: THS3491
+8.8 Typical Characteristics: ±7.5 V (continued)
+at +VS = 7.5 V, –VS = –7.5 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V  RGT package: RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+Time (4 nsec/div)
+Input/Output Voltage (V)
+-3
+-2.5
+-2
+-1.5
+-1
+-0.5
+0
+0.5
+1
+1.5
+2
+2.5
+3
+D034
+D034
+VIN
+VOUT
+VO = 5 VPP
+Figure 8-54. G = 5 V/V Pulse Response
+Time (4 nsec/div)
+Input/Output Voltage (V)
+-6
+-5
+-4
+-3
+-2
+-1
+0
+1
+2
+3
+4
+5
+6
+D035
+D035
+VIN
+VOUT
+VO = 10 VPP
+Figure 8-55. G = 5 V/V Pulse Response
+Time (4 nsec/div)
+Input/Output Voltage (V)
+-3
+-2.5
+-2
+-1.5
+-1
+-0.5
+0
+0.5
+1
+1.5
+2
+2.5
+3
+D036
+D036
+VIN
+VOUT
+VO = 5 VPP
+Figure 8-56. G = –5 V/V Pulse Response
+Time (4 nsec/div)
+Input/Output Voltage (V)
+-6
+-5
+-4
+-3
+-2
+-1
+0
+1
+2
+3
+4
+5
+6
+D037
+D037
+VIN
+VOUT
+VO = 10 VPP
+Figure 8-57. G = –5 V/V Pulse Response
+Time (100 nsec/div)
+Output Voltage (V)
+Input Voltage (V)
+-8
+-2.4
+-7
+-2.1
+-6
+-1.8
+-5
+-1.5
+-4
+-1.2
+-3
+-0.9
+-2
+-0.6
+-1
+-0.3
+0
+0
+1
+0.3
+2
+0.6
+3
+0.9
+4
+1.2
+5
+1.5
+6
+1.8
+7
+2.1
+8
+2.4
+D022
+VOUT (AV = +5)
+VIN x 5 gain
+Figure 8-58. Overdrive Recovery Time
+IOUT (mA)
+VOUT (V)
+0
+50
+100 150 200 250 300 350 400 450 500 550 600
+-7
+-6
+-5
+-4
+-3
+-2
+-1
+0
+1
+2
+3
+4
+5
+6
+7
+D044
+Source, TA = -40qC
+Source, TA = 25qC
+Source, TA = 85qC
+Sink, TA = -40qC
+Sink, TA = 25qC
+Sink, TA = 85qC
+Measured with devices soldered on TI EVM. Devices not 
+turned off at any read points but load applied for a few msec 
+to measure VOUT and then removed.
+Figure 8-59. Output Voltage Swing vs Output Current
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+22
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+8.8 Typical Characteristics: ±7.5 V (continued)
+at +VS = 7.5 V, –VS = –7.5 V, TA ≅ 25°C, RLOAD = 100 Ω to midsupply, noninverting gain (G) = 5 V/V  RGT package: RF = 576 
+Ω, RG = 143 Ω, or DDA package: RF = 798 Ω, RG = 200 Ω (unless otherwise noted)
+TA Temperature (qC)
+Input Offset Voltage (mV)
+-40
+-25
+-10
+5
+20
+35
+50
+65
+80
+95
+110
+125
+0
+0.2
+0.4
+0.6
+0.8
+1
+1.2
+1.4
+1.6
+1.8
+2
+D049
+Flash tested to keep TJ as close to TA as possible
+Figure 8-60. Input Offset Voltage Over Temperature
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+23
+Product Folder Links: THS3491
+9 Detailed Description
+9.1 Overview
+The THS3491 is a high-voltage, low-distortion, high-speed, current-feedback amplifier designed to operate over 
+a wide supply range of ±7 V to ±16 V for applications requiring large, linear output swings such as arbitrary 
+waveform generators.
+The THS3491 features a power-down pin that puts the amplifier in low power standby mode and lowers the 
+quiescent current from 16.7 mA to 750 µA.
+The RGT package also features a feedback pin (pin 1). Internally on the die this pin is connected to the 
+amplifier's output. This feedback pin arrangement minimizes the PCB trace lengths in the feedback path for the 
+connection from the feedback resistor to the inverting input and output pins. This in turn minimizes the board 
+parasitics in the feedback path, thus allowing to maximize bandwidth with minimal peaking.
+9.2 Functional Block Diagram
+ZIN±
+.(s)
+ZOL(s)×Ierr
+RF
+RG
+VIN+
+VIN±
+VSIG
+VREF
++
+±
+(1 + RF/RG)VSIG
+VREF
+VREF
+Ierr
+VO
+AV = VO/VIN+ = 1 + (RF/RG)
+THS3491
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+24
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+9.3 Feature Description
+9.3.1 Power-Down (PD) Pin
+The THS3491 features a power-down ( PD) pin that lowers the quiescent current from 16.7 mA down to 750 µA, 
+which is designed to reduce system power.
+The power-down pin of the amplifier defaults to 2 V below the positive supply voltage in the absence of an 
+externally applied voltage, which places the amplifier in the power-on mode of operation. To turn off the amplifier 
+in an effort to conserve power, the power-down pin can be pulled low. The PD pin threshold voltages are 
+specified with respect to the REF pin voltage. The threshold voltages for power on and power down are relative 
+to the REF pin and are shown in the Section 8.5 and Section 8.6 tables. Above the enable threshold voltage, the 
+device is on. Below the disable threshold voltage, the device is off. The behavior is not specified between these 
+threshold voltages.
+This power-down functionality helps the amplifier consume less power in power-down mode. Power-down mode 
+is not intended to provide a high-impedance output. The power-down functionality is not intended for use as 
+a tri-state bus driver. In power-down mode, the impedance looking back into the output of the amplifier is 
+dominated by the feedback and gain-setting resistors, but the output impedance of the device varies depending 
+on the voltage applied to the outputs.
+As with most current-feedback amplifiers, the internal architecture places limitations on the system in power-
+down mode. The most common limitation is that the amplifier turns on if there is a ±1 V or greater difference 
+between the two input nodes (VIN+ and VIN–) of the amplifier. If this difference exceeds ±1 V, the amplifier 
+creates an output voltage equal to approximately [(VIN+ – VIN–) –0.7 V] × gain. Conversely if a voltage is 
+applied to the output while in power-down mode, the VIN– node voltage is equal to VO(applied) × RG / (RF + RG). 
+For low-gain configurations and a large applied voltage at the output, the amplifier may turn on because of the 
+aforementioned behavior.
+The time delays associated with turning the device on and off are specified as the time it takes for the amplifier 
+to reach 10% or 90% of the final output voltage. The time delays are in nanoseconds during power on 
+and microseconds during power off because the amplifier moves out of linear operating mode for power-off 
+conditions.
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+25
+Product Folder Links: THS3491
+9.3.2 Power-Down Reference (REF) Pin
+In addition to the power-down pin, the DDA package features a reference pin (REF) that allows control over the 
+enable or disable power-down voltage levels applied to the PD pin. This reference pin is explicitly pinned out 
+on the DDA package as the REF pin. However, on the RGT package, the reference pin refers to pin 5 (GND), 
+which must be connected to GND. In most split-supply applications, the reference pin is connected to ground. In 
+either case, be aware of voltage-level thresholds that apply to the power-down pin. Table 9-1 provides examples 
+and shows the relationship between the reference voltage and the power-down thresholds. In Table 9-1, the 
+threshold levels are derived by the conditions that follow:
+•
+PD ≤ REF + 0.8 V (Disable)
+•
+PD  ≥ REF + 1.5 V (Enable)
+where the usable range at the REF pin is:
+•
+VS– ≤ VREF ≤  (VS+  – 5 V)
+Table 9-1. Example Power-Down Threshold Voltage Levels
+SUPPLY
+VOLTAGE (V)
+REFERENCE PIN
+VOLTAGE (V)
+ENABLE
+LEVEL (V)
+DISABLE
+LEVEL (V)
+±15, ±7, 30
+0
+1.5
+0.8
+±15
+2
+3.5
+2.8
+±15
+–2
+–0.5
+–1.2
+±7
+1
+2.5
+1.8
+±7
+–1
+0.5
+–0.2
+30
+15
+16.5
+15.8
+14
+7
+8.5
+7.8
+The recommended operating mode is to tie the REF pin to ground for single and split-supply operations, which 
+sets the enable and disable thresholds to 1.5 V and 0.8 V, respectively.
+The REF pin must be tied to a valid potential within the recommended operating range of (–VS ≤ V(REF) ≤ 
++VS – 5 V). Although the PD pin can be floated, TI does not recommend floating the PD pin in case stray 
+signals couple into the pin and cause unintended turnon or turnoff device behavior. However, if the PD pin is left 
+unterminated, the PD pin floats to 2 V below the positive rail and the device remains enabled. As a result, the 
+THS3491 DDA package is a drop-in replacement for the THS3091 DDA pinout if the REF pin (pin 1) is tied to a 
+valid potential. If balanced, split supplies are used (±VS) and the REF and PD pins are grounded, the device is 
+disabled.
+9.3.3 Internal Junction Temperature Sense (TJ_SENSE) Pin
+The RGT package includes an internal, junction-temperature sense pin (TJ_SENSE). This pin is a temperature-
+dependent current source from the positive supply into one side of the internal resistor, where the other side of 
+the internal resistor is connected to pin 5 (GND), the PD logic reference pin on the die. For simplicity, and to 
+keep the TJ_SENSE output ground referenced, tie pin 5 to ground (internally, the PD logic reference pin). If pin 5 
+is tied to a voltage in the same range as the REF pin voltage for the DDA package, the output of the TJ_SENSE 
+voltage and input threshold voltages of the PD pin are level shifted.
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+26
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+9.4 Device Functional Modes
+9.4.1 Wideband Noninverting Operation
+The THS3491 is a 900-MHz current-feedback operational amplifier that is designed to operate from a power 
+supply of ±7 V to ±16 V.
+Figure 9-1 shows the THS3491 in a noninverting gain configuration of 5 V/V which is used to generate the 
+majority of the performance curves. Most of the curves are characterized using signal sources with a 50-Ω 
+source impedance and measurement equipment presenting a 50-Ω load impedance.
+6.8 …F
+±
++
+50-Ÿ6RXUFH
+VI
+50-Ÿ/RDG
+±15 V
++
+15 V
+THS3491
+0.1 …F
+RT
+49.9 
+RG
+143 
+RF
+576 
+6.8 …F
+49.9 
++
+0.1 …F
+Figure 9-1. Wideband Noninverting Gain Configuration (5 V/V)
+Current-feedback amplifiers are highly dependent on the RF feedback resistor for maximum performance and 
+stability. Table 9-2 provides the optimal resistor values for RF and RG at different gains to achieve maximum 
+bandwidth with minimal peaking in the frequency response. Use lower RF values for higher bandwidth. Note 
+that this can cause additional peaking and a reduction in phase margin. Conversely, increasing RF decreases 
+the bandwidth but phase margin increases and stability improves. To gain further insight on the feedback and 
+stability analysis of current-feedback amplifiers like the THS3491, see the Current-feedback Amplifiers section of 
+TI Precision Labs.
+Table 9-2. Recommended Resistor Values for Minimum Peaking and Optimal Frequency Response
+With RLOAD = 100 Ω
+GAIN (V/V)
+RGT PACKAGE
+DDA PACKAGE
+RG (Ω)
+RF (Ω)
+RG (Ω)
+RF (Ω)
+2
+976
+976
+2.1k
+2.1k
+5
+143
+576
+200
+798
+10
+54.9
+499
+78.7
+704
+20
+20
+383
+29.4
+564
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+27
+Product Folder Links: THS3491
+9.4.2 Wideband, Inverting Operation
+Figure 9-2 shows the THS3491 in a typical inverting gain configuration where the input and output impedances 
+and signal gain from Figure 9-1 are retained in an inverting circuit configuration.
+±
++
+50-Ÿ6RXUFH
+VI
+50-Ÿ/RDG
+±15 V
++
+15 V
+THS3491
+0.1 …F
+RT
+88.7 
+RG
+115 
+RF
+576 
+49.9 
+6.8 …F
+49.9 
++
+0.1 …F
+6.8 …F
+Figure 9-2. Wideband Inverting Gain Configuration (5 V/V)
+9.4.3 Single-Supply Operation
+The THS3491 operates from a single-supply voltage ranging from 14 V to 32 V. When operating from a single 
+power supply, biasing the input and output at midsupply allows for the maximum output voltage swing. Figure 
+9-3 shows circuits that display noninverting (a) and inverting (b) amplifiers that are configured for single-supply 
+operation.
++VS
+2
+±
++
+50-Ÿ6RXUFH
+VI
+50-Ÿ/RDG
++
+THS3491
+0.1 …F
+RT
+88.7 
+RG
+115 
+RF
+576 
+49.9 
+6.8 …F
+49.9 
+±
++
+50-Ÿ6RXUFH
+VI
+50-Ÿ/RDG
++
++VS
+THS3491
+0.1 …F
+RT
+49.9 
+RG
+143 
+RF
+576 
+6.8 …F
+49.9 
++VS
+2
++VS
+2
++VS
+2
+b) Inverting Gain Configuration
+a) Noninverting Gain Configuration
++VS
+Figure 9-3. DC-Coupled, Single-Supply Operation
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+28
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+9.4.4 Maximum Recommended Output Voltage
+The THS3491 is designed to produce better than 40 dB SFDR while driving a 100-MHz, 20-Vpp signal into a 
+100-Ω load. To accomplish this, the geometries of certain signal path transistors must be limited. As a result of 
+this limitation, some internal devices begin to saturate when large signal levels are input at frequencies greater 
+than 100 MHz. When these devices saturate, the loop opens and the amplifier is no longer in linear operation. 
+This appears as a gain step-up in the frequency response curve. To avoid this phenomenon, applications must 
+comply with the recommended linear operating region shown in Figure 9-4. Figure 9-4 shows the maximum 
+output voltage vs frequency that is permitted to keep the amplifier in linear operation.
+Frequency (MHz)
+Maximum Output Voltage (VPP)
+1
+10
+100
+1000
+0
+5
+10
+15
+20
+25
+30
+D020
+VS = r 15V
+VS = r 7.5V
+Figure 9-4. Maximum Recommended Output Voltage vs Frequency
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+29
+Product Folder Links: THS3491
+10 Application and Implementation
+Note
+Information in the following applications sections is not part of the TI component specification, 
+and TI does not warrant its accuracy or completeness. TI’s customers are responsible for 
+determining suitability of components for their purposes, as well as validating and testing their design 
+implementation to confirm system functionality.
+10.1 Application Information
+10.1.1 Driving Capacitive Loads
+Applications such as power JFET and MOSFET (power FET) drivers are highly capacitive and cause stability 
+problems for high-speed amplifiers.
+Figure 10-1 and Figure 10-2 show recommended methods for driving capacitive loads. The basic idea is to 
+use a resistor or ferrite chip to isolate the phase shift at high frequency caused by the capacitive load from 
+the amplifier feedback path. The output impedance of the amplifier in conjunction with CLOAD introduces a pole 
+in the open-loop transimpedance gain response and if the pole is at a frequency lower than the non-dominant 
+pole of the amplifier, then this results in a reduced loop gain and a reduced phase margin. The isolation resistor 
+introduces a zero in the response, which counteracts the effect of the pole. The location of the zero is dependent 
+on the values of RISO and CLOAD. Figure 8-5 shows examples of the recommended RISO values to achieve 
+flat frequency response while driving certain capacitive loads. See Effect of Parasitic Capacitance in Op Amp 
+Circuits for a detailed analysis of selecting isolation resistor values while driving capacitive loads.
+576 
+143 
+RISO
+1 
++
+±
++VS
+±VS
+THS3491
+49.9 
+CLOAD
+1 …F
+VI
+RLOAD
+1 k
+Figure 10-1. Driving a Large Capacitive Load Using an Output Series Isolation Resistor
+Placing a small series resistor (RISO) between the output of the amplifier and the capacitive load as Figure 10-1 
+shows is a simple way to isolate the load capacitance.
+Figure 10-2 shows two amplifiers in parallel to double the output drive current in order to drive larger capacitive 
+loads. This technique is used when more output current is required to charge and discharge the load faster, such 
+as driving large FET transistors.
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+30
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+576 
+143 
+2.49 
++
+±
++VS
+±VS
+THS3491
+24.9 
+576 
+143 
+2.49 
++
+±
++VS
+±VS
+THS3491
+VS
+24.9 
+1 nF
+Figure 10-2. Driving a Large Capacitive Load Using Two Parallel Amplifier Channels
+Figure 10-3 shows a push-pull FET driver circuit commonly used in ultrasound applications with isolation 
+resistors to isolate the gate capacitance from the amplifier.
+576 
+2.49 
++
+±
+±VS
++VS
+THS3491
+576 
+286 
+2.49 
++
+±
++VS
+±VS
+THS3491
++VS
+±VS
+Figure 10-3. Power FET Drive Circuit
+10.1.2 Video Distribution
+The wide bandwidth, high slew rate, and high output drive current of the THS3491 meets the demands for video 
+distribution by delivering video signals down multiple cables. For high signal quality with minimal degradation 
+of performance, use a 0.1-dB gain flatness that is at least seven times the pass-band frequency to minimize 
+group delay variations from the amplifier. A high slew rate minimizes distortion of the video signal and supports 
+component video and RGB video signals that require fast transition and settling times for high signal quality.
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+31
+Product Folder Links: THS3491
+±
++
+THS3491
+VI
+±7.5 V
+7.5 V
+75-Ÿ7UDQVPLVVLRQ/LQH
+VO(1)
+VO(n)
+n 
+Lines
+75 
+75 
+75 
+976 
+976 
+75 
+75 
+Figure 10-4. Video Distribution Amplifier Application
+10.2 Typical Application
+The fundamental concept of load sharing is to drive a load using two or more of the same operational amplifier. 
+Each amplifier is driven by the same source. Figure 10-5 shows two THS3491 amplifiers sharing the same load. 
+This concept effectively reduces the current load of each amplifier by 1/N, where N is the number of amplifiers.
+50-Ÿ7UDQVPLVVLRQ/LQH
+(TL1)
+VOUT
+RLOAD
+50 
+-
++
+±15 V
+15 V
+50-Ÿ7UDQVPLVVLRQ/LQH(TL2)
+±
++
+±15 V
+15 V
+U1
+U2
++
+VIN
+VOUT
+-
++
+±15 V
+15 V
+U3
+THS3491
+THS3491
+THS3491
+RT2
+100 
+a) Single THS3491 Amplifier Driving a Transmission Line
+b) Two THS3491 Amplifiers Driving a Transmission Line
+RS2
+40.2 
+RG2
+143 
+RF2
+576 
+RT1
+100 
+RSOURCE
+50 
+RLOAD
+50 
+RS2
+40.2 
+RG1
+143 
+RF1
+576 
+RS3
+50 
+RG1
+143 
+RF1
+576 
++
+VIN
+RSOURCE
+50 
+RT3
+50 
+RT
+30 
+Figure 10-5. Load-Sharing Driver Application
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+32
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+10.2.1 Design Requirements
+Use two THS3491 amplifiers in a parallel load-sharing circuit to improve distortion performance.
+Table 10-1. Design Parameters
+DESIGN PARAMETER
+VALUE
+VO (At amplifier output)
+20 VPP
+RLOAD
+100 Ω
+Gain flatness at 100 MHz
+Less than 0.5 dB
+10.2.2 Detailed Design Procedure
+In addition to providing higher output current drive to the load, the load-sharing configuration provides improved 
+distortion performance. In many cases, an operational amplifier shows greater distortion performance as the 
+load current decreases (that is, for higher resistive loads) until the feedback resistor dominates the current load. 
+In a load-sharing configuration of N amplifiers in parallel, the equivalent current load that each amplifier drives 
+is 1/N times the total load current. For example, in a two amplifier load- sharing configuration with matching 
+resistance (see Figure 10-5) driving a resistive load (RLOAD), the total series resistance (RTOT_SERIES) at the 
+output of the amplifiers is 2 x RLOAD and each amplifier drives 2 x RLOAD. The total series resistance in the 
+two-amplifier configuration shown in Figure 10-5 is the parallel combination of RS2 resistors in series with RT 
+resistor (RTOT_SERIES = RS2 || RS2 + RT). Such configuration of resistors at the output allows for fault detection if 
+the load is shorted to GND and can be used for filtering the signal going to the load.
+Figure 10-5 shows two circuits: one of a single THS3491 amplifier driving a double-terminated, 50-Ω cable 
+and one of two THS3491 amplifiers in a load-sharing configuration. In the load-sharing configuration, the two 
+40.2-Ω series output resistors act in parallel and in conjunction with the 30-Ω terminating resistor provide 50-Ω 
+back-matching to the 50-Ω cable.
+Figure 10-6 shows the normalized frequency response for the two-amplifier load-sharing configuration. The total 
+load, RTOT_LOAD, for the configuration is the sum of RTOT_SERIES and RLOAD which is 100 Ω for the two-amplifier 
+configuration in Figure 10-5. Figure 10-7 shows the distortion performance of the two-amplifier configuration.
+Benefit of the multiple amplifier's in load-sharing configuration becomes even more evident when the total 
+load increases. Figure 10-8 and Figure 10-9 show the HD2 and HD3 performance, respectively, in two, three, 
+and four amplifier configurations when the RTOT_LOAD = 20 Ω. HD2 improves by almost 13 dB and 24 dB, 
+respectively in the three and four amplifier configuration from the two-amplifier configuration, and HD3 shows an 
+improvement of almost 15 and 19 dB in the three and four amplifier configurations, respectively.
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+33
+Product Folder Links: THS3491
+10.2.3 Application Curves
+Frequency (MHz)
+Normalized Gain at VOUT (dB)
+-6
+-5
+-4
+-3
+-2
+-1
+0
+1
+2
+3
+10
+100
+D081
+RTOT_LOAD = 100 Ω
+VO (amplifier output) = 20 VPP
+Figure 10-6. Frequency Response Of Two-Amplifier 
+Configuration in Figure 10-5 (Gain = 5 V/V, 
+Measured At VOUT)
+Frequency (MHz)
+Harmonic Distortion (dBc)
+-100
+-90
+-80
+-70
+-60
+-50
+-40
+-30
+-20
+1
+10
+100
+D081
+HD2
+HD3
+RTOT_LOAD = 100 Ω
+VO (amplifier output) = 20 VPP
+Figure 10-7. Distortion Of Two-Amplifier 
+Configuration in Figure 10-5 (Gain = 5 V/V, 
+Measured At VOUT)
+Frequency (MHz)
+HD2 (dB)
+-95
+-90
+-85
+-80
+-75
+-70
+-65
+-60
+-55
+-50
+-45
+1
+10
+D083
+2 x THS3491
+3 x THS3491
+4 x THS3491
+RTOT_LOAD = 20 Ω
+VO (amplifier output) = 20 VPP
+Figure 10-8. HD2 For Amplifier Load-Sharing 
+Configuration (Gain = 5 V/V)
+Frequency (MHz)
+HD3 (dB)
+-90
+-85
+-80
+-75
+-70
+-65
+-60
+-55
+-50
+-45
+-40
+-35
+-30
+1
+10
+D084
+2 x THS3491
+3 x THS3491
+4 x THS3491
+RTOT_LOAD = 20 Ω
+VO (amplifier output) = 20 VPP
+Figure 10-9. HD2 For Amplifier Load-Sharing 
+Configuration (Gain = 5 V/V)
+10.3 Power Supply Recommendations
+The THS3491 operates from a single supply or with dual supplies if the input common-mode voltage range 
+(CMIR) has the required headroom (4.3 V) to either supply rail. Supplies must be decoupled with low inductance 
+(often ceramic) capacitors to ground less than 0.5 inches from the device pins. TI recommends using ground 
+planes, and as in most high-speed devices, removing ground planes close to device sensitive pins such as 
+input pins is advisable. An optional supply decoupling capacitor across the two power supplies (for split-supply 
+operation) improves second harmonic distortion performance.
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+34
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+10.4 Layout
+10.4.1 Layout Guidelines
+Achieving optimum performance with a high-frequency amplifier such as the THS3491 requires careful attention 
+to board layout parasitic and external component types.
+Recommendations that optimize performance include:
+•
+Minimize parasitic capacitance to any AC ground for all of the signal I/O pins. Parasitic capacitance on the 
+output and input pins can cause instability. To reduce unwanted capacitance, a window around the signal I/O 
+pins must be opened in all of the ground and power planes around those pins. Otherwise, ground and power 
+planes must be unbroken elsewhere on the board.
+•
+Minimize the distance (< 0.25 of an inch [6.35 mm] from the power supply pins to high-frequency 0.1-μF and 
+100-pF decoupling capacitors. At the device pins, the ground and power plane layout must not be in close 
+proximity to the signal I/O pins. Avoid narrow power and ground traces to minimize inductance between the 
+pins and the decoupling capacitors. The power supply connections must always be decoupled with these 
+capacitors Use larger tantalum decoupling capacitors (with a value of 6.8 µF or more) that are effective at 
+lower frequencies on the main supply pins. These can be placed further from the device and can be shared 
+among several devices in the same area of the printed circuit board (PCB).
+•
+Careful selection and placement of external components preserve the high-frequency performance of the 
+THS3491. Resistors must be a low reactance type. Surface-mount resistors work best and allow a tighter 
+overall layout. Keep leads and PCB trace length as short as possible. Never use wire-bound type resistors 
+in a high-frequency application. Because the output pin and inverting input pins are the most sensitive 
+to parasitic capacitance, always position the feedback and series output resistors, if any, as close to the 
+inverting input pins and output pins as possible, respectively. Place other network components such as 
+input termination resistors close to the gain setting resistors. Even with a low parasitic capacitance shunting 
+the external resistors, excessively high resistor values create significant time constants constraints? that 
+can degrade performance. Good axial metal film or surface-mount resistors feature approximately 0.2 pF 
+capacitance in shunt with the resistor. For resistor values greater than 2 kΩ, this parasitic capacitance adds 
+a pole or a zero that can effect circuit operation. Keep resistor values as low as possible and consistent with 
+load-driving considerations.
+•
+Make connections to other wideband devices on the board with short direct traces or through onboard 
+transmission lines. For short connections, consider the trace and the input to the next device as a lumped 
+capacitive load. Use relatively wide traces of 0.05 inch to 0.1 inch (1.3 mm to 2.54 mm), preferably with 
+open ground and power planes around the traces. Estimate the total capacitive load and determine if isolation 
+resistors on the outputs are required. Low parasitic capacitive loads ( less than 4 pF) may not require series 
+resistance because the THS3491 is nominally compensated to operate with a 2-pF parasitic load. Higher 
+parasitic capacitive loads without a series resistance are allowed as the signal gain increases (increasing the 
+unloaded phase margin). If a long trace is required and the 6-dB signal loss intrinsic to a twice-terminated 
+transmission line is acceptable, implement a matched impedance transmission line using microstrip or 
+stripline techniques (consult an ECL design handbook for microstrip and stripline layout techniques).
+•
+A 50-Ω environment is not required onboard, and a higher impedance environment improves distortion as 
+shown in the distortion versus load plots; see Figure 8-7 and Figure 8-8. With a characteristic board trace 
+impedance based on board material and trace dimensions, a matching series resistor into the trace from the 
+output of the THS3491 is used. A terminating shunt resistor at the input of the destination device is also used. 
+The terminating impedance is the parallel combination of the shunt resistor and the input impedance of the 
+destination device. This total effective impedance must be set to match the trace impedance.
+If the 6-dB attenuation of a twice-terminated transmission line is unacceptable, a long trace can be series 
+terminated at the source end only. Treat the trace as a capacitive load in this case. This termination does not 
+preserve signal integrity as well as a twice-terminated line. If the input impedance of the destination device 
+is low, there is some signal attenuation because of the voltage divider formed by the series output into the 
+terminating impedance.
+•
+Do not socket a high-speed device like the THS3491. The socket introduces additional lead lengths and 
+pin-to-pin capacitance, which can create a troublesome parasitic network. This can make it achieving a 
+smooth, stable frequency response impossible. Obtain better results by soldering the THS3491 devices 
+directly onto the board.
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+35
+Product Folder Links: THS3491
+10.4.1.1 PowerPAD™ Integrated Circuit Package Design Considerations (DDA Package Only)
+The THS3491 is available in a thermally-enhanced PowerPAD integrated circuit package. These packages are 
+constructed using a downset leadframe on which the die is mounted, as shown in the (a) and (b) sections of 
+Figure 10-10. This arrangement results in the lead frame that is exposed as a thermal pad on the underside of 
+the package, a shown in Figure 10-10(c). Because this thermal pad directly contacts the die, achieve efficient 
+thermal performance by providing a good thermal path away from the thermal pad. Devices such as the 
+THS3491 have no electrical connection between the PowerPAD and the die.
+The PowerPAD integrated circuit package allows for assembly and thermal management in one manufacturing 
+operation. During the surface-mount solder operation (when the leads are soldered), the thermal pad can be 
+soldered to a copper area underneath the package. By using thermal paths within this copper area, heat is 
+conducted away from the package into a ground plane or other heat-dissipating device.
+The PowerPAD integrated circuit package represents a breakthrough in combining the small area and ease of 
+assembly of surface mount with the, heretofore, awkward mechanical methods of heatsinking.
+    DIE
+Side View (a)
+DIE
+End View (b)
+Thermal
+Pad
+Bottom View (c)
+Figure 10-10. Views of Thermally Enhanced Package
+Although there are many ways to properly heat sink the PowerPAD integrated circuit package, see Section 
+10.4.1.1.1 for the recommended approach.
+10.4.1.1.1 PowerPAD™ Integrated Circuit Package Layout Considerations
+The DDA package top-side etch and via pattern is shown in Figure 10-11.
+0.300
+(7,62)
+0.100
+(2,54)
+0.035
+(0,89)
+0.010
+(0,254)
+0.030
+(0,732)
+0.026
+(0,66)
+0.176
+(4,47)
+0.050
+(1,27)
+0.080
+(2,03)
+0.035
+(0,89)
+0.010
+vias
+(0.254)
+0.140
+(3,56)
+0.060
+(1,52)
+0.060
+(1,52)
+All Units in inches (millimeters)
+Figure 10-11. DDA PowerPAD™ Integrated Circuit Package PCB Etch and Via Pattern
+1.
+Use etch for the leads and the thermal pad.
+2.
+Place 13 vias in the thermal pad area. These vias must be 0.01 inch (0.254 mm) in diameter. Keep the vias 
+small so that solder wicking through the vias is not a problem during reflow.
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+36
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+3.
+Additional vias may be placed anywhere along the thermal plane outside of the thermal pad area, and help 
+dissipate the heat generated by the THS3491 device. These additional vias may be larger than the 0.01-inch 
+(0.254 mm) diameter vias directly under the thermal pad because they are not in the area that requires 
+soldering. As a result, wicking is not a problem.
+4.
+Connect all vias to the internal ground plane. The PowerPAD integrated circuit package is electrically 
+isolated from the silicon and all leads. Connecting the PowerPAD integrated circuit package to any potential 
+voltage such as –VS is acceptable because there is no electrical connection to the silicon.
+5.
+When connecting these vias to the ground plane, do not use the typical web or spoke through connection 
+methodology. Web and spoke connections have a high thermal resistance that slows the heat transfer during 
+soldering . Avoiding these connection methods makes the soldering of vias that have plane connections 
+easier. In this application, however, low thermal resistance is desired for the most efficient heat transfer. 
+Therefore, the vias under the THS3491 PowerPAD integrated circuit package must connect to the internal 
+ground plane with a complete connection around the entire circumference of the plated-through hole.
+6.
+The top-side solder mask must leave the pins of the package and the thermal pad area with the 13 vias 
+exposed.
+7.
+Apply solder paste to the exposed thermal pad area and all of the device pins.
+8.
+With these preparatory steps in place, the device is placed in position and run through the solder reflow 
+operation as any standard surface-mount component. This results in a device that is properly installed.
+10.4.1.1.2 Power Dissipation and Thermal Considerations
+The THS3491 includes automatic thermal shutoff protection. This protection circuitry shuts down the amplifier 
+if the junction temperature exceeds approximately 160°C. When the junction temperature decreases to 
+approximately 145°C, the amplifier turns on again. However, for maximum performance and reliability, make sure 
+that the design does not exceed a junction temperature of 125°C. Between 125°C and 150°C, damage does not 
+occur, but the performance of the amplifier begins to degrade and long-term reliability suffers. The package and 
+the PCB dictate the thermal characteristics of the device. Maximum power dissipation for a particular package is 
+calculated using the following formula.
+max
+A
+Dmax
+JA
+T
+T
+P
+
+ 
+T
+(1)
+where
+•
+PDmax is the maximum power dissipation in the amplifier (W).
+•
+Tmax is the absolute maximum junction temperature (°C).
+•
+TA is the ambient temperature (°C).
+•
+θJA = θJC + θCA
+•
+θJC is the thermal coefficient from the silicon junctions to the case (°C/W).
+•
+θCA is the thermal coefficient from the case to ambient air (°C/W).
+The thermal coefficient for the PowerPAD integrated circuit packages are substantially improved over the 
+traditional SOIC package. The data for the PowerPAD packages assume a board layout that follows the 
+PowerPAD package layout guidelines referenced above and detailed in PowerPAD™ Thermally Enhanced 
+Package. Maximum power dissipation levels are shown in Comparison of θJA for Various Packages. If the 
+PowerPAD integrated circuit package is not soldered to the PCB, the thermal impedance increases substantially 
+and may cause serious heat and performance issues. Take care to always solder the PowerPAD integrated 
+circuit package to the PCB for optimum performance.
+When determining whether or not the device satisfies the maximum power dissipation requirement, make sure 
+to consider not only quiescent power dissipation, but dynamic power dissipation. Often times, this dissipation 
+is difficult to quantify because the signal pattern is inconsistent, but an estimate of the RMS power dissipation 
+provides visibility into a possible problem.
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+37
+Product Folder Links: THS3491
+10.4.2 Layout Example
+Blind Vias to GND to help with 
+heat dissipation out of the board
+Power Connection with Vias 
+to the internal power plane
+Rout pad closer to 
+the device output
+THS3491RGT thermal pad 
+directly on top of blind vias
+Figure 10-12. RGT Package Layout Example
+GND trace cut-out underneath the device inputs 
+and output from PCB second layer to the fourth 
+layer in-order to reduce PCB parasitic capacitance
+Figure 10-13. Ground Trace Cutout Beneath the Device Inputs and Output
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+38
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+Blind Vias to GND to help with 
+heat dissipation of the board
+Heat Sink attach on the 
+bottom layer directly 
+underneath the device
+Figure 10-14. Heat Sink Attachment to Bottom Layer
+www.ti.com
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+Copyright © 2023 Texas Instruments Incorporated
+Submit Document Feedback
+39
+Product Folder Links: THS3491
+11 Device and Documentation Support
+11.1 Documentation Support
+11.1.1 Related Documentation
+For related documentation, see the following:
+•
+Texas Instruments, PowerPAD™ Made Easy
+•
+Texas Instruments, PowerPAD™ Thermally Enhanced Package
+•
+Texas Instruments, Voltage Feedback vs Current Feedback Op Amps
+•
+Texas Instruments, Current Feedback Amplifier Analysis and Compensation
+•
+Texas Instruments, Current Feedback Amplifiers: Review, Stability Analysis, and Applications
+•
+Texas Instruments, Effect of Parasitic Capacitance in Op Amp Circuits
+11.2 Receiving Notification of Documentation Updates
+To receive notification of documentation updates, navigate to the device product folder on ti.com. Click on 
+Subscribe to updates to register and receive a weekly digest of any product information that has changed. For 
+change details, review the revision history included in any revised document.
+11.3 Support Resources
+TI E2E™ support forums are an engineer's go-to source for fast, verified answers and design help — straight 
+from the experts. Search existing answers or ask your own question to get the quick design help you need.
+Linked content is provided "AS IS" by the respective contributors. They do not constitute TI specifications and do 
+not necessarily reflect TI's views; see TI's Terms of Use.
+11.4 Trademarks
+PowerPAD™ is a trademark of Texas Instruments.
+TI E2E™ is a trademark of Texas Instruments.
+All trademarks are the property of their respective owners.
+11.5 Electrostatic Discharge Caution
+This integrated circuit can be damaged by ESD. Texas Instruments recommends that all integrated circuits be handled 
+with appropriate precautions. Failure to observe proper handling and installation procedures can cause damage.
+ESD damage can range from subtle performance degradation to complete device failure. Precision integrated circuits may 
+be more susceptible to damage because very small parametric changes could cause the device not to meet its published 
+specifications.
+11.6 Glossary
+TI Glossary 
+This glossary lists and explains terms, acronyms, and definitions.
+12 Mechanical, Packaging, and Orderable Information
+The following pages include mechanical, packaging, and orderable information. This information is the most 
+current data available for the designated devices. This data is subject to change without notice and revision of 
+this document. For browser-based versions of this data sheet, refer to the left-hand navigation.
+THS3491
+SBOS875C – AUGUST 2017 – REVISED FEBRUARY 2023
+www.ti.com
+40
+Submit Document Feedback
+Copyright © 2023 Texas Instruments Incorporated
+Product Folder Links: THS3491
+PACKAGE OPTION ADDENDUM
+www.ti.com
+9-Nov-2025
+PACKAGING INFORMATION
+Orderable part number
+Status
+(1)
+Material type
+(2)
+Package | Pins
+Package qty | Carrier
+RoHS
+(3)
+Lead finish/
+Ball material
+(4)
+MSL rating/
+Peak reflow
+(5)
+Op temp (°C)
+Part marking
+(6)
+THS3491IDDAR
+Active
+Production
+SO PowerPAD
+(DDA) | 8
+2500 | LARGE T&R
+Yes
+NIPDAU | NIPDAUAG
+Level-3-260C-168 HR
+-40 to 85
+HS3491
+THS3491IDDAR.B
+Active
+Production
+SO PowerPAD
+(DDA) | 8
+2500 | LARGE T&R
+Yes
+NIPDAUAG
+Level-3-260C-168 HR
+-40 to 85
+HS3491
+THS3491IDDAT
+Active
+Production
+SO PowerPAD
+(DDA) | 8
+250 | SMALL T&R
+Yes
+NIPDAU | NIPDAUAG
+Level-3-260C-168 HR
+-40 to 85
+HS3491
+THS3491IDDAT.B
+Active
+Production
+SO PowerPAD
+(DDA) | 8
+250 | SMALL T&R
+Yes
+NIPDAUAG
+Level-3-260C-168 HR
+-40 to 85
+HS3491
+THS3491IRGTR
+Active
+Production
+VQFN (RGT) | 16
+2500 | LARGE T&R
+Yes
+NIPDAU
+Level-2-260C-1 YEAR
+-40 to 85
+HS3491
+THS3491IRGTR.B
+Active
+Production
+VQFN (RGT) | 16
+2500 | LARGE T&R
+Yes
+NIPDAU
+Level-2-260C-1 YEAR
+-40 to 85
+HS3491
+THS3491IRGTRG4
+Active
+Production
+VQFN (RGT) | 16
+2500 | LARGE T&R
+Yes
+NIPDAU
+Level-2-260C-1 YEAR
+-40 to 85
+HS3491
+THS3491IRGTRG4.B
+Active
+Production
+VQFN (RGT) | 16
+2500 | LARGE T&R
+Yes
+NIPDAU
+Level-2-260C-1 YEAR
+-40 to 85
+HS3491
+THS3491IRGTT
+Active
+Production
+VQFN (RGT) | 16
+250 | SMALL T&R
+Yes
+NIPDAU
+Level-2-260C-1 YEAR
+-40 to 85
+HS3491
+THS3491IRGTT.B
+Active
+Production
+VQFN (RGT) | 16
+250 | SMALL T&R
+Yes
+NIPDAU
+Level-2-260C-1 YEAR
+-40 to 85
+HS3491
+THS3491YR
+Active
+Production
+DIESALE (Y) | 0
+3000 | LARGE T&R
+Yes
+Call TI
+N/A for Pkg Type
+-40 to 85
+THS3491YR.B
+Active
+Production
+DIESALE (Y) | 0
+3000 | LARGE T&R
+Yes
+Call TI
+N/A for Pkg Type
+-40 to 85
+ 
+(1) Status:  For more details on status, see our product life cycle.
+ 
+(2) Material type:  When designated, preproduction parts are prototypes/experimental devices, and are not yet approved or released for full production. Testing and final process, including without limitation quality assurance,
+reliability performance testing, and/or process qualification, may not yet be complete, and this item is subject to further changes or possible discontinuation. If available for ordering, purchases will be subject to an additional
+waiver at checkout, and are intended for early internal evaluation purposes only. These items are sold without warranties of any kind.
+ 
+(3) RoHS values:  Yes, No, RoHS Exempt. See the TI RoHS Statement for additional information and value definition.
+ 
+(4) Lead finish/Ball material:  Parts may have multiple material finish options. Finish options are separated by a vertical ruled line. Lead finish/Ball material values may wrap to two lines if the finish value exceeds the maximum
+column width.
+ 
+(5) MSL rating/Peak reflow:  The moisture sensitivity level ratings and peak solder (reflow) temperatures. In the event that a part has multiple moisture sensitivity ratings, only the lowest level per JEDEC standards is shown.
+Refer to the shipping label for the actual reflow temperature that will be used to mount the part to the printed circuit board.
+ 
+(6) Part marking:  There may be an additional marking, which relates to the logo, the lot trace code information, or the environmental category of the part.
+Addendum-Page 1
+PACKAGE OPTION ADDENDUM
+www.ti.com
+9-Nov-2025
+ 
+Multiple part markings will be inside parentheses. Only one part marking contained in parentheses and separated by a "~" will appear on a part. If a line is indented then it is a continuation of the previous line and the two
+combined represent the entire part marking for that device.
+ 
+Important Information and Disclaimer:The information provided on this page represents TI's knowledge and belief as of the date that it is provided. TI bases its knowledge and belief on information provided by third parties, and
+makes no representation or warranty as to the accuracy of such information. Efforts are underway to better integrate information from third parties. TI has taken and continues to take reasonable steps to provide representative
+and accurate information but may not have conducted destructive testing or chemical analysis on incoming materials and chemicals. TI and TI suppliers consider certain information to be proprietary, and thus CAS numbers
+and other limited information may not be available for release.
+ 
+In no event shall TI's liability arising out of such information exceed the total purchase price of the TI part(s) at issue in this document sold by TI to Customer on an annual basis.
+ 
+Addendum-Page 2
+PACKAGE MATERIALS INFORMATION
+ 
+ 
+www.ti.com
+30-Sep-2025
+TAPE AND REEL INFORMATION
+Reel Width (W1)
+REEL DIMENSIONS
+A0
+B0
+K0
+W
+Dimension designed to accommodate the component length
+Dimension designed to accommodate the component thickness
+Overall width of the carrier tape
+Pitch between successive cavity centers
+Dimension designed to accommodate the component width
+TAPE DIMENSIONS
+K0
+ P1
+B0 W
+A0
+Cavity
+QUADRANT ASSIGNMENTS FOR PIN 1 ORIENTATION IN TAPE
+Pocket Quadrants
+Sprocket Holes
+Q1
+Q1
+Q2
+Q2
+Q3
+Q3
+Q4
+Q4
+User Direction of Feed
+P1
+Reel
+Diameter
+ 
+*All dimensions are nominal
+Device
+Package
+Type
+Package
+Drawing
+Pins
+SPQ
+Reel
+Diameter
+(mm)
+Reel
+Width
+W1 (mm)
+A0
+(mm)
+B0
+(mm)
+K0
+(mm)
+P1
+(mm)
+W
+(mm)
+Pin1
+Quadrant
+THS3491IDDAT
+SO
+PowerPAD
+DDA
+8
+250
+330.0
+12.8
+6.4
+5.2
+2.1
+8.0
+12.0
+Q1
+THS3491IRGTR
+VQFN
+RGT
+16
+2500
+330.0
+12.4
+3.3
+3.3
+1.1
+8.0
+12.0
+Q2
+THS3491IRGTRG4
+VQFN
+RGT
+16
+2500
+330.0
+12.4
+3.3
+3.3
+1.1
+8.0
+12.0
+Q2
+THS3491IRGTT
+VQFN
+RGT
+16
+250
+180.0
+12.4
+3.3
+3.3
+1.1
+8.0
+12.0
+Q2
+Pack Materials-Page 1
+PACKAGE MATERIALS INFORMATION
+ 
+ 
+www.ti.com
+30-Sep-2025
+TAPE AND REEL BOX DIMENSIONS
+Width (mm)
+W
+L
+H
+ 
+*All dimensions are nominal
+Device
+Package Type
+Package Drawing
+Pins
+SPQ
+Length (mm)
+Width (mm)
+Height (mm)
+THS3491IDDAT
+SO PowerPAD
+DDA
+8
+250
+366.0
+364.0
+50.0
+THS3491IRGTR
+VQFN
+RGT
+16
+2500
+346.0
+346.0
+33.0
+THS3491IRGTRG4
+VQFN
+RGT
+16
+2500
+346.0
+346.0
+33.0
+THS3491IRGTT
+VQFN
+RGT
+16
+250
+210.0
+185.0
+35.0
+Pack Materials-Page 2
+GENERIC PACKAGE VIEW
+Images above are just a representation of the package family, actual package may vary.
+Refer to the product data sheet for package details.
+DDA 8
+PowerPAD
+ TM SOIC - 1.7 mm max height
+PLASTIC SMALL OUTLINE
+4202561/G
+www.ti.com
+PACKAGE OUTLINE
+C
+6.2
+5.8 TYP
+1.7 MAX
+6X 1.27
+8X 0.51
+0.31
+2X
+3.81
+0.25
+0.10 TYP
+0 - 8
+0.15
+0.00
+2.71
+2.11
+3.4
+2.8
+4X (0 -10 )
+0.25
+GAGE PLANE
+1.27
+0.40
+A
+5.0
+4.8
+NOTE 3
+B
+4.0
+3.8
+4214849/B   09/2025
+PowerPAD    SOIC - 1.7 mm max height
+DDA0008B
+PLASTIC SMALL OUTLINE
+NOTES: 
+ 
+1. All linear dimensions are in millimeters. Any dimensions in parenthesis are for reference only. Dimensioning and tolerancing
+    per ASME Y14.5M. 
+2. This drawing is subject to change without notice. 
+3. This dimension does not include mold flash, protrusions, or gate burrs. Mold flash, protrusions, or gate burrs shall not
+    exceed 0.15 mm per side. 
+4. This dimension does not include interlead flash. Interlead flash shall not exceed 0.25 mm per side.
+5. Reference JEDEC registration MS-012.
+ 
+PowerPAD is a trademark of Texas Instruments.
+TM
+1
+8
+0.25
+C A B
+5
+4
+PIN 1 ID
+AREA
+NOTE 4
+SEATING PLANE
+0.1 C
+ SEE DETAIL A
+DETAIL A
+TYPICAL
+SCALE  2.400
+EXPOSED
+THERMAL PAD
+4
+1
+5
+8
+9
+www.ti.com
+EXAMPLE BOARD LAYOUT
+(5.4)
+(1.3) TYP
+(
+0.2) TYP
+VIA
+(R0.05) TYP
+0.07 MAX
+ALL AROUND
+0.07 MIN
+ALL AROUND
+8X (1.55)
+8X (0.6)
+6X (1.27)
+(2.95)
+NOTE 9
+(4.9)
+NOTE 9
+(2.71)
+(3.4)
+SOLDER MASK
+OPENING
+(1.3)
+TYP
+4214849/B   09/2025
+PowerPAD    SOIC - 1.7 mm max height
+DDA0008B
+PLASTIC SMALL OUTLINE
+SYMM
+SYMM
+SEE DETAILS
+LAND PATTERN EXAMPLE
+SCALE:10X
+1
+4
+5
+8
+SOLDER MASK
+OPENING
+ 
+METAL COVERED
+BY SOLDER MASK
+SOLDER MASK
+DEFINED PAD
+9
+NOTES: (continued)
+ 
+6.   Publication IPC-7351 may have alternate designs. 
+7.   Solder mask tolerances between and around signal pads can vary based on board fabrication site. 
+8.   This package is designed to be soldered to a thermal pad on the board. For more information, see Texas Instruments literature
+       numbers SLMA002 (www.ti.com/lit/slma002) and SLMA004 (www.ti.com/lit/slma004).
+9.   Size of metal pad may vary due to creepage requirement.
+10. Vias are optional depending on application, refer to device data sheet. If any vias are implemented, refer to their locations shown
+      on this view. It is recommended that vias under paste be filled, plugged or tented.
+TM
+METAL
+SOLDER MASK
+OPENING
+NON SOLDER MASK
+DEFINED
+SOLDER MASK DETAILS
+PADS 1-8
+OPENING
+SOLDER MASK
+METAL UNDER
+SOLDER MASK
+SOLDER MASK
+DEFINED
+www.ti.com
+EXAMPLE STENCIL DESIGN
+(R0.05) TYP
+8X (1.55)
+8X (0.6)
+6X (1.27)
+(5.4)
+(2.71)
+(3.4)
+BASED ON
+0.125 THICK
+STENCIL
+4214849/B   09/2025
+PowerPAD    SOIC - 1.7 mm max height
+DDA0008B
+PLASTIC SMALL OUTLINE
+2.29 X 2.87
+0.175
+2.47 X 3.10
+0.150
+2.71 X 3.40 (SHOWN)
+0.125
+3.03 X 3.80
+0.1
+SOLDER STENCIL
+OPENING
+STENCIL
+THICKNESS
+NOTES: (continued)
+ 
+11. Laser cutting apertures with trapezoidal walls and rounded corners may offer better paste release. IPC-7525 may have alternate
+      design recommendations.   
+12. Board assembly site may have different recommendations for stencil design.
+ 
+TM
+SOLDER PASTE EXAMPLE
+EXPOSED PAD
+100% PRINTED SOLDER COVERAGE BY AREA
+SCALE:10X
+SYMM
+SYMM
+1
+4
+5
+8
+BASED ON
+0.125 THICK
+STENCIL
+BY SOLDER MASK
+METAL COVERED
+SEE TABLE FOR
+DIFFERENT OPENINGS
+FOR OTHER STENCIL
+THICKNESSES
+9
+www.ti.com
+PACKAGE OUTLINE
+C
+16X 0.30
+0.18
+1.68
+0.07
+16X 0.5
+0.3
+1.0
+0.8
+(DIM A) TYP
+0.05
+0.00
+12X 0.5
+4X
+1.5
+A
+3.1
+2.9
+B
+3.1
+2.9
+4X (0.45)
+VQFN - 1 mm max height
+RGT0016C
+PLASTIC QUAD FLATPACK - NO LEAD
+4222419/E   07/2025
+SIDE WALL 
+METAL THICKNESS
+DIM A
+OPTION 1
+OPTION 2
+0.1
+0.2
+PIN 1 INDEX AREA
+0.08
+SEATING PLANE
+1
+4
+9
+12
+5
+8
+16
+13
+(OPTIONAL)
+PIN 1 ID
+0.1
+C A B
+0.05
+C
+EXPOSED
+THERMAL PAD
+SYMM
+SYMM
+NOTES:
+ 
+1. All linear dimensions are in millimeters. Any dimensions in parenthesis are for reference only. Dimensioning and tolerancing
+    per ASME Y14.5M. 
+2. This drawing is subject to change without notice. 
+3. The package thermal pad must be soldered to the printed circuit board for thermal and mechanical performance.
+SCALE  3.600
+www.ti.com
+EXAMPLE BOARD LAYOUT
+0.07 MIN
+ALL AROUND
+0.07 MAX
+ALL AROUND
+16X (0.24)
+16X (0.6)
+(
+0.2) TYP
+VIA
+12X (0.5)
+(2.8)
+(2.8)
+(0.58)
+TYP
+(
+1.68)
+(R0.05)
+ALL PAD CORNERS
+(0.58) TYP
+VQFN - 1 mm max height
+RGT0016C
+PLASTIC QUAD FLATPACK - NO LEAD
+4222419/E   07/2025
+SYMM
+1
+4
+5
+8
+9
+12
+13
+16
+SYMM
+LAND PATTERN EXAMPLE
+EXPOSED METAL SHOWN
+SCALE:20X
+NOTES: (continued)
+ 
+4. This package is designed to be soldered to a thermal pad on the board. For more information, see Texas Instruments literature
+    number SLUA271 (www.ti.com/lit/slua271).
+5. Vias are optional depending on application, refer to device data sheet. If any vias are implemented, refer to their locations shown
+    on this view. It is recommended that vias under paste be filled, plugged or tented.
+ 
+ 
+SOLDER MASK
+OPENING
+METAL UNDER
+SOLDER MASK
+SOLDER MASK
+DEFINED
+EXPOSED
+METAL
+METAL
+SOLDER MASK
+OPENING
+SOLDER MASK DETAILS
+NON SOLDER MASK
+DEFINED
+(PREFERRED)
+EXPOSED
+METAL
+www.ti.com
+EXAMPLE STENCIL DESIGN
+16X (0.6)
+16X (0.24)
+12X (0.5)
+(2.8)
+(2.8)
+(
+1.55)
+(R0.05) TYP
+VQFN - 1 mm max height
+RGT0016C
+PLASTIC QUAD FLATPACK - NO LEAD
+4222419/E   07/2025
+NOTES: (continued)
+ 
+6. Laser cutting apertures with trapezoidal walls and rounded corners may offer better paste release. IPC-7525 may have alternate
+   design recommendations. 
+ 
+SYMM
+ALL AROUND
+METAL
+SOLDER PASTE EXAMPLE
+BASED ON 0.125 mm THICK STENCIL
+ 
+EXPOSED PAD 17:
+85% PRINTED SOLDER COVERAGE BY AREA UNDER PACKAGE
+SCALE:25X
+SYMM
+1
+4
+5
+8
+9
+12
+13
+16
+17
+IMPORTANT NOTICE AND DISCLAIMER
+TI PROVIDES TECHNICAL AND RELIABILITY DATA (INCLUDING DATASHEETS), DESIGN RESOURCES (INCLUDING REFERENCE 
+DESIGNS), APPLICATION OR OTHER DESIGN ADVICE, WEB TOOLS, SAFETY INFORMATION, AND OTHER RESOURCES “AS IS” 
+AND WITH ALL FAULTS, AND DISCLAIMS ALL WARRANTIES, EXPRESS AND IMPLIED, INCLUDING WITHOUT LIMITATION ANY 
+IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT OF THIRD 
+PARTY INTELLECTUAL PROPERTY RIGHTS.
+These resources are intended for skilled developers designing with TI products. You are solely responsible for (1) selecting the appropriate 
+TI products for your application, (2) designing, validating and testing your application, and (3) ensuring your application meets applicable 
+standards, and any other safety, security, regulatory or other requirements.
+These resources are subject to change without notice. TI grants you permission to use these resources only for development of an 
+application that uses the TI products described in the resource. Other reproduction and display of these resources is prohibited. No license 
+is granted to any other TI intellectual property right or to any third party intellectual property right. TI disclaims responsibility for, and you fully 
+indemnify TI and its representatives against any claims, damages, costs, losses, and liabilities arising out of your use of these resources.
+TI’s products are provided subject to TI’s Terms of Sale, TI’s General Quality Guidelines, or other applicable terms available either on 
+ti.com or provided in conjunction with such TI products. TI’s provision of these resources does not expand or otherwise alter TI’s applicable 
+warranties or warranty disclaimers for TI products. Unless TI explicitly designates a product as custom or customer-specified, TI products 
+are standard, catalog, general purpose devices.
+TI objects to and rejects any additional or different terms you may propose.
+IMPORTANT NOTICE
+Copyright © 2025, Texas Instruments Incorporated
+Last updated 10/2025

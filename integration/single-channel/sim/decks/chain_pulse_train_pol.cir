@@ -1,0 +1,54 @@
+* ============================================================================
+* B2 chan-sim -- FULL CHAIN pulse train, POLARITY-CORRECTED for the CR-210 BLR
+*
+* Finding from chain_pulse_train.cir: the real CR-112 is INVERTING, so the shaped
+* pulse reaching the CR-210 is NEGATIVE.  The Cremat CR-210 restorer (and A5's M2)
+* is validated for a POSITIVE shaped pulse; fed a negative pulse it mis-restores
+* (baseline climbs).  The CR-210 is a unipolar baseline restorer -- the channel
+* must present it the polarity it is built for (positive, per the CR-160-R7 ref).
+*
+* This deck inserts a unity INVERTER between the shaper and the AC-coupling cap to
+* model that board polarity convention (POL=-1).  Set POL=+1 to reproduce the
+* mis-restoring (uncorrected) case.  Everything else identical to the train deck.
+* Buffer = OFFICIAL TI THS3491RGT model (round 2).  DECK OF RECORD for the BLR proof.
+* ============================================================================
+.include models.inc
+.include cr112_csp.sub
+.include cr200_1us.sub
+.include cr210.sub
+.include ths3491_rgt.lib
+
+Vp  VP  0  12
+Vn  VN  0 -12
+Vp6 VP6 0  6
+Vn6 VN6 0 -6
+
+Iinj 0 INJ PULSE(0 10m 1u 50p 50p 1p 10u 30)
+
+Xcsp INJ CSP_OUT VP6 VN6 CR112_CSP
+Xsh CSP_OUT SHOUT PZ VN VP CR200_1US
+Rpz CSP_OUT PZ 51k
+
+* ---- polarity convention: present the CR-210 the pulse polarity it restores ----
+.param POL=-1
+Epol SHOUT_P 0 VALUE = { POL*V(SHOUT) }
+Rpolld SHOUT_P 0 1G
+
+Cc SHOUT_P NBLR 100n
+Xblr NBLR BLR_OUT VN VP CR210
+
+Vpd PDN 0 12
+.param AVgain=2 Rfb=976
+.param Rgnd={Rfb/(AVgain-1)}
+Rs  BLR_OUT BPIN 49.9
+* THS3491RGT ports: INP INN FB OUT PD_not VCC VEE GND
+Xbuf BPIN BINV FB BUF_OUT PDN VP VN 0 THS3491RGT
+Rfb FB BINV {Rfb}
+Rgnd BINV 0 {Rgnd}
+Rterm BUF_OUT OUT_50 49.9
+Rload OUT_50 0 50
+
+.options plotwinsize=0 numdgt=7
+.tran 0 300u 0 5n
+.save V(CSP_OUT) V(SHOUT) V(SHOUT_P) V(BLR_OUT) V(BUF_OUT) V(OUT_50) I(Iinj)
+.end

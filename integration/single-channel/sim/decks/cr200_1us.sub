@@ -1,0 +1,27 @@
+* Cremat CR200_1US wrapped as .subckt from official LTspice model netlist
+* source: CR-200-1us-R2.1.net  (model retrieved 2026-06-25 from cremat.com)
+.subckt CR200_1US IN OUT PZ VN VP
+  R11 0 PZ 1k
+  R5 0 N004 1k
+  C1 PZ IN 1000pF
+  R4 N002 N004 4.25k
+  R8 0 N003 1k
+  XXU1 PZ N004 N011 N001 N004 level2 Avol=1Meg GBW=80Meg Slew=200Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg
+  XXU2 N005 N003 N011 N001 N003 level2 Avol=1Meg GBW=80Meg Slew=200Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg
+  R1 0 N009 1k
+  R3 N007 N009 1k
+  XXU3 N006 N009 N011 N001 N007 level2 Avol=1Meg GBW=80Meg Slew=200Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg
+  C4 N003 N002 260pF
+  R2 N005 N002 4.25k
+  C3 N005 0 100pF
+  C2 N006 0 100pF
+  R6 N006 N003 4.25k
+  R12 0 N010 100
+  R13 OUT N010 1.25k
+  XXU5 N008 N010 N011 N001 OUT level2 Avol=1Meg GBW=80Meg Slew=200Meg Ilimit=25m Rail=0 Vos=0 En=0 Enk=0 In=0 Ink=0 Rin=500Meg
+  C6 N008 0 100pF
+  R14 N008 N007 4.25k
+  V1 N001 VN .5
+  V2 VP N011 .5
+.ends CR200_1US
+

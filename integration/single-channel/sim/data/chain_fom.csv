@@ -1,0 +1,6 @@
+stage,peak_mV,peaking_us,fwhm_us,baseline_mV
+CSP_OUT,-6.445,0.903,37.294,-0.000
+SHOUT (shaper),-67.161,2.441,2.528,0.000
+BLR_OUT (CR-210),66.993,2.471,2.525,0.070
+BUF_OUT (THS3491),133.862,2.473,2.527,3.129
+OUT_50 (50ohm load),66.998,2.473,2.527,1.566

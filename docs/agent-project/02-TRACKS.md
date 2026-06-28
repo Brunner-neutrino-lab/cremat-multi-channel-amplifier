@@ -23,19 +23,21 @@ state changes (and keeps its `SESSION_REPORT.md` current). Status: `not-started`
 
 | Track | Dir | Status | Report |
 |---|---|---|---|
-| B1 chan-design | `integration/single-channel/design/` | in-progress | — |
-| B2 chan-sim | `integration/single-channel/sim/` | in-progress | — |
-| B3 chan-bom | `integration/single-channel/models-bom/` | in-progress | — |
+| B1 chan-design | `integration/single-channel/design/` | criteria-met | ERC 0 / DRC 0/0/0, THS3491 buffer @ 976 Ω | [report](../../integration/single-channel/design/SESSION_REPORT.md) |
+| B2 chan-sim | `integration/single-channel/sim/` | criteria-met | OUT_50 67 mV @ 0.5 pC, TI official model | [report](../../integration/single-channel/sim/SESSION_REPORT.md) |
+| B3 chan-bom | `integration/single-channel/models-bom/` | criteria-met | 48 refs / 19 MPNs, == design BOM | [report](../../integration/single-channel/models-bom/SESSION_REPORT.md) |
 
-**single-channel COMPLETE:** ☐
+**single-channel COMPLETE:** ☑ (2026-06-28)
+
+> **Coordinator gate (2026-06-28):** single-channel signed off after an independent re-run of the gates (not agent self-report): ERC 0, DRC 0 violations / 0 unconnected on the routed real-parts board; design BOM == models BOM (THS3491 + Rf=Rg=976 Ω, the TI datasheet G=+2 / B2-validated value). Buffer decision: **EL5167 (locked) was unusable** (±6 V part on ±12 V rails + obsolete) → replaced with **TI THS3491** HV-CFA (user-approved), runs direct on ±12 V. CR-210 polarity resolved as a documented detector charge-sign constraint (no added hardware). Known cosmetic: schematic-parity *warnings* (footprint lib-nickname + MPN field not propagated; +4 mounting holes) are a gen-pipeline artifact present on the Phase-A boards too — **Phase C must produce a parity-clean final fab board.**
 
 ## Phase C — twelve-channel final board (gates on single-channel COMPLETE)
 
 | Track | Dir | Status | Report |
 |---|---|---|---|
-| C1 board-design | `final-board/twelve-channel/design/` | not-started | — |
-| C2 board-bom | `final-board/twelve-channel/models-bom/` | not-started | — |
-| C3 board-sim | `final-board/twelve-channel/sim/` | not-started | — |
+| C1 board-design | `final-board/twelve-channel/design/` | in-progress | — |
+| C2 board-bom | `final-board/twelve-channel/models-bom/` | in-progress | — |
+| C3 board-sim | `final-board/twelve-channel/sim/` | in-progress | — |
 
 **PROJECT DONE:** ☐
 

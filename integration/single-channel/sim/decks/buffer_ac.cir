@@ -1,0 +1,34 @@
+* ============================================================================
+* B2 chan-sim -- THS3491 buffer step check (stability sanity)
+* AV=+2, 50-ohm back-terminated into 50-ohm load.  Official TI THS3491RGT model.
+* Confirms a clean step settle with no sustained ringing (=> stable, no oscillation)
+* for the shaper-relevant signal band.  The THS3491 (900 MHz / 8000 V/us) is far
+* in-band for the ~2.5 us pulse, so its dynamics are effectively ideal here.
+* ============================================================================
+.include ths3491_rgt.lib
+Vp VP 0 12
+Vn VN 0 -12
+Vpd PDN 0 12
+
+* step into the buffer +input through the same 49.9 series R as the chain.
+* 100 ns edge ~ the shaper-band edge of interest (a sub-ns edge excites the
+* model's 2nH output-L settling, irrelevant to the us-scale pulse).
+Vin SRC 0 PULSE(0 0.067 1u 100n 100n 5u 12u 3)
+Rs SRC BPIN 49.9
+* THS3491RGT ports: INP INN FB OUT PD_not VCC VEE GND
+Xbuf BPIN BINV FB BUF_OUT PDN VP VN 0 THS3491RGT
+.param Rfb=976 AVgain=2
+.param Rgnd={Rfb/(AVgain-1)}
+Rfb FB BINV {Rfb}
+Rgnd BINV 0 {Rgnd}
+Rterm BUF_OUT OUT_50 49.9
+Rload OUT_50 0 50
+
+* NOTE: the project ltspice_raw.py reader is transient-only; it does not parse
+* complex AC .raw.  Stability is judged from this transient step (clean settle,
+* no sustained ringing).  TI's model header notes it targets +/-15 V; on +/-12 V
+* the in-band gain/BW/slew used here are unaffected.
+.options plotwinsize=0
+.tran 0 40u 0 1n
+.save V(OUT_50) V(BUF_OUT)
+.end

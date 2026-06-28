@@ -1,0 +1,18 @@
+[
+  {
+    "label": "POL=-1 (CR-210 sees positive pulse, corrected)",
+    "first_pulse_peak_mV": 68.43830272133529,
+    "last_pulse_peak_mV": 67.50763575972401,
+    "peak_droop_pct": 1.359862715182658,
+    "late_baseline_mV": -0.6486627747861136,
+    "late_baseline_pct_of_peak": -0.9608731923228078
+  },
+  {
+    "label": "POL=+1 (uncorrected, real CR-112 polarity)",
+    "first_pulse_peak_mV": -58.1514235732123,
+    "last_pulse_peak_mV": 69.73630023895069,
+    "peak_droop_pct": -19.921914123311367,
+    "late_baseline_mV": 69.58351838054291,
+    "late_baseline_pct_of_peak": 99.78091487807028
+  }
+]

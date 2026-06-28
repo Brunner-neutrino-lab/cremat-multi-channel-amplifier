@@ -1,0 +1,53 @@
+* ============================================================================
+* B2 chan-sim -- 100 kHz pulse train, UN-CORRECTED polarity  [DOCUMENTED NOTE ONLY]
+*   train of 0.5 pC events -> [CR-112] -> [CR-200,P/Z=51k] -> Cc -> [CR-210]
+*                          -> [THS3491 buffer, AV=2] -> 49.9 ohm -> OUT_50 (50 ohm)
+*
+* NOT the deck of record -- this is the reference case that DEMONSTRATES the CR-210
+* polarity finding: the real CR-112 is inverting, so the shaped pulse reaching the
+* CR-210 is NEGATIVE, and the unipolar CR-210 then MIS-restores (baseline climbs to
+* ~+70 mV). The corrected deck-of-record is chain_pulse_train_pol.cir (POL=-1),
+* which holds OUT_50 baseline at ~-0.8 mV (~98% droop removed, matching A5's M2).
+* Kept here so the finding is reproducible.
+*
+* Charge injection as a true current-impulse train into the CR-112 (so the CSP
+* tails physically superpose). 100 kHz (Tper 10 us), 30 events -> 300 us.
+* ============================================================================
+.include models.inc
+.include cr112_csp.sub
+.include cr200_1us.sub
+.include cr210.sub
+.include ths3491_rgt.lib
+
+Vp  VP  0  12
+Vn  VN  0 -12
+Vp6 VP6 0  6
+Vn6 VN6 0 -6
+
+* ---- 0.5 pC impulse train into the CSP input, 100 kHz, first at t=1us ----
+* Each event: 100 ps, 10 mA triangle = 0.5 pC.  PULSE current source repeats it.
+* (Iperiod 10us; the CSP integrates each, tails superpose with tau_csp=51us.)
+Iinj 0 INJ PULSE(0 10m 1u 50p 50p 1p 10u 30)
+
+Xcsp INJ CSP_OUT VP6 VN6 CR112_CSP
+Xsh CSP_OUT SHOUT PZ VN VP CR200_1US
+Rpz CSP_OUT PZ 51k
+
+Cc SHOUT NBLR 100n
+Xblr NBLR BLR_OUT VN VP CR210
+
+Vpd PDN 0 12
+.param AVgain=2 Rfb=976
+.param Rgnd={Rfb/(AVgain-1)}
+Rs  BLR_OUT BPIN 49.9
+* THS3491RGT ports: INP INN FB OUT PD_not VCC VEE GND
+Xbuf BPIN BINV FB BUF_OUT PDN VP VN 0 THS3491RGT
+Rfb FB BINV {Rfb}
+Rgnd BINV 0 {Rgnd}
+Rterm BUF_OUT OUT_50 49.9
+Rload OUT_50 0 50
+
+.options plotwinsize=0 numdgt=7
+.tran 0 300u 0 5n
+.save V(CSP_OUT) V(SHOUT) V(BLR_OUT) V(BUF_OUT) V(OUT_50) I(Iinj)
+.end

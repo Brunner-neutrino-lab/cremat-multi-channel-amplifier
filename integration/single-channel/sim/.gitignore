@@ -1,0 +1,19 @@
+# Regenerable LTspice artifacts (per 01-CONVENTIONS §8) -- reproduce with
+#   powershell -File scripts\run_all.ps1
+data/*.raw
+data/*.log
+*.raw
+*.log
+*.op.raw
+# bulky regenerable vendor model downloads (re-fetch from ti.com/lit/zip):
+models/THS3491/*.zip
+models/THS3491/sbombp9/
+models/THS3491/sbomai5a/
+models/THS3491/sboman4/
+# committed SOURCE/results that must NOT be ignored:
+!decks/*.cir
+!decks/*.sub
+!decks/*.inc
+!decks/*.lib
+!data/*.json
+!data/*.csv
