@@ -1,0 +1,5 @@
+(version 1)
+
+(rule "MCX edge-mount shield pad straddles its slot by design"
+   (constraint edge_clearance (min -2mm))
+   (condition "A.Library_Link == 'cremat:MCX_CONMCX013_EdgeMount'"))

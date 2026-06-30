@@ -35,11 +35,13 @@ state changes (and keeps its `SESSION_REPORT.md` current). Status: `not-started`
 
 | Track | Dir | Status | Report |
 |---|---|---|---|
-| C1 board-design | `final-board/twelve-channel/design/` | in-progress | — |
-| C2 board-bom | `final-board/twelve-channel/models-bom/` | in-progress | — |
-| C3 board-sim | `final-board/twelve-channel/sim/` | in-progress | — |
+| C1 board-design | `final-board/twelve-channel/design/` | criteria-met | ERC 0 / DRC 0/0/0, parity 0, fab package | [report](../../final-board/twelve-channel/design/SESSION_REPORT.md) |
+| C2 board-bom | `final-board/twelve-channel/models-bom/` | criteria-met | final BOM == board, $2,847 q1 FULL | [report](../../final-board/twelve-channel/models-bom/SESSION_REPORT.md) |
+| C3 board-sim | `final-board/twelve-channel/sim/` | criteria-met | one-ch unchanged ×12; rails/bulk OK | [report](../../final-board/twelve-channel/sim/SESSION_REPORT.md) |
 
-**PROJECT DONE:** ☐
+**PROJECT DONE:** ◑ board fab-ready & independently verified (2026-06-29) — final user sign-off pending visual schematic audit
+
+> **Coordinator gate (2026-06-29) — tile-and-replicate re-architecture:** Per user direction the PCB layout was rebuilt from "autoroute all 12 channels" to **route one channel tile → clone ×12 → route only the shared power** (far less routing; identical, matched channels). Independently verified (re-run, not agent self-report): ERC 0; DRC **0 errors / 0 unconnected / 0 schematic-parity** (with `--severity-warning`); **all 12 channels bit-identical** (exact integer-nm: same parts/X/relative-Y/rotation, 173 tracks + 29 vias each, exact 21.0 mm pitch); **48 MCX cutouts now on Edge.Cuts** (196-segment gerber — the earlier "cutouts parked on Dwgs.User" blocker is resolved by construction). Edge-clearance DRU exemption is narrowly scoped to the MCX shield pad only (creepage/clearance/hole rules still enforced). Board **235.1 × 264.1 mm** (deeper-enclosure decision). design BOM == C2 BOM unchanged. **Bias confirmed ≤60 V** (user, 2026-06-29) → closes CLAUDE.md iron-rule-#5 HV item; 0.6 mm hv_bias clearance + 100 V caps adequate. Earlier decisions stand: buffer = TI THS3491 (EL5167 unusable); 48 MCX kept. Remaining (cosmetic, non-blocking): dense-0805 silkscreen warnings (KiCad 199-per-check report cap; refdes already moved to F.Fab). **Final PROJECT DONE pending the user's visual audit via the wired single-channel schematic (separate session).**
 
 ---
 

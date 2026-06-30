@@ -1,0 +1,58 @@
+* ============================================================================
+* CR-112 charge-sensitive preamplifier wrapped as a .subckt
+* track B2 chan-sim.  EXACT re-use of A2's cr11x_csp.cir internal model
+* (CR-112 target: Cf=75p, Rf=680k, Cin=15p, G2=1.0 -> 13.3 mV/pC, tau=51us,
+*  tr~3ns).  Netlist re-expressed from Cremat's official CR-110-R2 LTspice model
+* and retargeted to the CR-112 datasheet -- see chips-board/csp-cr112/sim.
+*
+* Ports:  .subckt CR112_CSP  INJ CSP_OUT vcc vee
+*   INJ     = the CSP input node; inject the ideal charge impulse here.
+*   CSP_OUT = 50-ohm-back-terminated CSP output (datasheet Zout = 50).
+*   vcc/vee = +/-6 V CSP rails (A2 uses ideal +/-6 V operating point).
+* The CR-112 feedback is internal/fixed, so these FoM do not move with real parts.
+* ============================================================================
+.subckt CR112_CSP INJ CSP_OUT vcc vee
+.param Cf=75p Rf=680k Cin=15p G2=1.0
+.param Rbw=50 Cbw=27.3p          ; output-bandwidth pole -> ~3 ns rise (A2)
+
+* detector / input capacitance to ground (Cremat model C3)
+C3 INJ 0 {Cin}
+
+* Stage 1: charge integrator (inverting), feedback Cf || Rf -> V(n_o1)=-Q/Cf
+Cf n_o1 INJ {Cf}
+Rf n_o1 INJ {Rf}
+XU1 0 INJ n_o1 vcc vee opamp1_csp
+
+* Stage 2: voltage amp, gain G2 (rail-limited)
+BU2 n_o2a 0 V=limit( {G2}*V(n_o1), V(vee)+0.2, V(vcc)-0.2 )
+Ro2 n_o2a 0 1G
+
+* output-bandwidth pole (CR-112 ~3 ns rise)
+Rbw n_o2a n_o2 {Rbw}
+Cbw n_o2 0 {Cbw}
+
+* unity output buffer + 50 ohm series (datasheet Zout = 50)
+XU3 n_o2 nbuf nbuf vcc vee opamp2_csp
+R3 nbuf CSP_OUT 50
+.ends CR112_CSP
+
+* --- CSP op-amp macromodels (Cremat UniversalOpamp2 params, from A2) ---
+.subckt opamp1_csp inp inn out vcc vee
+.param Avol1=3000 GBW1=680e6
+.param wp1={6.283185*GBW1/Avol1}
+Gm 0 n1 inp inn 1
+Rp n1 0 {Avol1}
+Cp n1 0 {1/(Avol1*wp1)}
+Bout out 0 V=limit( V(n1), V(vee)+0.2, V(vcc)-0.2 )
+Rout out 0 1G
+.ends opamp1_csp
+
+.subckt opamp2_csp inp inn out vcc vee
+.param Avol2=1e6 GBW2=500e6
+.param wp2={6.283185*GBW2/Avol2}
+Gm 0 n1 inp inn 1
+Rp n1 0 {Avol2}
+Cp n1 0 {1/(Avol2*wp2)}
+Bout out 0 V=limit( V(n1), V(vee)+0.2, V(vcc)-0.2 )
+Rout out 0 1G
+.ends opamp2_csp

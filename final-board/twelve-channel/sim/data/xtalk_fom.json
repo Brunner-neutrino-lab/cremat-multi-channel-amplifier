@@ -1,0 +1,22 @@
+{
+  "per_channel_quiescent_+rail_mA": 23.830756782685896,
+  "per_channel_quiescent_-rail_mA": 23.794905451583436,
+  "aggressor_dynamic_Ipeak_+rail_mA": -1.3823323739034985,
+  "aggressor_dynamic_Ipeak_-rail_mA": 0.025327738878418854,
+  "shared_rail_dynamic_ripple_+_uV": -41.56816496095287,
+  "shared_rail_dynamic_ripple_-_uV": 0.761745512191765,
+  "shared_rail_dynamic_ripple_worst_uV": 41.56816496095287,
+  "static_DC_droop_+rail_mV_at_100mohm_feed": 58.440000000000005,
+  "static_DC_droop_-rail_mV_at_100mohm_feed": 53.64,
+  "victim_xtalk_at_DC_PSRR_uV": 0.005233121919099547,
+  "victim_xtalk_at_band_PSRR_uV": 0.13145007943021525,
+  "victim_xtalk_pct_of_FS_band": 0.00019619414840330634,
+  "params": {
+    "Cbulk_uF": 100,
+    "ESR_mohm": 30,
+    "Rfeed_mohm": 100,
+    "PSRR_dc_dB": 78.0,
+    "PSRR_band_dB": 50.0,
+    "FS_mV": 67.0
+  }
+}

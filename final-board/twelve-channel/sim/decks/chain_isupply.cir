@@ -1,0 +1,87 @@
+* ============================================================================
+* B2 chan-sim -- FULL SINGLE-CHANNEL CHAIN, single 0.5 pC event  [DECK OF RECORD]
+*   0.5 pC -> [CR-112 CSP] -> CSP_OUT -> [CR-200 shaper, P/Z=51k] -> SHOUT
+*          -> Cc(100n) -> [CR-210 BLR] -> BLR_OUT -> [THS3491 CFA buffer, AV=2]
+*          -> 49.9 ohm series -> OUT_50  (loaded with 50 ohm)
+*
+* Chains the PROVEN Phase-A sub-component models (read-only, copied here):
+*   cr112_csp.sub  = A2 CR-112 internal model (Cf=75p,Rf=680k -> 13.3mV/pC,tau51us)
+*   cr200_1us.sub  = A5/Cremat official CR-200-1us LTspice model
+*   cr210.sub      = A5/Cremat official CR-210-R0 LTspice model
+*   ths3491_rgt.lib= OFFICIAL TI THS3491RGT SPICE model (SBOMAN4, ti.com, no login)
+*
+* Round 2 (coordinator): output buffer = TI THS3491 HV CFA (+/-12 V direct, 900 MHz
+* SSBW, 8000 V/us, ~520 mA Iout). Far in-band for the ~2.5 us pulse. Buffer gain
+* AV=+2 (Rf=Rg=976, TI's G=2 recommended Rf); one .param to change. 49.9-ohm
+* back-term + 50-ohm load = 2:1 divider -> ~unity CSP-shaper amplitude at OUT_50.
+* Run:  LTspice.exe -b -Run chain_single_event.cir   (staged via run_ltspice.ps1)
+* ============================================================================
+.include models.inc
+.include cr112_csp.sub
+.include cr200_1us.sub
+.include cr210.sub
+.include ths3491_rgt.lib
+
+* ---- supplies ----
+* Channel analog rails +/-12 V (board spec). CSP runs on its own +/-6 V (A2 op pt).
+Vp  VP  0  12
+Vn  VN  0 -12
+Vp6 VP6 0  6
+Vn6 VN6 0 -6
+
+* ---- ideal 0.5 pC charge impulse INTO the CSP input ----
+* 100 ps FWHM triangle, peak 10 mA -> area = 0.5*10mA*100ps = 0.5 pC (A2 stimulus).
+Iinj 0 INJ PWL(0 0  999.95n 0  1000.00n 10m  1000.05n 0  300u 0)
+
+* ---- Stage 1: CR-112 CSP (its own +/-6 V rails) ----
+Xcsp INJ CSP_OUT VP6 VN6 CR112_CSP
+
+* ---- Stage 2: CR-200-1us shaper, correct pole-zero RP/Z = 51 k ----
+* ports: IN OUT PZ VN VP
+Xsh CSP_OUT SHOUT PZ VN VP CR200_1US
+Rpz CSP_OUT PZ 51k
+
+* ---- polarity convention (see chain_pulse_train_pol.cir for the finding) ----
+* The real CR-112 is inverting -> the shaped pulse is NEGATIVE. The CR-210 is a
+* unipolar restorer validated (A5 M2) for a POSITIVE pulse, so the channel must
+* present it the positive polarity. POL=-1 applies that board convention; set
+* POL=+1 to see the un-corrected (mis-restoring) polarity. (For a single event
+* this only flips the sign of the shaped pulse; the BLR difference shows at rate.)
+.param POL=-1
+Epol SHOUT_P 0 VALUE = { POL*V(SHOUT) }
+Rpolld SHOUT_P 0 1G
+
+* ---- AC coupling into the CR-210 BLR (100 V-rated Cc on the HV board) ----
+Cc SHOUT_P NBLR 100n
+* ---- Stage 3: CR-210 baseline restorer ----
+* ports: IN OUT VN VP ; R1=10k inside is the input load.
+Xblr NBLR BLR_OUT VN VP CR210
+
+* ---- Stage 4: TI THS3491 CFA output buffer, AV=+2, 50-ohm back-terminated ----
+* enable the part (PD_not held high) and reference its GND pin to board ground.
+Vpd PDN 0 12
+.param AVgain=2
+.param Rfb=976           ; TI G=2 recommended feedback resistor (datasheet table)
+.param Rgnd={Rfb/(AVgain-1)}   ; Rg = Rf/(AV-1); AV=2 -> Rg=976
+* + input fed by the BLR output through a small series R
+Rs  BLR_OUT BPIN 49.9
+* THS3491RGT ports: INP INN FB OUT PD_not VCC VEE GND
+Xbuf BPIN BINV FB BUF_OUT PDN VP VN 0 THS3491RGT
+* feedback network: Rf FB->-IN, Rg -IN->GND  (FB tied to OUT inside the model)
+Rfb FB BINV {Rfb}
+Rgnd BINV 0 {Rgnd}
+* 50-ohm back-termination + 50-ohm load
+Rterm BUF_OUT OUT_50 49.9
+Rload OUT_50 0 50
+
+* ---- analysis ----
+* 60 us window covers the shaper pulse + early CSP tail. plotwinsize=0 disables
+* LTspice waveform compression so every computed point is kept; maxstep 2 ns
+* resolves the 3 ns CSP rise and the 2.5 us shaper peak.
+* NO uic: let LTspice solve the DC operating point first so all nodes start
+* settled at 0 (the A5 shaper deck does the same). With uic the level2 op-amp
+* macromodels ring for ~1 us at startup and contaminate the event response.
+.options plotwinsize=0 numdgt=7
+.tran 0 60u 0 2n
+.save V(INJ) V(CSP_OUT) V(SHOUT) V(SHOUT_P) V(BLR_OUT) V(BUF_OUT) V(OUT_50) I(Iinj) I(Vp) I(Vn)
+.end
