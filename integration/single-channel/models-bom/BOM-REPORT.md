@@ -163,11 +163,30 @@ ohm value shifts one E96 step; pick per the populated op-amp.)
    currently 0 DK-direct stock / ~6-wk factory lead — kept on the `U_BUF` Notes as a
    cost-optimization option for Phase C if it returns to stock. *(THS3061 rejected: also
    Last-Time-Buy / 0 DK stock.)*
-3. **No other unsourced / obsolete parts.** All passives, MCX, terminal, electrolytic, trimpot
-   show healthy stock (passives >100 k–4 M; CONMCX013 >1000; Nichicon/Phoenix/Bourns ship today).
-4. **`Cc` Digi-Key PN suffix not 100 % pinned** (carried over from CSP A3): Murata
-   `GRM21AR72A224KAC5K` (0.22 µF/100 V/X7R/0805) is confirmed real & stocked; search the exact
-   `490-…` PN on digikey.com. Equal-spec alts: TDK `CGA4J3X7T2A224K125AE`, KEMET `C0805C224K1RAC`.
+3. **NEW (2026-07-07 sourcing sweep): `Cf` = Samsung `CL21B104KCC5PNC` (0.1 µF **100 V** X7R
+   0805) is now NRND** ("Not For New Designs") on Digi-Key, stock depleting (~11.6k). It is an
+   **HV-critical** part (SiPM bias-filter shunt), so the replacement stays ≥100 V per Iron
+   Rule 4: **Samsung `CL21B104KCFNNNE`** — 0.1 µF/**100 V**/X7R/0805, **Active**, DK
+   `1276-6840-1-ND`, ~552k in stock, $0.10 q1 — a same-value/package/voltage **drop-in** (no
+   schematic/footprint change) and cheaper than the NRND part. The CSV `Cf` row keeps the
+   original MPN with a Notes pointer (design session owns the swap); **recommend adopting the
+   replacement.** Full detail in [`SOURCING-VERIFICATION-2026-07-07.md`](SOURCING-VERIFICATION-2026-07-07.md).
+4. **Digi-Key PN corrections found in the sweep** (were wrong/placeholder in the merged BOM;
+   now pinned to page-verified PNs): 0.1 µF 50 V decoupling `CL21B104KBCNNNC` → **`1276-1003-1-ND`**
+   (the old `1276-1000-1-ND` was a *0603* part); 10 µF 25 V bulk `CL21A106KAYNNNE` →
+   **`1276-2891-1-ND`**; 1 pF `CC0805CRNPO9BN1R0` → **`311-1089-1-ND`** (old value was malformed).
+   All three MPNs are **Active**. ⚠ The 10 µF bulk is **Active but 0 Digi-Key stock (16-wk lead)
+   today** — in-stock equal-spec alternate **Taiyo Yuden `TMK212BBJ106KG-T`** (DK `587-2985-1-ND`);
+   it is a 25 V rail-bulk cap (not HV-critical), so either reorder the Samsung part or substitute.
+5. **`Cc` Digi-Key PN now pinned:** Murata `GRM21AR72A224KAC5K` (0.22 µF/100 V/X7R/0805) =
+   DK **`490-8306-1-ND`**, Active, ~94k in stock, $0.24 q1. Verified equal-spec (≥100 V) alt:
+   **KEMET `C0805C224K1RACTU`** (DK `399-C0805C224K1RACTUCT-ND`, Active). *(The TDK
+   `CGA4J3X7T2A224K125AE` previously listed here did not resolve on Digi-Key; the KEMET part
+   is the confirmed alternate.)*
+6. **All remaining lines Active + in stock.** `Rfb`/`Rgain` suffix confirmed `311-976CRCT-ND`;
+   THS3491 (`296-49085-2-ND`, ~690 stk), CONMCX013 (~1050), Nichicon/Phoenix ship today.
+   Bourns trimpot `3296W-1-204LF` is Active but thin (~95 stk) — source ahead for the ×12
+   build. The three Cremat modules are confirmed **current catalog** (prices/revs match).
 
 ---
 
@@ -203,8 +222,8 @@ ohm value shifts one E96 step; pick per the populated op-amp.)
 | buffer Rg "976 Ω" (`Rgain`) | Yageo RC0805FR-07976RL | 311-976CRCT-ND | `Resistor_SMD:R_0805_2012Metric` |
 | output term "49.9 Ω" (`R_OUT`) | Yageo RC0805FR-0749R9L | 311-49.9CRCT-ND | `Resistor_SMD:R_0805_2012Metric` |
 | buffer rail R "4.7 Ω" (`Rdp3/Rdn3`) | Yageo RC0805JR-074R7L | 311-4.7ARCT-ND | `Resistor_SMD:R_0805_2012Metric` |
-| buffer HF cap "0.1 µF" (`Cbp3/Cbn3`) | Samsung CL21B104KBCNNNC | 1276-1000-1-ND | `Capacitor_SMD:C_0805_2012Metric` |
-| buffer bulk "10 µF" (`Clp3/Cln3`) | Samsung CL21A106KAYNNNE | 1276-1037-1-ND | `Capacitor_SMD:C_0805_2012Metric` |
+| buffer HF cap "0.1 µF" (`Cbp3/Cbn3`) | Samsung CL21B104KBCNNNC | 1276-1003-1-ND | `Capacitor_SMD:C_0805_2012Metric` |
+| buffer bulk "10 µF" (`Clp3/Cln3`) | Samsung CL21A106KAYNNNE | 1276-2891-1-ND *(0 stk today; alt TY 587-2985-1-ND)* | `Capacitor_SMD:C_0805_2012Metric` |
 
 **Merged-in CSP + shaper parts** keep their Phase-A MPNs unchanged **except the two §2c
 reconciliations** (use the *reconciled* PN): board bulk → **UWT1V101MCL1GS** (SMD), power

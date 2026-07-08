@@ -255,3 +255,55 @@ governs; B2 validated it against TI's official SPICE model.
 
 **State vs criteria:** ALL met; Phase-B design gate closed. `channel` cell ready for Phase C ×12.
 
+---
+
+## 2026-07-08 — session 4 — 2026-07 rework recap + rail reverse-polarity protection + doc reconcile
+
+**Context:** a prior 2026-07 session reworked the channel but did not log here; this entry
+records that rework (reconstructed from the design files + the `gen_sch.py` DESIGN NOTES
+docstring) plus the rail-protection work and doc reconciliation done this session.
+
+**2026-07 design rework (prior session, folded in here):**
+- Output buffer → **populate-or-bypass, DNP by default.** New `JP_BUF` (R18, 0 Ω,
+  `SHAPER_OUT→BUF_OUT`) fitted by default XORs the whole THS3491 block. Default build: CR-210
+  drives the 49.9 Ω back-term directly (OUT_50 = ½·SHAPER_OUT into 50 Ω).
+- Test input reworked: `R5` = 47 Ω shunt termination to GND, `C3` = 1 pF series into `CSP_IN`;
+  net `TEST_N` removed.
+- Per-rail decoupling reduced to 4.7 Ω + 10 µF (all eight 0.1 µF HF caps dropped).
+- `channel.kicad_sch` redrawn as a human-review **WIRED** layout (`gen_sch.py` rewritten).
+- Sourcing folded in (2026-07-07 sweep): Cf NRND → CL21B104KCFNNNE; Digi-Key PN fixes; 10 µF
+  25 V bulk flagged Active-but-0-stock (16-wk lead).
+
+**This session — rail protection (the TBD the rework left "pending review"):**
+- Researched supply abs-max of every rail part, adversarially verified vs primary datasheets:
+  **weakest = ±13 V** (Cremat CR-200 explicit abs-max; CR-112/CR-210 spec-table "maximum");
+  THS3491 = ±16.5 V. Rails are ±12 V nominal → **~1 V headroom, effectively closed: no passive
+  shunt Zener/TVS can both idle off at 12 V and clamp below 13 V** → over-voltage clamping of
+  the modules is infeasible; over-voltage becomes an operational limit.
+- Chose (with user) **reverse-polarity block + fault interrupt**; dropped the drawn shunt-Zener.
+- Implemented per rail: `+VDC_IN → F_P (PTC) → +VDC_F → D_RP (Schottky, cathode→+VDC) → +VDC`
+  (mirror on −rail, anode→−VDC). Parts: onsemi **SS14** (40 V/1 A, `Diode_SMD:D_SMA`) +
+  Littelfuse **1206L010/60WR** PTC (0.1 A hold / 0.25 A trip / 60 V, `Fuse:Fuse_1206_3216Metric`)
+  — both Active/in-stock, native KiCad footprints. Added `Device:D_Schottky` +
+  `Device:Polyfuse_Small` to SYMSRC; new nets `+VDC_IN/+VDC_F/−VDC_IN/−VDC_F`; refs `F1/F2`
+  (PTC), `D1/D2` (Schottky). Removed the TBD `R_ZP/D_ZP/R_ZN/D_ZN` placeholders.
+- Netlist-audited the series chain + Schottky polarity; regenerated; **ERC 0/0**. Added the 4
+  parts to `single-channel-bom.csv` (now 45 rows / 20 MPNs); refreshed `channel.pdf`.
+
+**Docs reconciled:** `INTERFACE.md` + `SESSION_REPORT.md` updated to the reworked topology
+(buffer optional, rail protection, test-inject, decoupling, 45-ref/20-MPN counts, PCB-stale
+flag, OUT_50 default-vs-populated amplitudes); BOM `R_test` row description fixed (said
+"series R"; now shunt termination to GND).
+
+**Results:** schematic **ERC 0/0**; design BOM ↔ CSV = **45 refs / 20 MPNs**. **PCB
+`channel.kicad_pcb` is STALE** (predates the rework) — layout rebuild deferred by request.
+
+**Decisions & why:** reverse-block + fuse over shunt-Zener because the ±13 V module abs-max vs
+±12 V nominal closes the over-voltage window; reverse polarity (swapped leads) is the real,
+achievable bench-error protection. Series Schottky (SS14) blocks reverse; PTC interrupts
+sustained faults; ~0.4 V drop leaves the rails ≈ ±11.6 V (> the modules' ±6 V and the THS3491's
+±7 V minimums).
+
+**State vs criteria:** schematic + BOM + docs updated & mutually consistent (ERC 0/0). Open
+item: rebuild `channel.kicad_pcb` against the new netlist.
+
