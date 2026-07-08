@@ -53,71 +53,78 @@ def dnp_refs(comps):
     # is hard from .net; instead hardcode the role->ref mapping discovered from gen_sch ordering.
     return DNP_BY_REF
 
-# Board geometry: single-channel cell. Phase C shrinks/tiles; topology is what's reused.
-# W=164 gives the OUT_50 jack + its GND routing >=0.5mm board-edge clearance on the right.
-W, H = 164.0, 90.0
+# ============================================================================================
+# Board geometry: THIN, tile-able CHANNEL-ROW cell (2026-07). Anticipates the multi-channel
+# board: each channel is a horizontal ROW (signal flows left->right), stacked vertically, with
+# a shared COM row of common circuitry across the top (power input at the rear/top edge):
+#
+#     [======= COM row: J5 screw terminal + F1/F2 PTC + D1/D2 Schottky + C10/C11 bulk =======]
+#     [SIPM]                                                                        [OUT_50]
+#     [TEST]  frontend  CR-112   CR-200   CR-210   THS3491(buffer)  49.9            [BIAS_IN]
+#      left-end MCX (IN/TEST)  --------- signal L->R ---------            right-end MCX (OUT/BIAS)
+#
+# MCX are edge-mount: left edge = SIPM(IN)+TEST, right edge = OUT_50+BIAS. Height is set by two
+# stacked MCX per end (courtyard ~10x11.5) => channel row ~24 mm; keep the strip as thin as that.
+# Refs (verified against channel.net, 2026-07 rework):
+#   U1=CR-112 U2=CR-200 U3=CR-210 U4=THS3491(SOIC-8-1EP)
+#   J1=BIAS J2=SIPM J3=TEST J4=OUT_50 J5=screw terminal
+#   R1=Rf1 R2=JP_Rf1 R3=Rf2 R4=JP_Rf2 R5=R_test  R6/R7=CSP dec 4.7  R8/R9=CR200 dec  R10/R11=CR210 dec
+#   R12=JP_BLR R13=R_FB(976) R14=R_GAIN(976) R15=R_BSER(49.9) R16/R17=buffer dec  R18=JP_BUF(0R,fit)
+#   RV1=P/Z trim  C1=Cf C2=Cc C3=C_test  C4/C5=CSP 10uF  C6/C7=CR200 10uF  C8/C9=CR210 10uF
+#   C10=C_BULKP C11=C_BULKN (100uF)  C12/C13=buffer 10uF
+#   F1/F2=rail PTC (Fuse_1206)  D1/D2=rail Schottky SS14 (D_SMA)
+W, H = 138.0, 52.0
 
-# Explicit placement: ref -> (x_mm, y_mm, rotation_deg). Hand-laid for a clean DRC.
-# Refs follow gen_sch's per-prefix counter assignment (verified against channel.net, Round 2):
-#   U1=CR-112  U2=CR-200  U3=CR-210  U4=THS3491 buffer (SOIC-8-1EP)
-#   J1=BIAS J2=SIPM J3=TEST J4=OUT_50 J5=PWR
-#   R1=Rf1 R2=JP_Rf1 R3=Rf2 R4=JP_Rf2 R5=R_test R6=R_dvp R7=R_dvn
-#   R8=R_SHP R9=R_SHN R10=R_BLP R11=R_BLN R12=JP_BLR
-#   R13=R_FB(976) R14=R_GAIN(976) R15=R_BSER(49.9 back-term) R16=R_BVP R17=R_BVN
-#   RV1=P/Z trim
-#   C1=Cf C2=Cc C3=C_test C4=Cp1 C5=Cp2 C6=Cn1 C7=Cn2
-#   C8=C_SHPb C9=C_SHPh C10=C_SHNb C11=C_SHNh  C12=C_BLPb C13=C_BLPh C14=C_BLNb C15=C_BLNh
-#   C16=C_BULKP C17=C_BULKN (100uF SMD, ONE pair)  C18=C_BVPb C19=C_BVPh C20=C_BVNb C21=C_BVNh
-# (Round-2 deltas: removed CSP radial bulk Cb_p/Cb_n + shaper 49.9 R_OUT -> caps/Rs renumbered;
-#  buffer is now SOIC-8-1EP not SOT-23-5; Rf/Rg=976R (THS3491 datasheet G=+2 value).)
-DNP_BY_REF = {"R2", "R4", "R12"}   # JP_Rf1, JP_Rf2, JP_BLR (populate-XOR bypass jumpers)
-MAIN_Y = 45.0      # signal row
-TOPDEC_Y = 18.0    # +rail decoupling row
-BOTDEC_Y = 72.0    # -rail decoupling row
+# DNP by default (2026-07): bias/BLR bypass jumpers + the whole (bypassed) buffer block.
+DNP_BY_REF = {"R2", "R4", "R12",                       # JP_Rf1, JP_Rf2, JP_BLR
+              "U4", "R13", "R14", "R16", "R17", "C12", "C13"}   # THS3491 buffer block (JP_BUF R18 = FIT)
+
+COM_Y    = 9.0     # COM row (power entry + protection + bulk) centre, near the rear/top edge
+TOPDEC_Y = 26.0    # +rail decoupling row (top of the channel row)
+MOD_Y    = 34.0    # module row centre
+BOTDEC_Y = 42.0    # -rail decoupling row (bottom of the channel row)
+MCX_TOP  = 29.0    # upper MCX (SIPM / OUT_50)
+MCX_BOT  = 41.0    # lower MCX (TEST / BIAS)
 
 PLACE = {
-    # ----- left edge: bias + test inputs (MCX) -----
-    "J1": (9.0,  22.0, 0),     # BIAS_IN  (left edge, upper)
-    "J3": (9.0,  68.0, 0),     # TEST_IN  (left edge, lower)
-    # ----- bias filter chain: BIAS -> Rf1/0R -> N_filt(-Cf) -> Rf2/0R -> FE -----
-    "R1": (24.0, 30.0, 0),     # Rf1 10k
-    "R2": (24.0, 34.0, 0),     # JP_Rf1 0R (DNP) parallel
-    "C1": (31.0, 38.0, 90),    # Cf 100nF/100V -> GND
-    "R3": (38.0, 30.0, 0),     # Rf2 10k
-    "R4": (38.0, 34.0, 0),     # JP_Rf2 0R (DNP) parallel
-    # SIPM jack (DC-coupled to FE), top edge
-    "J2": (46.0, 9.0, 180),    # SIPM MCX (top edge)
-    "C2": (46.0, 22.0, 0),     # Cc 0.22uF/100V (FE -> CSP_IN)
-    # test injection
-    "R5": (24.0, 60.0, 0),     # R_test 47
-    "C3": (38.0, 60.0, 0),     # C_test 1pF (TEST_N -> CSP_IN)
-    # ----- CR-112 CSP module (SIP-8 flat) + its decoupling -----
-    "U1": (60.0, 45.0, 90),    # CR-112 (rot 90: spans x ~49..71 along the row)
-    "R6": (54.0, TOPDEC_Y, 0), "C4": (61.0, TOPDEC_Y, 0), "C5": (67.0, TOPDEC_Y, 0),   # +VS_F
-    "R7": (54.0, BOTDEC_Y, 0), "C6": (61.0, BOTDEC_Y, 0), "C7": (67.0, BOTDEC_Y, 0),   # -VS_F
-    # ----- CR-200 shaper (SIP-8 flat) + P/Z trim + decoupling -----
-    "U2": (85.0, 45.0, 90),    # CR-200
-    "RV1":(85.0, 62.0, 0),     # 200k P/Z trim (below CR-200)
-    "R8": (79.0, TOPDEC_Y, 0), "C8": (86.0, TOPDEC_Y, 0), "C9": (92.0, TOPDEC_Y, 0),   # SHVP
-    "R9": (74.0, BOTDEC_Y, 0), "C10":(81.0, BOTDEC_Y, 0), "C11":(95.0, BOTDEC_Y, 0),   # SHVN (flank the trim)
-    # ----- CR-210 BLR (SIP-8 flat) + decoupling + JP_BLR bypass -----
-    "U3": (108.0, 45.0, 90),   # CR-210 (out = SHAPER_OUT, feeds buffer +IN directly)
-    "R10":(102.0, TOPDEC_Y, 0),"C12":(109.0,TOPDEC_Y, 0),"C13":(115.0,TOPDEC_Y, 0),    # BLVP
-    "R11":(102.0, BOTDEC_Y, 0),"C14":(109.0,BOTDEC_Y, 0),"C15":(115.0,BOTDEC_Y, 0),    # BLVN
-    "R12":(108.0, 60.0, 0),    # JP_BLR 0R (DNP)
-    # ----- output buffer (THS3491 SOIC-8-1EP) + gain net + 49.9 back-term + decoupling -----
-    "U4": (134.0, 45.0, 0),    # THS3491 buffer (bbox 7.5x5.6)
-    "R13":(132.0, 56.0, 0),    # R_FB 976R (OUT -> -IN)
-    "R14":(140.0, 56.0, 0),    # R_GAIN 976R (-IN -> GND)
-    "R15":(143.0, 45.0, 90),   # R_BSER 49.9 (BUF_OUT -> OUT_50, 50R back-term)
-    "R16":(126.0, TOPDEC_Y, 0),"C18":(133.0,TOPDEC_Y, 0),"C19":(139.0,TOPDEC_Y, 0),    # BVP
-    "R17":(126.0, BOTDEC_Y, 0),"C20":(133.0,BOTDEC_Y, 0),"C21":(139.0,BOTDEC_Y, 0),    # BVN
-    # output jack (right edge); J4 center 152 -> body right ~157, >=2.5mm to the 160 edge
-    "J4": (152.0, 45.0, 0),    # OUT_50 MCX (right edge)
-    # ----- power entry + rail bulk (bottom strip, y=82, clear of mounting holes at x=5.5/W-5.5) -----
-    "J5": (20.0, 82.0, 0),     # +12V/GND/-12V screw terminal (bottom-left, right of H3)
-    "C16":(95.0, 82.0, 0),     # C_BULKP 100uF SMD (+VDC)
-    "C17":(112.0, 82.0, 0),    # C_BULKN 100uF SMD (-VDC)
+    # ===== COM row (shared): power entry -> reverse-polarity protection -> bulk =====
+    "J5":  (24.0, COM_Y, 0),        # 3-pos screw terminal (power input at the rear/top)
+    "F1":  (38.0,  6.0, 90), "D1": (44.0,  6.0, 90),   # +rail: PTC -> +VDC_F -> Schottky(cathode->+VDC)
+    "F2":  (38.0, 13.0, 90), "D2": (44.0, 13.0, 90),   # -rail: PTC -> -VDC_F -> Schottky(anode->-VDC)
+    "C10": (58.0, COM_Y, 0), "C11": (72.0, COM_Y, 0),  # 100uF bulk (+VDC / -VDC)
+    # ===== left end: IN (SIPM) + TEST edge-mount MCX =====
+    "J2":  (7.5, MCX_TOP, 90),      # SIPM  (detector input)
+    "J3":  (7.5, MCX_BOT, 90),      # TEST_IN
+    # ===== SiPM bias front-end (near the left/detector end) =====
+    "R1":  (19.0, 30.0, 0), "R2": (19.0, 33.0, 0),     # Rf1 / JP_Rf1(DNP)
+    "C1":  (24.5, 28.0, 90),                            # Cf -> GND
+    "R3":  (19.0, 38.0, 0), "R4": (19.0, 41.0, 0),     # Rf2 / JP_Rf2(DNP)
+    "C2":  (24.5, 34.0, 90),                            # Cc (FE -> CSP_IN)
+    "R5":  (18.0, 45.5, 0), "C3": (27.0, 45.5, 0),     # R_test(->GND) / C_test(->CSP_IN)
+    # ===== CR-112 CSP + decoupling =====
+    "U1":  (41.0, MOD_Y, 90),
+    "R6":  (35.0, TOPDEC_Y, 0), "C4": (41.0, TOPDEC_Y, 0),   # +VS_F
+    "R7":  (35.0, BOTDEC_Y, 0), "C5": (41.0, BOTDEC_Y, 0),   # -VS_F
+    # ===== CR-200 shaper + P/Z trim + decoupling =====
+    "U2":  (66.0, MOD_Y, 90),
+    "RV1": (66.0, 46.0, 0),         # 200k P/Z trim (below CR-200)
+    "R8":  (60.0, TOPDEC_Y, 0), "C6": (66.0, TOPDEC_Y, 0),   # SHVP
+    "R9":  (60.0, BOTDEC_Y, 0), "C7": (74.0, BOTDEC_Y, 0),   # SHVN (clear of the trim)
+    # ===== CR-210 BLR + decoupling + JP_BLR bypass =====
+    "U3":  (91.0, MOD_Y, 90),
+    "R10": (85.0, TOPDEC_Y, 0), "C8": (91.0, TOPDEC_Y, 0),   # BLVP
+    "R11": (85.0, BOTDEC_Y, 0), "C9": (91.0, BOTDEC_Y, 0),   # BLVN
+    "R12": (97.0, 46.0, 0),         # JP_BLR (DNP)
+    # ===== THS3491 buffer + feedback + 49.9 back-term + JP_BUF + decoupling =====
+    "U4":  (112.0, MOD_Y, 0),
+    "R13": (108.0, 28.5, 0), "R14": (116.0, 28.5, 0),        # R_FB / R_GAIN (feedback, above amp)
+    "R15": (112.0, 39.5, 90),       # 49.9 back-term
+    "R18": (118.0, 45.5, 0),        # JP_BUF (0R, FIT)
+    "R16": (106.0, TOPDEC_Y, 0), "C12": (112.0, TOPDEC_Y, 0),  # BVP (DNP)
+    "R17": (106.0, BOTDEC_Y, 0), "C13": (118.0, BOTDEC_Y, 0),  # BVN (DNP)
+    # ===== right end: OUT_50 + BIAS edge-mount MCX =====
+    "J4":  (W - 7.5, MCX_TOP, 270), # OUT_50
+    "J1":  (W - 7.5, MCX_BOT, 270), # BIAS_IN (bias supply enters here; routes to the front-end)
 }
 MCX_REFS = ("J1", "J2", "J3", "J4")
 
@@ -175,6 +182,14 @@ def main():
         placed += 1
     print("placed %d footprints, %d missing" % (placed, miss))
 
+    # ---- silkscreen cleanup: hide ref labels that clip the board edge or overlap a neighbour
+    # (MCX are at the edges; R2/R4 are DNP jumpers stacked under R1/R3; R13 sits over R16's pad).
+    # Refs stay in the netlist/fab + assembly drawing; this only clears F.Silk DRC on a dense board.
+    HIDE_SILK = {"J1", "J2", "J3", "J4", "R2", "R4", "R13"}
+    for fp in b.GetFootprints():
+        if fp.GetReference() in HIDE_SILK:
+            fp.Reference().SetVisible(False)
+
     # board outline
     pts = [(0, 0), (W, 0), (W, H), (0, H), (0, 0)]
     for (ax, ay), (bx, by) in zip(pts, pts[1:]):
@@ -182,9 +197,9 @@ def main():
         seg.SetStart(V(ax, ay)); seg.SetEnd(V(bx, by))
         seg.SetLayer(pcbnew.Edge_Cuts); seg.SetWidth(mm(0.1)); b.Add(seg)
 
-    # 4x M3 mounting holes
+    # M3 mounting holes in the COM row (thin channel row has no spare height; corners tile away)
     try:
-        for i, (hx, hy) in enumerate([(5.5, 5.5), (W-5.5, 5.5), (5.5, H-5.5), (W-5.5, H-5.5)], 1):
+        for i, (hx, hy) in enumerate([(6.0, 6.0), (W-6.0, 6.0)], 1):
             h = pcbnew.FootprintLoad("%s/MountingHole.pretty" % STOCK_FP, "MountingHole_3.2mm_M3")
             if h:
                 h.SetReference("H%d" % i); h.SetPosition(V(hx, hy))
@@ -246,6 +261,7 @@ def write_netclasses():
         {"netclass": "signal",  "pattern": "BUF_*"},
         {"netclass": "power", "pattern": "GND"}, {"netclass": "power", "pattern": "+VDC"},
         {"netclass": "power", "pattern": "-VDC"},
+        {"netclass": "power", "pattern": "*VDC_IN*"}, {"netclass": "power", "pattern": "*VDC_F*"},
         {"netclass": "power", "pattern": "*VS_F*"},
         {"netclass": "power", "pattern": "SHVP"}, {"netclass": "power", "pattern": "SHVN"},
         {"netclass": "power", "pattern": "BLVP"}, {"netclass": "power", "pattern": "BLVN"},

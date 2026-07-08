@@ -8,10 +8,12 @@
 > carries a **reverse-polarity block (PTC + series Schottky)**; and the test input, HF
 > decoupling and layout were reworked (all detailed below).
 >
-> **⚠ PCB is STALE.** `channel.kicad_pcb` predates this 2026-07 rework (buffer-bypass jumper,
-> rail-protection parts, dropped 0.1 µF HF caps, reworked test input), so the earlier
-> "DRC 0/0/0, fully autorouted (FreeRouting score 996)" describes the **pre-rework** netlist.
-> The layout rebuild — deferred until schematic + BOM + docs are wrapped — will re-sync it.
+> **PCB rebuilt (2026-07-08) as a THIN, tile-able channel-row cell.** `channel.kicad_pcb` =
+> **138 × 52 mm, 4-layer, DRC 0/0/0** (fully autorouted, FreeRouting 2.2.4 score 996.4; 171
+> tracks / 41 vias), matching the reworked netlist. Floorplan: MCX at the two **ends** (SIPM+TEST
+> on the left edge, OUT_50+BIAS on the right edge), a shared **COM row** (screw terminal + rail
+> protection + bulk) across the top with power in at the rear, and the signal chain left→right
+> — so channels stack vertically below the COM row for the multi-channel board.
 
 ## What this board is — one complete channel
 
@@ -160,17 +162,22 @@ DNP (filters + BLR populated), while **JP_BUF (R18) is FITTED** and the entire b
 DNP. When CR-210 is bypassed its rail decoupling is also DNP; the test path (R5/C3/J3) is DNP
 if there's no bench charge-injection. (The rail-protection parts F1/F2/D1/D2 are always fitted.)
 
-## Mechanical / stackup
+## Mechanical / stackup (2026-07-08 rebuild)
 - **4-layer:** F.Cu / In1.Cu = **GND plane** / In2.Cu = **−VDC plane** / B.Cu = **+VDC pour**.
-  (Both supply rails get a low-impedance copper area; +VDC pour added because +VDC has no
-  inner plane — this is what let FreeRouting route 100 %.)
-- Board outline **164 × 90 mm** (standalone single-channel cell; Phase C shrinks/tiles
-  per-channel — the **topology**, not this outline, is reused).
-- 4× M3 mounting holes. I/O: 4× MCX `CONMCX013` edge jacks, 1× Phoenix MKDS 3-pos screw
-  terminal (1715734, 5.08 mm). (MCX `Edge.Cuts` cutouts parked on `Dwgs.User`; restore on
-  `Edge.Cuts` when jacks go at the true edge in the GUI.)
+  (Both supply rails get a low-impedance copper area; the +VDC pour lets FreeRouting route 100 %.)
+- Board outline **138 × 52 mm** — a **THIN, tile-able CHANNEL-ROW cell**: signal flows
+  left→right (front-end → CR-112 → CR-200 → CR-210 → THS3491), the four MCX are at the two
+  **short ends** (left edge = `SIPM`(IN)+`TEST_IN`; right edge = `OUT_50`+`BIAS_IN`), and the
+  shared **COM row** across the top holds J5 + rail protection (F1/F2/D1/D2) + bulk (C10/C11),
+  power in at the rear/top edge. Multi-channel: stack channel rows below the COM row.
+- 2× M3 mounting holes in the COM row (the thin channel row has no spare height; corner holes
+  belong to the tiled array, not the cell). I/O: 4× MCX `CONMCX013` **edge-mount female jacks**,
+  1× Phoenix MKDS 3-pos screw terminal (1715734, 5.08 mm). (MCX `Edge.Cuts` cutouts parked on
+  `Dwgs.User`; restore on `Edge.Cuts` when the jacks sit at the true edge in the GUI.)
 - Net classes: `hv_bias` (0.6 mm clear, 0.4 mm track) on `BIAS_IN/SIPM/FE/N_filt`;
-  `power` (0.5 mm) on rails; `signal` (0.33 mm) on the amplifier nets; `Default` 0.2 mm.
+  `power` (0.5 mm) on the rails + pre-rail `*VDC_IN/*VDC_F`; `signal` (0.33 mm) on the amplifier
+  nets; `Default` 0.2 mm. **Note the bias route:** BIAS_IN enters at the right edge and runs the
+  board length (hv_bias) to the front-end/SIPM at the left.
 
 ## Part list pointer — design BOM
 - **Design BOM (this board)** = the per-symbol Value/MPN/Manufacturer/Distributor-PN fields
@@ -189,10 +196,11 @@ if there's no bench charge-injection. (The rail-protection parts F1/F2/D1/D2 are
 ## Verified-by
 - ERC: `kicad-cli sch erc channel.kicad_sch` = **0 errors / 0 warnings** (re-run after the
   2026-07 rework + rail protection).
-- **DRC / schematic-parity: STALE.** The prior "0/0/0, fully autorouted, 207 tracks" describes
-  the **pre-rework** PCB; `channel.kicad_pcb` has not been rebuilt against the new netlist
-  (buffer bypass, `F1/F2/D1/D2`, `+VDC_F/−VDC_F`). Re-run DRC + `--schematic-parity` after the
-  layout rebuild.
+- **DRC: 0 errors / 0 warnings / 0 unconnected** on the rebuilt `channel.kicad_pcb` (2026-07-08
+  thin channel-row cell, 138 × 52 mm, 4-layer, fully autorouted FreeRouting 2.2.4 score 996.4,
+  171 tracks / 41 vias) — matches the reworked netlist (buffer bypass, F1/F2/D1/D2, +VDC_F/−VDC_F).
+  Pipeline: `gen_pcb.py` → `export_dsn.py` → FreeRouting (needs Java 25) → `import_ses.py` →
+  `fill_zones.py` → `kicad-cli pcb drc`.
 - Function (**B2 chan-sim, populated-buffer variant**): gains compound
   ×10.42·×0.998·×1.999·×0.501, peaking ≈ 2.5 µs, OUT_50 = +67.1 mV for 0.5 pC into 50 Ω,
   buffer stable 0 % overshoot, BLR baseline ≤1.2 %. **Default (buffer-bypassed) build** drops

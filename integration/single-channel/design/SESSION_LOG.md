@@ -307,3 +307,47 @@ sustained faults; ~0.4 V drop leaves the rails ≈ ±11.6 V (> the modules' ±6 
 **State vs criteria:** schematic + BOM + docs updated & mutually consistent (ERC 0/0). Open
 item: rebuild `channel.kicad_pcb` against the new netlist.
 
+---
+
+## 2026-07-08 — session 5 — PCB rebuild: thin, tile-able CHANNEL-ROW cell (autonomous)
+
+**Objective (user):** lay out the PCB. Requirements: bias+output on one grouping, test+input on
+the other; edge-mount **MCX female** receptacles; keep the channel **as thin as possible** for
+multiple channels; keep **common circuitry at one end**, anticipating a multi-channel board.
+
+**Floorplan chosen (confirmed with user):** each channel is a horizontal **ROW** — signal
+flows left→right (front-end → CR-112 → CR-200 → CR-210 → THS3491) — with the four MCX at the
+two **short ends** (left edge = `SIPM`(IN)+`TEST_IN`; right edge = `OUT_50`+`BIAS_IN`) and a
+shared **COM row** across the top (J5 screw terminal + F1/F2 PTC + D1/D2 Schottky + C10/C11
+bulk, power in at the rear). Channels stack vertically below the COM row.
+
+**Work:**
+- Measured footprints (pcbnew): MCX courtyard ~10×11.5 (2 stacked/end ⇒ the ~24 mm channel
+  height), SIP-8 module 21.4×3.6 @ rot 90, screw terminal 16×11, CP_Elec bulk 9.4×7.2.
+- Rewrote `gen_pcb.py` `PLACE`/`W`/`H`/`DNP_BY_REF` for the new floorplan and the 2026-07 refs:
+  `U1..U4`, `J1..J5`, `F1/F2` (PTC), `D1/D2` (SS14), `R18`=JP_BUF(fit); DNP set = the buffer
+  block {U4,R13,R14,R16,R17,C12,C13} + bias/BLR jumpers {R2,R4,R12}. Added net-class patterns
+  for `*VDC_IN*`/`*VDC_F*` (power). 2 M3 holes in the COM row. Hid J1–J4/R2/R4/R13 silk refs to
+  clear F.Silk DRC. Board = **138 × 52 mm**.
+- Placement DRC clean (0 violations). Installed a **Java 25** runtime (Temurin 25.0.3 JRE,
+  downloaded from Adoptium to `%LOCALAPPDATA%\temurin25` — FreeRouting 2.2.4 needs class 69;
+  Java 21 was too old). Ran the pipeline: `export_dsn.py` → FreeRouting (`-de channel.dsn -do
+  channel.ses -mp 200`) → `import_ses.py` → `fill_zones.py` → `kicad-cli pcb drc`.
+- First route left `+VDC_IN` (J5.1→F1.1) unrouted — mounting hole H1 sat in that path; moved
+  J5 to x=24 and H1 back to the top-left corner. Re-route = **100 % routed**.
+
+**Results:** `channel.kicad_pcb` — **DRC 0 errors / 0 warnings / 0 unconnected**, 4-layer
+(F.Cu / In1=GND / In2=−VDC / B.Cu=+VDC pour), fully autorouted (FreeRouting 2.2.4 score 996.4),
+**171 tracks, 41 vias**. Matches the reworked netlist.
+
+**Decisions & why:** channel-row + shared COM row per the user's tiling sketch — connectors on
+the short ends stay on the array perimeter when channels stack; MCX-pair height (~24 mm) sets
+the thin dimension. BIAS_IN enters at the right edge (grouped with OUT) and runs the board
+length as `hv_bias` to the front-end/SIPM at the left — a deliberate consequence of the
+connector grouping. MCX `Edge.Cuts` cutouts parked on `Dwgs.User` (restore at the true edge in
+the GUI), same convention as the prior board.
+
+**State vs criteria:** ALL met — schematic ERC 0/0, PCB DRC 0/0/0, docs reconciled. GUI
+finishing left: restore MCX edge cutouts; optional per-connector silk labels. Single channel
+is fab-ready as a cell; the multi-channel board tiles this row under the shared COM row.
+
