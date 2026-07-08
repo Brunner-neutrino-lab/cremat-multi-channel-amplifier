@@ -145,14 +145,16 @@ def build_child():
 #  ROOT  twelve-channel.kicad_sch  (12 sheet instances + common power section)
 # =====================================================================================
 # up-rated board-level part metadata (override the single-channel values for 12x current)
+# MPNs verified in-stock 2026-07-08 (see models-bom/SOURCING-VERIFICATION); all three provisional
+# picks were rejected (obsolete / wrong package / fictional) and replaced.
 UPRATED = {
-    "F_P":    ("PTC 1.1A 30V",  "MF-MSMF110-2",  "Bourns",        "MF-MSMF110-2CT-ND"),
-    "F_N":    ("PTC 1.1A 30V",  "MF-MSMF110-2",  "Bourns",        "MF-MSMF110-2CT-ND"),
-    "D_RP":   ("SS24",          "SS24",          "onsemi",        "SS24FSCT-ND"),
-    "D_RN":   ("SS24",          "SS24",          "onsemi",        "SS24FSCT-ND"),
-    "C_BULKP":("470uF 35V",     "UWT1V471MNL1GS", "Nichicon",     "493-13313-1-ND"),
-    "C_BULKN":("470uF 35V",     "UWT1V471MNL1GS", "Nichicon",     "493-13313-1-ND"),
-    "J_DAISY":("Screw terminal 3-pos 5.08mm (daisy)", "1715734", "Phoenix Contact", "277-1264-ND"),
+    "F_P":    ("PTC 1.1A 24V",  "1812L110/24DR", "Littelfuse",       "F5632CT-ND"),
+    "F_N":    ("PTC 1.1A 24V",  "1812L110/24DR", "Littelfuse",       "F5632CT-ND"),
+    "D_RP":   ("SSA24",         "SSA24",         "onsemi",           "SSA24CT-ND"),
+    "D_RN":   ("SSA24",         "SSA24",         "onsemi",           "SSA24CT-ND"),
+    "C_BULKP":("470uF 35V",     "EEE-FN1V471UP", "Panasonic",        "10-EEE-FN1V471UPCT-ND"),
+    "C_BULKN":("470uF 35V",     "EEE-FN1V471UP", "Panasonic",        "10-EEE-FN1V471UPCT-ND"),
+    "J_DAISY":("Screw terminal 3-pos 5.08mm", "1715734", "Phoenix Contact", "277-1264-ND"),
 }
 FP_PTC_BIG   = "Fuse:Fuse_1812_4532Metric"
 FP_CPELEC_BIG= "Capacitor_SMD:CP_Elec_10x10.5"

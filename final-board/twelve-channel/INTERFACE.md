@@ -61,9 +61,12 @@ block) + `twelve-channel.kicad_sch` (12 `(sheet)` instances + the common power s
 places+routes the common section once; `fill_zones.py` fills the planes; `polish_silk.py`
 moves refdes to F.Fab. Gate: `kicad-cli pcb drc --schematic-parity`.
 
-## Open items (for models-BOM / follow-up)
+## Status / open items
 
-- **BOM not yet regenerated** for this board (old one deleted with the pre-rework design).
-- **Up-rated common-power MPNs are provisional** (`MF-MSMF110-2` PTC, `SS24`, `UWT1V471MNL1GS`
-  470 µF) — verify in-stock + voltage rating like the single-channel sourcing pass.
+- **BOM** — `models-bom/twelve-channel-bom.csv` regenerated (23 line items, 464 parts: 344 FIT
+  + 120 DNP), enriched from the single-channel BOM. Generator: `models-bom/gen_bom.py`.
+- **Common-power MPNs verified in-stock 2026-07-08** (`models-bom/SOURCING-VERIFICATION-2026-07-08.md`):
+  Littelfuse `1812L110/24DR` PTC (1.1 A/24 V), onsemi `SSA24` Schottky (2 A/40 V SMA), Panasonic
+  `EEE-FN1V471UP` 470 µF/35 V — all three provisional picks were rejected (obsolete / wrong
+  package / fictional) and replaced.
 - Daisy-chain cable between boards is user-supplied (3-conductor, ≥1 A/rail).
