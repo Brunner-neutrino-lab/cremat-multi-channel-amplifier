@@ -1,0 +1,286 @@
+#!/usr/bin/env python3
+"""Build the 12-channel PCB by TILE-AND-REPLICATE (the user's brief: duplicate the routed
+single-channel layout x12 so the autorouter barely works; only the shared power is new).
+
+  * TILE  = the routed single-channel channel row (integration/single-channel/design/
+    channel.kicad_pcb) MINUS its COM row. Its 38 footprints + all channel-region tracks/vias
+    are cloned x12, translated by PITCH in Y, refs re-mapped via ROLE (ch1->chNN), nets
+    re-mapped /X -> /chNN/X (rails +VDC/-VDC/GND stay global).
+  * COMMON = one power section at the top: J_PWR (in) + J_DAISY (board-to-board daisy out) on
+    the raw rails, UP-RATED reverse-polarity block (PTC 1.1A / SS24) + 470uF bulk. Only these
+    ~4 short pre-plane nets are hand-routed; every channel rail via drops into board-wide plane
+    pours (In1 GND / In2 -VDC / B.Cu +VDC / F.Cu GND) exactly as in the single channel.
+
+Run:  "C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py
+Then: fill_zones.py ; kicad-cli pcb drc --schematic-parity twelve-channel.kicad_pcb
+"""
+import os, re, importlib.util
+import pcbnew
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SC_DIR = os.path.abspath(os.path.join(HERE, "..", "..", "..", "integration", "single-channel", "design"))
+SC_PCB = os.path.join(SC_DIR, "channel.kicad_pcb")
+TW_NET = os.path.join(HERE, "twelve-channel.net")
+PCB = os.path.join(HERE, "twelve-channel.kicad_pcb")
+DRU = os.path.join(HERE, "twelve-channel.kicad_dru")
+
+# ---- import the 12-ch schematic generator for the role/ref/net maps --------------------
+_spec = importlib.util.spec_from_file_location("tw_gen_sch", os.path.join(HERE, "gen_sch.py"))
+g12 = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(g12)
+sc = g12.sc
+NCH = g12.NCH
+CH_ROLES = set(g12.CH_ROLES)
+CH_BASE_REF = g12.CH_BASE_REF
+SC_REFMAP, _ = g12.build_refmap(sc.ROLES)          # role -> single-channel ref
+SC_ROLE = {v: k for k, v in SC_REFMAP.items()}     # single-channel ref -> role
+DNP_ROLES = {r for r in CH_ROLES if sc.SPEC[r][2]}
+MCX_ROLES = {"J_BIAS", "J_SIPM", "J_TEST", "J_OUT50"}
+def chref(role, n): return g12.stride_ref(CH_BASE_REF[role], n)
+
+PITCH = 25.0            # per-channel vertical pitch (single-channel row ~24.6 mm tall)
+YSPLIT = 20.0           # tracks with min-y >= this belong to the channel (COM row is above it)
+W = 138.0
+
+def mm(v): return pcbnew.FromMM(float(v))
+def V(x, y): return pcbnew.VECTOR2I(mm(x), mm(y))
+
+def parse_netlist(path):
+    t = open(path, encoding="utf-8").read()
+    comps = {}
+    for cm in re.finditer(r'\(comp\s+\(ref "([^"]+)"\)(.*?)(?=\(comp\s|\(libparts)', t, re.S):
+        ref, body = cm.group(1), cm.group(2)
+        fp = re.search(r'\(footprint "([^"]*)"\)', body)
+        uid = re.search(r'\(tstamps "([0-9a-fA-F-]{36})"\)', body)
+        val = re.search(r'\(value "([^"]*)"\)', body)
+        fields = dict(re.findall(r'\(field\s+\(name "([^"]+)"\)\s*"([^"]*)"\)', body))
+        comps[ref] = (fp.group(1) if fp else "", uid.group(1) if uid else None,
+                      val.group(1) if val else "", fields)
+    pad_net = {}
+    sec = t[t.index("(nets"):]
+    for nb in re.split(r'\n\s*\(net\b', sec)[1:]:
+        nm = re.search(r'\(name "([^"]+)"', nb)
+        if not nm: continue
+        for ref, pad in re.findall(r'\(ref "([^"]+)"\)\s*\(pin "([^"]+)"', nb):
+            pad_net[(ref, pad)] = nm.group(1)
+    return comps, pad_net
+
+TW_COMPS, TW_PADNET = parse_netlist(TW_NET)
+
+def remap_net(net, n):
+    if net in ("+VDC", "-VDC", "GND", ""): return net
+    if net.startswith("unconnected-"): return None
+    if net.startswith("/"): return "/ch%02d/%s" % (n, net[1:])
+    return net
+
+_netcache = {}
+def ensure_net(board, name):
+    if not name: return None
+    if name in _netcache: return _netcache[name]
+    ni = board.FindNet(name)
+    if ni is None:
+        ni = pcbnew.NETINFO_ITEM(board, name); board.Add(ni)
+    _netcache[name] = ni
+    return ni
+
+def dup(item):
+    try: d = item.Duplicate(False)
+    except TypeError: d = item.Duplicate()
+    try: d = d.Cast()
+    except Exception: pass
+    return d
+
+def track_bbox_y(t):
+    bb = t.GetBoundingBox()
+    return bb.GetTop() / 1e6, bb.GetBottom() / 1e6
+
+# =====================================================================================
+def main():
+    src = pcbnew.LoadBoard(SC_PCB)
+    # channel-vs-COM classification
+    chan_fps = [fp for fp in src.GetFootprints() if SC_ROLE.get(fp.GetReference()) in CH_ROLES]
+    assert len(chan_fps) == len(CH_ROLES), "channel fp count %d != %d" % (len(chan_fps), len(CH_ROLES))
+    chan_trk, com_trk, straddle = [], [], 0
+    for t in src.GetTracks():
+        top, bot = track_bbox_y(t)
+        if top >= YSPLIT: chan_trk.append(t)
+        elif bot <= YSPLIT: com_trk.append(t)
+        else: straddle += 1
+    print("channel fps=%d  channel tracks/vias=%d  COM tracks=%d  straddling=%d"
+          % (len(chan_fps), len(chan_trk), len(com_trk), straddle))
+    assert straddle == 0, "tracks straddle the COM/channel split - adjust YSPLIT"
+
+    # output board = fresh 4-layer board (same stackup as the single channel; netclasses come
+    # from twelve-channel.kicad_pro at DRC time). Building fresh avoids SWIG state corruption
+    # from clearing a loaded board.
+    out = pcbnew.CreateEmptyBoard()
+    out.SetCopperLayerCount(4)
+    try:
+        out.SetLayerName(pcbnew.In1_Cu, "GND.Cu")
+        out.SetLayerName(pcbnew.In2_Cu, "PWR.Cu")
+    except Exception as e:
+        print("layer name:", e)
+
+    # ---- clone channels ----
+    for n in range(1, NCH + 1):
+        dy = (n - 1) * PITCH
+        off = V(0, dy)
+        for fp in chan_fps:
+            role = SC_ROLE[fp.GetReference()]; nref = chref(role, n)
+            d = dup(fp); out.Add(d); d.Move(off)
+            d.SetReference(nref)
+            uid = TW_COMPS.get(nref, ("", None, "", {}))[1]
+            if uid: d.SetPath(pcbnew.KIID_PATH("/" + uid))
+            try: d.SetDNP(role in DNP_ROLES)
+            except Exception: pass
+            for pad in d.Pads():
+                nm = TW_PADNET.get((nref, pad.GetNumber()))
+                if nm: pad.SetNet(ensure_net(out, nm))
+            if role in MCX_ROLES:                       # restore MCX slot cutout to Edge.Cuts
+                for it in d.GraphicalItems():
+                    if it.GetLayer() == pcbnew.Dwgs_User:
+                        it.SetLayer(pcbnew.Edge_Cuts)
+        for t in chan_trk:
+            d = dup(t); out.Add(d); d.Move(off)
+            nm = remap_net(t.GetNetname(), n)
+            if nm: d.SetNet(ensure_net(out, nm))
+
+    H = max(fp.GetBoundingBox(False, False).GetBottom() for fp in out.GetFootprints()) / 1e6 + 11.0
+    H = round(H, 1)
+    print("cloned %d channels; board = %.1f x %.1f mm" % (NCH, W, H))
+
+    place_common(out, H)
+    add_planes(out, H)
+    add_outline(out, H)
+    write_dru()
+    pcbnew.SaveBoard(PCB, out)
+    print("saved", PCB)
+
+# ---- common power section: J_PWR + J_DAISY + up-rated PTC/Schottky + 470uF bulk ----
+COMMON_PLACE = {   # ref: (x, y, rot)  -- top strip, generous spacing (terminals 16 mm wide)
+    "J_PWR":   (24.0, 10.0, 0),
+    "J_DAISY": (48.0, 10.0, 0),
+    # orientations chosen so each PTC's _F pad faces its Schottky's _F pad at the SAME y (straight
+    # trace), the _IN pad points toward its bus, and the rail pad takes a plane via.
+    "F_P": (64.0, 6.0, 270), "D_RP": (70.0, 6.0, 270),   # +rail: _F pads both lower, +VDC_IN upper
+    "F_N": (64.0, 16.0, 90), "D_RN": (70.0, 16.0, 270),  # -rail: _F pads both upper, -VDC_IN lower
+    "C_BULKP": (90.0, 10.0, 0), "C_BULKN": (112.0, 10.0, 0),
+}
+COMMON_ROLES = ["J_PWR", "J_DAISY", "F_P", "D_RP", "F_N", "D_RN", "C_BULKP", "C_BULKN"]
+
+def _load_fp(fpid):
+    nick, fname = fpid.split(":", 1)
+    STOCK = r"C:/Program Files/KiCad/10.0/share/kicad/footprints"
+    d = os.path.join(HERE, "lib", "cremat.pretty") if nick == "cremat" else "%s/%s.pretty" % (STOCK, nick)
+    return pcbnew.FootprintLoad(d, fname)
+
+def _pad_xy(fp, num):
+    for p in fp.Pads():
+        if p.GetNumber() == num:
+            return p.GetPosition().x / 1e6, p.GetPosition().y / 1e6
+    return None
+
+def place_common(b, H):
+    # up-rated part refs come from the 12-ch netlist (J49/J50/F1/F2/D1/D2/C133/C134)
+    jn = NCH * g12.PREFIX_COUNT["J"]; cn = NCH * g12.PREFIX_COUNT["C"]
+    REF = {"J_PWR": "J%d" % (jn + 1), "J_DAISY": "J%d" % (jn + 2),
+           "F_P": "F1", "F_N": "F2", "D_RP": "D1", "D_RN": "D2",
+           "C_BULKP": "C%d" % (cn + 1), "C_BULKN": "C%d" % (cn + 2)}
+    fps = {}
+    for role in COMMON_ROLES:
+        ref = REF[role]; fpid, uid, val, fields = TW_COMPS[ref]
+        fp = _load_fp(fpid); assert fp, "missing common fp %s %s" % (ref, fpid)
+        nick, fname = fpid.split(":", 1)
+        try: fp.SetFPID(pcbnew.LIB_ID(nick, fname))     # keep library nickname (schematic-parity)
+        except Exception: pass
+        x, y, rot = COMMON_PLACE[role]
+        fp.SetReference(ref); fp.SetValue(val)          # value + BOM fields from the netlist (= schematic)
+        for k in ("MPN", "Manufacturer", "Distributor PN"):
+            if fields.get(k):
+                try: fp.SetField(k, fields[k])
+                except Exception: pass
+        if rot: fp.SetOrientationDegrees(rot)
+        fp.SetPosition(V(0, 0))
+        bb = fp.GetBoundingBox(False, False)
+        cx = (bb.GetLeft() + bb.GetRight()) / 2e6; cy = (bb.GetTop() + bb.GetBottom()) / 2e6
+        fp.SetPosition(V(x - cx, y - cy))
+        if uid: fp.SetPath(pcbnew.KIID_PATH("/" + uid))
+        b.Add(fp)
+        for pad in fp.Pads():
+            nm = TW_PADNET.get((ref, pad.GetNumber()))
+            if nm: pad.SetNet(ensure_net(b, nm))
+        fps[role] = fp
+    # mounting holes: top strip (above ch1) + bottom strip (below ch12), clear of the edge MCX
+    for i, (hx, hy) in enumerate([(8, 5), (W - 8, 5), (8, H - 5), (W - 8, H - 5)], 1):
+        h = _load_fp("MountingHole:MountingHole_3.2mm_M3")
+        if h:
+            h.SetReference("H%d" % i); h.SetPosition(V(hx, hy)); h.Reference().SetVisible(False)
+            try: h.SetBoardOnly(True)
+            except Exception: pass
+            b.Add(h)
+    route_common(b, fps)
+
+def _track(b, net, layer, pts, width=0.5):
+    ni = ensure_net(b, net)
+    for a, c in zip(pts, pts[1:]):
+        t = pcbnew.PCB_TRACK(b); t.SetStart(V(*a)); t.SetEnd(V(*c))
+        t.SetWidth(mm(width)); t.SetLayer(layer); t.SetNet(ni); b.Add(t)
+
+def _via(b, net, xy, plane_layer):
+    ni = ensure_net(b, net)
+    v = pcbnew.PCB_VIA(b); v.SetPosition(V(*xy)); v.SetDrill(mm(0.4)); v.SetWidth(mm(0.8))
+    v.SetNet(ni); v.SetLayerPair(pcbnew.F_Cu, plane_layer); b.Add(v)
+
+def _bus(b, net, layer, pads, bus_y):
+    """Stub each pad vertically to a horizontal bus at bus_y (pins never cross their neighbours)."""
+    xs = sorted(p[0] for p in pads)
+    for p in pads:
+        _track(b, net, layer, [p, (p[0], bus_y)])
+    _track(b, net, layer, [(xs[0], bus_y), (xs[-1], bus_y)])
+
+def _lroute(b, net, layer, a, c):
+    _track(b, net, layer, [a, (c[0], a[1]), c])
+
+def route_common(b, fps):
+    P = lambda role, num: _pad_xy(fps[role], num)
+    F = pcbnew.F_Cu
+    # +VDC_IN carried on a bus ABOVE the parts, -VDC_IN on a bus BELOW: the vertical stub off the
+    # outer terminal pin (pin1 / pin3) and off F_x.1 never crosses a neighbouring pad.
+    _bus(b, "/+VDC_IN", F, [P("J_PWR", "1"), P("J_DAISY", "1"), P("F_P", "1")], 3.0)
+    _bus(b, "/-VDC_IN", F, [P("J_PWR", "3"), P("J_DAISY", "3"), P("F_N", "1")], 21.0)
+    # PTC out -> Schottky in: _F pads are placed at the same y -> straight trace, no pad crossed
+    _lroute(b, "/+VDC_F", F, P("F_P", "2"), P("D_RP", "2"))
+    _lroute(b, "/-VDC_F", F, P("F_N", "2"), P("D_RN", "1"))
+    # rails to planes: Schottky outputs + SMD bulk rail pads each drop a via (screw-terminal GND is THT)
+    _via(b, "+VDC", P("D_RP", "1"), pcbnew.B_Cu);  _via(b, "+VDC", P("C_BULKP", "1"), pcbnew.B_Cu)
+    _via(b, "-VDC", P("D_RN", "2"), pcbnew.In2_Cu); _via(b, "-VDC", P("C_BULKN", "2"), pcbnew.In2_Cu)
+
+# ---- board-wide plane pours (filled by fill_zones.py) ----
+def add_planes(b, H):
+    def add(net, layer, prio=None):
+        ni = b.FindNet(net)
+        if ni is None: print("no net", net); return
+        z = pcbnew.ZONE(b); z.SetLayer(layer); z.SetNetCode(ni.GetNetCode()); z.SetIsFilled(True)
+        if prio is not None: z.SetAssignedPriority(prio)
+        o = z.Outline(); o.NewOutline()
+        for px, py in [(1.5, 1.5), (W - 1.5, 1.5), (W - 1.5, H - 1.5), (1.5, H - 1.5)]:
+            o.Append(mm(px), mm(py))
+        b.Add(z)
+    add("GND", pcbnew.In1_Cu)
+    add("-VDC", pcbnew.In2_Cu)
+    add("+VDC", pcbnew.B_Cu, prio=1)
+
+def add_outline(b, H):
+    pts = [(0, 0), (W, 0), (W, H), (0, H), (0, 0)]
+    for a, c in zip(pts, pts[1:]):
+        s = pcbnew.PCB_SHAPE(b); s.SetShape(pcbnew.SHAPE_T_SEGMENT)
+        s.SetStart(V(*a)); s.SetEnd(V(*c)); s.SetLayer(pcbnew.Edge_Cuts); s.SetWidth(mm(0.1)); b.Add(s)
+
+def write_dru():
+    open(DRU, "w", encoding="utf-8").write(
+        '(version 1)\n'
+        '(rule "MCX edge-mount shield pad straddles its slot by design"\n'
+        '   (constraint edge_clearance (min -2mm))\n'
+        '   (condition "A.Library_Link == \'cremat:MCX_CONMCX013_EdgeMount\'"))\n')
+
+if __name__ == "__main__":
+    main()
