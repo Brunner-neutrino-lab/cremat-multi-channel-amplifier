@@ -179,6 +179,12 @@ def _pad_xy(fp, num):
             return p.GetPosition().x / 1e6, p.GetPosition().y / 1e6
     return None
 
+def _set_model(fp, path):
+    try: fp.Models().clear()
+    except Exception: pass
+    m = pcbnew.FP_3DMODEL(); m.m_Filename = path; m.m_Show = True
+    fp.Models().push_back(m)
+
 def place_common(b, H):
     # up-rated part refs come from the 12-ch netlist (J49/J50/F1/F2/D1/D2/C133/C134)
     jn = NCH * g12.PREFIX_COUNT["J"]; cn = NCH * g12.PREFIX_COUNT["C"]
@@ -204,6 +210,8 @@ def place_common(b, H):
         cx = (bb.GetLeft() + bb.GetRight()) / 2e6; cy = (bb.GetTop() + bb.GetBottom()) / 2e6
         fp.SetPosition(V(x - cx, y - cy))
         if uid: fp.SetPath(pcbnew.KIID_PATH("/" + uid))
+        if role in ("F_P", "F_N"):                      # KiCad ships no Fuse_1812 3D model; a PTC
+            _set_model(fp, "${KICAD10_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_1812_4532Metric.step")  # is a 1812 chip
         b.Add(fp)
         for pad in fp.Pads():
             nm = TW_PADNET.get((ref, pad.GetNumber()))
