@@ -416,7 +416,7 @@ def deco(rrole, cb, rail, vdc, top=True):
     pwr("GND", P(cb, "2"))
 
 # ---------- the layout ----------------------------------------------------------------
-def layout():
+def layout_channel():
     # ===== bias front-end + inputs =====
     # BIAS_IN: J_BIAS -> Rf1 ; JP_Rf1 bypass tap up
     W(P("J_BIAS", "1"), P("Rf1", "1")); W(P("Rf1", "1"), P("JP_Rf1", "1"))
@@ -510,6 +510,7 @@ def layout():
     W((295.91, 115.57), (295.91, 135.89), P("JP_BUF", "1"))    # tap SHAPER_OUT down to the jumper
     W(P("JP_BUF", "2"), (325.12, 135.89), (325.12, 115.57))    # jumper up to the BUF_OUT node
 
+def layout_power():
     # ===== power entry: screw terminal -> PTC fuse -> series Schottky reverse-block -> board rail =====
     p1 = P("J_PWR", "1"); p2 = P("J_PWR", "2"); p3 = P("J_PWR", "3")
     # raw inputs off the terminal reach +VDC_F/-VDC_F through the PTC, then the board rails via the Schottky
@@ -532,6 +533,10 @@ def layout():
     ax, ay = P("D_RN", "2")                                           # -VDC rail = Schottky anode
     W((ax, ay), (ax + 5.08, ay)); pwr("-VDC", (ax + 5.08, ay), rot=180)
     W((ax, ay), (ax, ay + 3.81)); flag("-VDC", (ax, ay + 3.81))
+
+def layout():
+    layout_channel()
+    layout_power()
 
 def auto_junctions():
     from collections import Counter
