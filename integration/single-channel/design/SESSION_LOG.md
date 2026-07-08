@@ -351,3 +351,13 @@ the GUI), same convention as the prior board.
 finishing left: restore MCX edge cutouts; optional per-connector silk labels. Single channel
 is fab-ready as a cell; the multi-channel board tiles this row under the shared COM row.
 
+**Schematic-parity note (benign):** `kicad-cli pcb drc --schematic-parity` reports ~92
+*metadata* items — footprint↔symbol library-link mismatches (the `.kicad_pcb` footprints carry
+the bare footprint name, not `lib:name`), footprints not carrying the symbols' BOM fields
+(`MPN`/`Manufacturer`/`Distributor PN`), and the 2 mounting holes not in the schematic. **None
+are electrical** (DRC copper/clearance/connectivity = 0/0/0; netlist matches). A KiCad GUI
+*Update PCB from Schematic* reconciles the links/fields cleanly. Doing it headlessly via
+`fp.SetFPID(lib:name)` fixes the link-parity but then re-triggers a `lib_footprint_mismatch`
+DRC on the 4 intentionally-modified MCX (Edge.Cuts parked on Dwgs.User), so the parity cleanup
+is left for the GUI pass rather than trading benign parity for a real DRC hit.
+
