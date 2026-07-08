@@ -104,6 +104,24 @@ def pwrflag_multi(net, x, y, ref, rot=0):
             '%s\n\t)' % (x, y, rot, iu, ref, x, y - 3, x, y + 3,
                          uid(iu, "pin"), instances_multi(frefs)))
 
+# CONCRETE single-instance power symbol for the ROOT sheet (refs offset ABOVE the child's #PWR
+# range so nothing collides and the whole design is fully annotated -> no annotate prompt on
+# Update-from-Schematic). Signature matches sc.power_sym (net, x, y, key, rot).
+ROOT_PWRN = [0]
+def root_power_sym(net, x, y, key, rot=0):
+    ROOT_PWRN[0] += 1
+    pref = "#PWR%d" % (PWRCTR[0] + 200 + ROOT_PWRN[0])
+    iu = uid("rootpwr", net, x, y, pref)
+    inst = ('\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s" (reference "%s") (unit 1))\n'
+            '\t\t\t)\n\t\t)' % (PROJ, ROOT_UUID, pref))
+    return ('\t(symbol\n\t\t(lib_id "power:%s")\n\t\t(at %s %s %d)\n\t\t(unit 1)\n\t\t(body_style 1)\n'
+            '\t\t(exclude_from_sim no)\n\t\t(in_bom yes)\n\t\t(on_board yes)\n\t\t(in_pos_files yes)\n'
+            '\t\t(dnp no)\n\t\t(uuid "%s")\n'
+            '\t\t(property "Reference" "%s" (at %s %s 0) (hide yes) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Value" "%s" (at %s %s 0) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(pin "1" (uuid "%s"))\n%s\n\t)' % (
+        net, x, y, rot, iu, pref, x, y - 3, net, x, y + 3, uid(iu, "pin"), inst))
+
 # =====================================================================================
 #  header / footer helpers
 # =====================================================================================
@@ -162,7 +180,7 @@ FP_CPELEC_BIG= "Capacitor_SMD:CP_Elec_10x10.5"
 def build_root():
     # restore single-instance emitters
     sc.sym_instance = _orig_sym
-    sc.power_sym = sc._power_sym_orig
+    sc.power_sym = root_power_sym                # concrete #PWR refs (no "?" -> no annotate prompt)
     sc.pwrflag = sc._pwrflag_orig
     sc.ROOT = ROOT_UUID; sc.PROJ = PROJ
 
@@ -183,7 +201,7 @@ def build_root():
                 "F_P": "F1", "F_N": "F2", "D_RP": "D1", "D_RN": "D2",
                 "C_BULKP": "C%d" % (cn + 1), "C_BULKN": "C%d" % (cn + 2)}
 
-    sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = 0
+    sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = FLGCTR[0] + 100   # root #FLG above child range
     sc.ROLES = ROOT_ROLES
     for role in ROOT_ROLES:
         _v, mpn, mfr, dkpn = sc.PARTS[role]

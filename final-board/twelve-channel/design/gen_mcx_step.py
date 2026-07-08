@@ -34,5 +34,8 @@ coupling = ycyl(CUP_OD, BAR_LEN, BAR_LEN + CUP_LEN, AXIS_Z)
 pin = ycyl(PIN_OD, -2.0, BAR_LEN + CUP_LEN + 0.6, AXIS_Z)  # center conductor tip
 
 body = base.union(riser).union(barrel).union(coupling).union(pin)
+# KiCad applies NO Y-flip (model +Y == footprint +Y). The footprint's mating side / signal pad /
+# board edge is at footprint -Y, so the barrel must protrude toward -Y: flip 180 deg about Z.
+body = body.rotate((0, 0, 0), (0, 0, 1), 180)
 cq.exporters.export(body, OUT)
 print("wrote", OUT)
