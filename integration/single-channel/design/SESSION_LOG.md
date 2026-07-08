@@ -361,3 +361,17 @@ are electrical** (DRC copper/clearance/connectivity = 0/0/0; netlist matches). A
 DRC on the 4 intentionally-modified MCX (Edge.Cuts parked on Dwgs.User), so the parity cleanup
 is left for the GUI pass rather than trading benign parity for a real DRC hit.
 
+---
+
+## 2026-07-08 — session 6 — push + 10 µF bulk swapped to an in-stock part
+
+- **Pushed** to `github.com/Brunner-neutrino-lab/cremat-multi-channel-amplifier` (`main` → origin/main;
+  Git Credential Manager auth).
+- **10 µF 25 V X5R bulk fitted part swapped** off the 0-stock Samsung CL21A106KAYNNNE to the
+  in-stock **KEMET C0805C106K3PACTU** (DK 399-11939-1-ND). Re-verified live on Digi-Key:
+  ~255 k in stock, Active, $0.23 q1 / $0.083 q100 — beat Taiyo Yuden (in stock but ~600 pcs),
+  TDK (stocked but NRND), Murata/Yageo (0-stock). Samsung retained as documented alternate
+  (same-mfr fallback CL21A106KACLRNC, ~71 k). Value-only swap in `gen_sch.py` (8 caps) + the 8
+  CSV rows; **0805 footprint and PCB unchanged** (schematic ERC re-run 0/0). Docs updated
+  (INTERFACE, SESSION_REPORT, SOURCING-VERIFICATION).
+

@@ -80,8 +80,9 @@ detail + the constraint box in `INTERFACE.md`.
 - **Over-voltage protection is not passively achievable** at ±12 V nominal vs the ±13 V Cremat
   supply abs-max — the rail protection is reverse-polarity + fault-interrupt only. Keep the
   bench supply set correctly. (Verified vs datasheets; in INTERFACE + gen_sch docstring.)
-- **Sourcing:** 10 µF 25 V bulk (CL21A106KAYNNNE) is Active but 0-stock (16-wk lead) — Taiyo
-  Yuden `TMK212BBJ106KG-T` is the in-stock equal-spec alt; decide keep-and-reorder vs sub.
+- **Sourcing (resolved 2026-07-08):** the 10 µF 25 V bulk was swapped to the in-stock **KEMET
+  C0805C106K3PACTU** (DK 399-11939-1-ND, ~255 k stock, drop-in 0805); Samsung CL21A106KAYNNNE
+  (0-stock) kept as a documented alternate. Value-only swap — no PCB change.
 - 3D-only: `CONMCX013.step` absent from `lib/cremat.pretty` — layout-unaffected.
 - Buffer gain change → update Rf/Rg (one PARTS line in gen_sch.py) + re-sim (B2).
 - Default build has **no active line driver** (buffer DNP): the CR-210 drives the 50 Ω

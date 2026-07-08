@@ -67,6 +67,14 @@ replaced by THS3491 before this sweep).
   flagged "0 DK-stock 2026-07 (16wk lead)". **This cap is not HV-critical** (25 V rail bulk),
   so the design session may either keep the Samsung PN and reorder, or substitute the Taiyo
   Yuden part for immediate builds.
+- **RESOLVED 2026-07-08 — fitted part swapped to KEMET `C0805C106K3PACTU`** (DK **399-11939-1-ND**,
+  10 µF 25 V X5R ±10% 0805, drop-in). Re-verified in-stock on Digi-Key: **~255,000 units**,
+  **Active** (no NRND), $0.23 q1 / **$0.0833 q100** — deep, cheap, jellybean, best of the
+  candidates (Taiyo Yuden 587-2985-1-ND was in stock but only ~600 pcs; TDK's stocked 10 µF is
+  NRND; Murata/Yageo were 0-stock). Value-only swap in `gen_sch.py` + the 8 CSV bulk rows; the
+  0805 footprint and PCB are unchanged. **Alternates kept:** Samsung CL21A106KAYNNNE
+  (1276-2891-1-ND, the original, currently 0-stock) and same-mfr Samsung CL21A106KACLRNC
+  (1276-2397-1-ND, ~71 k in stock).
 
 ### 2c. Low-stock watch (not obsolete, no substitution required)
 - **Bourns 3296W-1-204LF** 200 kΩ trimpot (`R_PZ`): Active, but only ~95 pcs in Digi-Key

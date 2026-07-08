@@ -187,8 +187,10 @@ if there's no bench charge-injection. (The rail-protection parts F1/F2/D1/D2 are
   MPN → 20 MPNs.)
 - 2026-07 sourcing (`models-bom/SOURCING-VERIFICATION-2026-07-07.md`): **Cf** swapped off the
   NRND CL21B104KCC5PNC → **CL21B104KCFNNNE** (same 0.1 µF/100 V/X7R/0805); several Digi-Key
-  PNs corrected; the **10 µF 25 V bulk (CL21A106KAYNNNE) is Active but currently 0-stock
-  (16-wk lead)** — Taiyo Yuden `TMK212BBJ106KG-T` is the in-stock equal-spec alternate.
+  PNs corrected. The **10 µF 25 V bulk was swapped (2026-07-08) to the in-stock KEMET
+  `C0805C106K3PACTU`** (DK 399-11939-1-ND, ~255 k stock, drop-in 0805) — Samsung
+  CL21A106KAYNNNE (0-stock / 29-wk lead) is retained as the documented alternate (same-mfr
+  fallback: Samsung CL21A106KACLRNC).
 - Earlier B3 merge/dedup (still in effect): CSP↔shaper internal jacks removed; the two
   board-edge 49.9 Ω collapsed to **one** at `OUT_50`; one 100 µF Nichicon UWT bulk pair;
   power terminal = Phoenix **1715734** (5.08 mm).
@@ -230,7 +232,7 @@ maps, values and the CR-210 populate-XOR — unchanged. The 2026-07 rework chang
 | **R14** | gain Rg | 976 Ω 1% | RC0805FR-07976RL (Yageo) | R_0805 |
 | **R15** | 49.9 Ω back-term | 49.9 Ω 1% | RC0805FR-0749R9L (Yageo) | R_0805 |
 | R16/R17 | buffer rail 4.7 Ω | 4.7 Ω | RC0805JR-074R7L (Yageo) | R_0805 |
-| C12 (BVP), C13 (BVN) | buffer decoupling | 10 µF 25 V | CL21A106KAYNNNE (Samsung) | C_0805 |
+| C12 (BVP), C13 (BVN) | buffer decoupling | 10 µF 25 V | C0805C106K3PACTU (KEMET) | C_0805 |
 
 The buffer block (U4, R13/R14, R16/R17, C12/C13) is **DNP by default** — populate to enable
 Av=+2 (see the buffer note above); **R15 (49.9 Ω back-term) and J4 stay fitted in both

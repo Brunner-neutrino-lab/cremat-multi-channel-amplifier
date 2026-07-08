@@ -3586,17 +3586,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 128.27 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 128.27 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 128.27 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -3676,17 +3676,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 128.27 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 128.27 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 128.27 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -3856,17 +3856,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 193.04 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 193.04 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 193.04 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -3946,17 +3946,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 193.04 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 193.04 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 193.04 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -4081,17 +4081,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 257.81 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 257.81 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 257.81 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -4171,17 +4171,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 257.81 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 257.81 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 257.81 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -4622,17 +4622,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 320.04 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 320.04 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 320.04 67.31 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -4712,17 +4712,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "CL21A106KAYNNNE"
+		(property "MPN" "C0805C106K3PACTU"
 			(at 320.04 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Samsung Electro-Mechanics"
+		(property "Manufacturer" "KEMET"
 			(at 320.04 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "1276-2891-1-ND"
+		(property "Distributor PN" "399-11939-1-ND"
 			(at 320.04 181.61 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
