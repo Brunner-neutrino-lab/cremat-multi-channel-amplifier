@@ -35,8 +35,8 @@ def parse_netlist(path):
         ref, body = cm.group(1), cm.group(2)
         val = re.search(r'\(value "([^"]*)"\)', body)
         fp = re.search(r'\(footprint "([^"]*)"\)', body)
-        dnp = "(dnp)" in body or '(exclude_from_bom)' in body  # fallback; real DNP set below
-        comps[ref] = (val.group(1) if val else "", fp.group(1) if fp else "")
+        uid = re.search(r'\(tstamps "([0-9a-fA-F-]{36})"\)', body)   # schematic symbol UUID
+        comps[ref] = (val.group(1) if val else "", fp.group(1) if fp else "", uid.group(1) if uid else None)
     nets = {}
     sec = t[t.index("(nets"):]
     for nb in re.split(r'\n\s*\(net\b', sec)[1:]:
@@ -149,7 +149,7 @@ def main():
 
     placed = miss = 0
     for ref in sorted(comps, key=lambda r: (r[0], int(re.sub(r'\D', '', r) or 0))):
-        val, fpid = comps[ref]
+        val, fpid, uid = comps[ref]
         if ":" not in fpid:
             miss += 1; print("no footprint id:", ref); continue
         nick, fname = fpid.split(":", 1)
@@ -157,6 +157,8 @@ def main():
         if fp is None:
             miss += 1; print("MISS", fpid, ref); continue
         fp.SetReference(ref); fp.SetValue(val)
+        if uid:                                       # link footprint to its schematic symbol UUID
+            fp.SetPath(pcbnew.KIID_PATH("/" + uid))    # so 'Update PCB from Schematic' matches, not re-adds
         if ref in DNP_BY_REF:
             try: fp.SetDNP(True)
             except Exception: pass
@@ -203,7 +205,10 @@ def main():
             h = pcbnew.FootprintLoad("%s/MountingHole.pretty" % STOCK_FP, "MountingHole_3.2mm_M3")
             if h:
                 h.SetReference("H%d" % i); h.SetPosition(V(hx, hy))
-                h.Reference().SetVisible(False); b.Add(h)
+                h.Reference().SetVisible(False)
+                try: h.SetBoardOnly(True)              # mechanical: not in schematic (Update-from-Sch ignores it)
+                except Exception: pass
+                b.Add(h)
     except Exception as e:
         print("mounting holes:", e)
 

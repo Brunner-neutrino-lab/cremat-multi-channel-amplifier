@@ -375,3 +375,31 @@ is left for the GUI pass rather than trading benign parity for a real DRC hit.
   CSV rows; **0805 footprint and PCB unchanged** (schematic ERC re-run 0/0). Docs updated
   (INTERFACE, SESSION_REPORT, SOURCING-VERIFICATION).
 
+---
+
+## 2026-07-08 — session 7 — fix: 'Update PCB from Schematic' re-spawned all components
+
+**Symptom (user):** clicking *Update PCB from Schematic* in the GUI added a fresh copy of
+every footprint instead of updating the existing ones.
+
+**Cause:** `gen_pcb.py` built the board by loading bare footprints and assigning nets by name,
+but never wrote each footprint's **schematic-symbol UUID** into its `(path ...)`. KiCad's
+Update-from-Schematic matches symbols→footprints **by UUID**; with no UUIDs it treated every
+symbol as new and re-added the whole board. (Same root gap behind the "annotation errors"
+netlist warning and the footprint↔symbol parity items.)
+
+**Fix:**
+- `gen_pcb.py` now parses each component's UUID from the netlist `(tstamps ...)` and calls
+  `fp.SetPath(KIID_PATH("/" + uuid))`; mounting holes get `SetBoardOnly(True)` so Update
+  ignores them (were flagged `extra_footprint`).
+- Applied the same **in place** to the committed routed board (a small pcbnew pass) so its 45
+  footprints carry their UUIDs **without re-routing** — DRC stays **0/0/0**, routes intact.
+  Remaining parity (footprint library-link + MPN-field, 90) is benign and does NOT cause the
+  re-spawn; it's the FPID/field metadata left for a GUI reconcile (see the session-5 note —
+  forcing the FPID headlessly re-triggers `lib_footprint_mismatch` on the modified MCX).
+
+**To apply on an already-open project:** either (a) close the board without saving, `git pull`,
+reopen; or (b) in the open session, undo the spawn and re-run *Update PCB from Schematic* with
+**"Re-link footprints to schematic symbols based on their reference designators"** checked —
+that matches by refdes and writes the UUIDs. Do one or the other, not both.
+
