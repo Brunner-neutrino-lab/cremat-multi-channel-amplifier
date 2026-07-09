@@ -763,13 +763,18 @@
       {
         "filename": "channel.kicad_sch",
         "name": "channel",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "aa95846c-e539-501d-afb0-905016103771"
       }
     ],
-    "used_designators": "",
+    "used_designators": "#PWR1-34",
     "variants": []
   },
-  "sheets": [],
+  "sheets": [
+    [
+      "aa95846c-e539-501d-afb0-905016103771",
+      "channel"
+    ]
+  ],
   "text_variables": {},
   "tuning_profiles": {
     "meta": {
