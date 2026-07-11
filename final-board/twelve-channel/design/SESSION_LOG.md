@@ -82,3 +82,26 @@ machine** (`C:\Users\<you>\tools\jdk-25...jre` + `freerouting-2.2.4.jar`). The s
 NOTE: this board's `channel.kicad_sch` / `twelve-channel.kicad_sch` / `.kicad_pro` had a large
 uncommitted rebuild (from 2026-07-08) — now committed WIP; open it and confirm it's clean
 before starting layout.
+
+---
+
+## 2026-07-11 — session 9 — connector fixes PROPAGATED to 12-ch (DONE)
+
+Followed the recipe above; all items transferred + verified:
+- Copied `MCX_CONMCX013-T.kicad_mod` + `CONMCX013-T.step` into the 12-ch lib; **deleted** the old
+  `MCX_CONMCX013_EdgeMount.kicad_mod` + generated `CONMCX013.step` + the now-obsolete `gen_mcx_step.py`.
+- `gen_sch.py` re-run (inherits `sc.FP_MCX = cremat:MCX_CONMCX013-T`): child `channel.kicad_sch`
+  now **0** refs to `_EdgeMount`, 4 to `-T`. ERC 0.
+- `gen_pcb.py` updated: (a) **stop** promoting MCX cutouts to Edge.Cuts; (b) **notch builder** reads
+  each tiled MCX's Dwgs.User cutout and cuts **48 notches (24/edge)** into the outline; (c) `.kicad_dru`
+  waives `edge_clearance` for `cremat:MCX_CONMCX013-T`; (d) `J_PWR`/`J_DAISY` rot **180** (funnels out).
+  Also add MPN/Mfr/DistPN fields to the tiled channel footprints (the regenerated single-channel board
+  drops them → had been 199 `field_mismatch`).
+- Verified on the board: 48 MCX = `cremat:MCX_CONMCX013-T`, model rot **(270,0,0)**; J49/J50 rot 180;
+  48 notches; 0 old `_EdgeMount`. **DRC (error severity) 0 / 0 / 0**; the 48 `lib_footprint_mismatch`
+  are warning-level + intentional (Edge.Cuts → Dwgs.User demotion). Render (`twelve-channel-3d.png`,
+  from the design dir, `--quality high`) confirms the MCX lie flat facing off the edges. Fab regenerated
+  (`fab/`, git-ignored).
+
+Board 138 × 334.7 mm, DRC 0/0/0. **Order-ready pending the enclosure-depth width resize** (widen the
+138 mm dimension so the MCX edges meet the box front/back bulkheads).

@@ -121,6 +121,11 @@ def main():
         print("layer name:", e)
 
     # ---- clone channels ----
+    # Each tiled MCX carries its edge cutout on Dwgs.User (the single channel already demoted it,
+    # since a closed rect straddling the outline is malformed). Read the notch back from each and
+    # CUT it into the board outline (add_outline) -- keep the footprint cutout on Dwgs.User.
+    EPS = 0.05
+    notches = []   # (edge 'L'/'R', y0, y1, depth), absolute board coords
     for n in range(1, NCH + 1):
         dy = (n - 1) * PITCH
         off = V(0, dy)
@@ -135,10 +140,21 @@ def main():
             for pad in d.Pads():
                 nm = TW_PADNET.get((nref, pad.GetNumber()))
                 if nm: pad.SetNet(ensure_net(out, nm))
-            if role in MCX_ROLES:                       # restore MCX slot cutout to Edge.Cuts
+            fld = TW_COMPS.get(nref, ("", None, "", {}))[3]     # add BOM fields from the netlist (the
+            for k in ("MPN", "Manufacturer", "Distributor PN"):  # regenerated single channel drops them
+                if fld.get(k):
+                    try: d.SetField(k, fld[k])
+                    except Exception: pass
+            if role in MCX_ROLES:                       # read the edge notch (cutout stays on Dwgs.User)
+                ex, ey = [], []
                 for it in d.GraphicalItems():
                     if it.GetLayer() == pcbnew.Dwgs_User:
-                        it.SetLayer(pcbnew.Edge_Cuts)
+                        for p in (it.GetStart(), it.GetEnd()):
+                            ex.append(pcbnew.ToMM(p.x)); ey.append(pcbnew.ToMM(p.y))
+                if ex:
+                    xlo, xhi, ylo, yhi = min(ex), max(ex), min(ey), max(ey)
+                    if abs(xlo) < EPS:       notches.append(('L', ylo, yhi, xhi))       # opens through x=0
+                    elif abs(xhi - W) < EPS: notches.append(('R', ylo, yhi, W - xlo))   # opens through x=W
         for t in chan_trk:
             d = dup(t); out.Add(d); d.Move(off)
             nm = remap_net(t.GetNetname(), n)
@@ -150,15 +166,15 @@ def main():
 
     place_common(out, H)
     add_planes(out, H)
-    add_outline(out, H)
+    add_outline(out, H, notches)
     write_dru()
     pcbnew.SaveBoard(PCB, out)
     print("saved", PCB)
 
 # ---- common power section: J_PWR + J_DAISY + up-rated PTC/Schottky + 470uF bulk ----
 COMMON_PLACE = {   # ref: (x, y, rot)  -- top strip, generous spacing (terminals 16 mm wide)
-    "J_PWR":   (24.0, 10.0, 0),
-    "J_DAISY": (48.0, 10.0, 0),
+    "J_PWR":   (24.0, 10.0, 180),      # rot 180: wire funnels face the top/rear edge (out), like J5
+    "J_DAISY": (48.0, 10.0, 180),
     # orientations chosen so each PTC's _F pad faces its Schottky's _F pad at the SAME y (straight
     # trace), the _IN pad points toward its bus, and the rail pad takes a plane via.
     "F_P": (64.0, 6.0, 270), "D_RP": (70.0, 6.0, 270),   # +rail: _F pads both lower, +VDC_IN upper
@@ -277,18 +293,29 @@ def add_planes(b, H):
     add("-VDC", pcbnew.In2_Cu)
     add("+VDC", pcbnew.B_Cu, prio=1)
 
-def add_outline(b, H):
-    pts = [(0, 0), (W, 0), (W, H), (0, H), (0, 0)]
+def add_outline(b, H, notches):
+    # rectangle W x H with the MCX edge notches cut in (24 per long edge). Same builder as the
+    # single channel: walk top -> right (notch in to W-d) -> bottom -> left (notch in to d).
+    Ln = sorted([n for n in notches if n[0] == 'L'], key=lambda n: n[1])
+    Rn = sorted([n for n in notches if n[0] == 'R'], key=lambda n: n[1])
+    pts = [(0, 0), (W, 0)]
+    for _, y0, y1, d in Rn:
+        pts += [(W, y0), (W - d, y0), (W - d, y1), (W, y1)]
+    pts += [(W, H), (0, H)]
+    for _, y0, y1, d in reversed(Ln):
+        pts += [(0, y1), (d, y1), (d, y0), (0, y0)]
+    pts += [(0, 0)]
     for a, c in zip(pts, pts[1:]):
         s = pcbnew.PCB_SHAPE(b); s.SetShape(pcbnew.SHAPE_T_SEGMENT)
         s.SetStart(V(*a)); s.SetEnd(V(*c)); s.SetLayer(pcbnew.Edge_Cuts); s.SetWidth(mm(0.1)); b.Add(s)
+    print("outline: %d MCX edge notches (%dL / %dR)" % (len(notches), len(Ln), len(Rn)))
 
 def write_dru():
     open(DRU, "w", encoding="utf-8").write(
         '(version 1)\n'
         '(rule "MCX edge-mount shield pad straddles its slot by design"\n'
         '   (constraint edge_clearance (min -2mm))\n'
-        '   (condition "A.Library_Link == \'cremat:MCX_CONMCX013_EdgeMount\'"))\n')
+        '   (condition "A.Library_Link == \'cremat:MCX_CONMCX013-T\'"))\n')
 
 if __name__ == "__main__":
     main()
