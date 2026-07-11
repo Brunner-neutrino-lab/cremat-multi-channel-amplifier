@@ -130,3 +130,32 @@ the box's real internal depth**).
 
 **Order-ready.** Remaining pre-order check is purely mechanical: confirm `W=180` against the actual
 RM2U1908 internal depth before sending gerbers.
+
+---
+
+## 2026-07-11 — session 11 — SPICE extension + purchase-ready BOM + cross-machine handoff (DONE)
+
+Board layout unchanged this session (still 180 × 335 mm, DRC 0/0/0). Work was on `sim/` and
+`models-bom/`, plus a handoff doc:
+
+- **SPICE** (`../sim/`): re-ran the 3-criterion pipeline on the widened design — reproduces
+  bit-identically (widening is mechanical). Added three analyses — **AC transfer function**
+  (band-pass 1.59 kHz–130 kHz, upper corner confirms the 1 µs shaping), **charge
+  linearity / dynamic range** (133 mV/pC, linear ~1 % to ≈30 pC, OUT_50 hard-clip 5.13 V set
+  by the THS3491 buffer railing at +10.25 V — the shaper is still linear at 60 pC), and
+  **ENC/noise** (design ENC = CR-112 datasheet 7000 e⁻ + 30 e⁻/pF @ 1 µs; `.noise` is only a
+  cross-check because the Cremat macromodels are noiseless). Decks `chain_ac`/`chain_linearity`/
+  `chain_noise`, `scripts/analyze_ac_lin.py`, report in `../sim/SESSION_REPORT.md`.
+- **BOM** (`../models-bom/`): a 21-agent sourcing pass verified every DigiKey PN live (all
+  Active, 2026-07-11) + Mouser second sources. `gen_purchasing.py` → `PURCHASING.md` +
+  `twelve-channel-purchasing.csv` (clickable links, DigiKey Quick-Add, totals, Cremat-direct +
+  Hammond ordering). Enclosure = **Hammond RM2U1908SBK** (DK HM998-ND, $189.67); its ~197 mm
+  clear internal depth **confirms the 180 mm board fits** (~17 mm margin). Fixed the stale MCX
+  BOM row (footprint → `MCX_CONMCX013-T`, all-4-roles desc, bias ≤70 V; `gen_bom.py` override).
+
+- **Handoff:** wrote **`../HANDOFF.md`** — the "resume on another machine" doc: current state,
+  the full toolchain + paths (LTspice / anaconda-python / KiCad / Java-FreeRouting) with the
+  portability flags (`run_ltspice.ps1` hard-codes the LTspice path), the solved gotchas, how to
+  regenerate every artifact, and the open user-decisions. **A new session should read that first.**
+
+Commits: `58d0945` (SPICE + BOM), `ab68975` (widening). **Next machine: start at `HANDOFF.md`.**

@@ -1,5 +1,8 @@
 # INTERFACE — `twelve-channel` final board
 
+> **Resuming / on a new machine? Read [`HANDOFF.md`](HANDOFF.md) first** (state, toolchain +
+> paths, gotchas, how to regenerate, open decisions).
+
 > Status: **ERC 0 · DRC 0 errors / 0 unconnected / 0 schematic-parity**. Rebuilt 2026-07-08
 > from the reworked single channel (`integration/single-channel/`) as a KiCad **hierarchical**
 > design (channel sheet instantiated 12×) with a **tile-and-replicate** layout (one routed
