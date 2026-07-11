@@ -74,7 +74,7 @@ Quick-Add paste (**per board** — multiply by board count; case is one per boar
 612-SS-108-TT-2-ND, 36
 3296W-204LF-ND, 12
 277-1264-ND, 2
-HM1004-ND, 2
+HM1004-ND, 1
 ```
 
 ≈ **$399/board** (dominated by MCX $155 + sockets $42 + case $169). Optional buffer
