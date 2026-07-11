@@ -37,3 +37,48 @@ Result: 138 × 335 mm, 468 footprints, 1836 tracks + 424 vias, 120 DNP. Render:
 `twelve-channel-top.png`.
 
 **Open:** regenerate the BOM (models-bom); verify the provisional up-rated protection MPNs.
+
+---
+
+## 2026-07-11 — NEXT UP (resume here): propagate single-channel connector fixes to 12-ch
+
+**This board is STALE.** It was tiled from the single channel BEFORE the 2026-07-11 connector
+fixes. It still uses the OLD MCX footprint — `cremat:MCX_CONMCX013_EdgeMount` (4 child-sheet
+refs, **48** board instances) with old `CONMCX013.STEP` in `design/lib/cremat.pretty/` — and
+the old J5 orientation. The single channel (`integration/single-channel/design`, session 8)
+now has: (a) the user's **Linx `cremat:MCX_CONMCX013-T`** footprint, (b) MCX 3D
+`(rotate (xyz 270 0 0))` so the coax faces off the edge, (c) MCX edge-**notch** outline, and
+(d) J5 screw terminal at **rot 180**.
+
+**How to propagate.** The 12-ch `gen_pcb.py` **tiles by cloning the routed single-channel row**
+(`integration/single-channel/design/channel.kicad_pcb`) ×12, and `gen_sch.py` instantiates the
+child sheet 12×. Since the single-channel source is already updated, the cleanest path is to
+**re-run the 12-ch generators against it** and then verify each item transferred:
+
+1. **Footprint files.** Copy `MCX_CONMCX013-T.kicad_mod` + `CONMCX013-T.step` into the 12-ch
+   `design/lib/cremat.pretty/`. (The `.kicad_mod` already has pads 1 / `2`×2 and the `rotate
+   270` 3D fix baked in.)
+2. **Schematic.** Re-run 12-ch `gen_sch.py` (its `FP_MCX` must point at `cremat:MCX_CONMCX013-T`;
+   grep the child `channel.kicad_sch` afterward — must show 0 refs to `_EdgeMount`). ERC 0.
+3. **PCB.** Re-run 12-ch `gen_pcb.py` (re-tiles the updated single channel). Then confirm on the
+   regenerated board:
+   - all **48** MCX FPIDs = `cremat:MCX_CONMCX013-T`, model `(rotate (xyz 270 0 0))`;
+   - the **notched outline** ports for 48 MCX = **24 notches per long edge** (single-channel
+     `gen_pcb.py` cuts the notch read-back from each placed MCX + demotes footprint Edge.Cuts →
+     Dwgs.User — make sure the 12-ch outline builder does the same for every tiled MCX);
+   - a `channel.kicad_dru`/board `.kicad_dru` waives `edge_clearance` for
+     `A.Library_Link == 'cremat:MCX_CONMCX013-T'`;
+   - J5-equivalent power connector(s) at rot 180 (wire entry to the rear/top edge).
+4. **Fill zones, DRC → 0/0, render** to eyeball that all 48 MCX lie flat facing off the edges
+   and J5 faces out. Delete the old `MCX_CONMCX013_EdgeMount.kicad_mod` + `CONMCX013.STEP` from
+   the 12-ch lib once nothing references them.
+
+**Cross-refs:** exact recipe + the KIPRJMOD/quality **render gotcha** →
+`integration/single-channel/design/SESSION_LOG.md` (2026-07-11); autoroute (Java 25 +
+dead-proxy headless) → `docs/FREEROUTING.md` — **both tools must be reinstalled on the new
+machine** (`C:\Users\<you>\tools\jdk-25...jre` + `freerouting-2.2.4.jar`). The single-channel
+`channel.kicad_pcb` is the proven reference: routed, DRC 0/0.
+
+NOTE: this board's `channel.kicad_sch` / `twelve-channel.kicad_sch` / `.kicad_pro` had a large
+uncommitted rebuild (from 2026-07-08) — now committed WIP; open it and confirm it's clean
+before starting layout.
