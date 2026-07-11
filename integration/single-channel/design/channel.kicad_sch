@@ -2994,7 +2994,7 @@
 			(hide yes)
 			(effects (font (size 1.0 1.0)))
 		)
-		(property "Footprint" "cremat:MCX_CONMCX013_EdgeMount"
+		(property "Footprint" "cremat:MCX_CONMCX013-T"
 			(at 46.99 115.57 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -3265,7 +3265,7 @@
 			(hide yes)
 			(effects (font (size 1.0 1.0)))
 		)
-		(property "Footprint" "cremat:MCX_CONMCX013_EdgeMount"
+		(property "Footprint" "cremat:MCX_CONMCX013-T"
 			(at 86.36 104.14 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -3356,7 +3356,7 @@
 			(hide yes)
 			(effects (font (size 1.0 1.0)))
 		)
-		(property "Footprint" "cremat:MCX_CONMCX013_EdgeMount"
+		(property "Footprint" "cremat:MCX_CONMCX013-T"
 			(at 58.42 140.97 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -4527,7 +4527,7 @@
 			(hide yes)
 			(effects (font (size 1.0 1.0)))
 		)
-		(property "Footprint" "cremat:MCX_CONMCX013_EdgeMount"
+		(property "Footprint" "cremat:MCX_CONMCX013-T"
 			(at 355.6 115.57 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))

@@ -65,6 +65,10 @@ BOM with `MPN`/`MFN`/`VPN`/`VN` fields and DNP flags, and a DRC gate before fab.
 README.md                     overview + documentation map
 CLAUDE.md                     this file
 docs/                         the build documentation set (see README map)
+  HARDWARE_DEV_PLAYBOOK.md     ** read first for any board work ** — parallel-track model,
+                               verification gates (ERC + netlist-membership diff + render),
+                               and the empirically-verified KiCad-as-text gotchas
+  KICAD_WITH_CLAUDE_CODE.md    the file-as-text method   FREEROUTING.md  autoroute recipe
   development-plan.md          work-track breakdown + dependency graph + decisions
   architecture.md  modifications.md  session-report.md
   hardware/   channel.md board.md bom.md pcb-design-rules.md component-libraries.md

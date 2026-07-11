@@ -403,3 +403,47 @@ reopen; or (b) in the open session, undo the spawn and re-run *Update PCB from S
 **"Re-link footprints to schematic symbols based on their reference designators"** checked —
 that matches by refdes and writes the UUIDs. Do one or the other, not both.
 
+---
+
+## 2026-07-11 — session 8 — edge-mount MCX (user's own footprint) + connector orientation
+
+Three user-reported connector issues on the routed board; all fixed, board re-routed,
+**DRC 0 errors / 0 unconnected** (4 benign `lib_footprint_mismatch` from the intentional
+Edge.Cuts → Dwgs.User demotion).
+
+**1. MCX edge cutout pointed the wrong way (Plan A).** Fixed `gen_pcb.py`: J1–J4 place by
+footprint **ORIGIN** at rot 90 (right edge) / 270 (left edge); the **board outline cuts the
+notch itself** (reads each notch back from the placed footprint, then demotes the footprint's
+Edge.Cuts → Dwgs.User); FPID keeps the `cremat:` prefix (`SetFPID`); `write_dru()` emits
+`channel.kicad_dru` waiving `edge_clearance` for the MCX shield tabs. Re-autorouted with
+FreeRouting — see `docs/FREEROUTING.md` for the Java-25 + **dead-proxy** headless recipe
+(reinstall Java 25 + freerouting jar on the new machine).
+
+**2. Power connector J5 faced inward.** Screw-terminal wire funnels faced the board interior →
+`gen_pcb.py` J5 rot `0` → **`180`** so the funnels face the top edge (outward). Render-verified.
+
+**3. Swapped in the user's downloaded MCX footprint.** Replaced project SnapEDA
+`cremat:MCX_CONMCX013_EdgeMount` with the user's Linx `CONMCX013-T` package
+(`~/Downloads/CONMCX013_T (1).zip`). Installed as **`cremat:MCX_CONMCX013-T`**
+(`lib/cremat.pretty/MCX_CONMCX013-T.kicad_mod` + `CONMCX013-T.step`) with two required edits:
+shield pads `G1`/`G2` → **`2`** (GND connects via `Conn_Coaxial` pin 2), and trimmed the
+connector-tiling ±6 mm Edge.Cuts extension segments so the outline logic reads the true notch.
+`gen_sch.py` `FP_MCX` + the `.kicad_dru` condition updated. ERC 0; netlist-membership
+**IDENTICAL** to baseline (footprint field only, circuit unchanged).
+
+**4. MCX 3D model faced up ("facing the wrong way").** Raw STEP points the coax barrel +Z
+(vertical); an edge-launch jack must lie flat with the coax face OFF the edge. Fix =
+**`(rotate (xyz 270 0 0))`** on the model block in `MCX_CONMCX013-T.kicad_mod` (rot90 → mating
+face inboard; rot270 → coax socket off-edge = correct; `offset 0` seats it — the jack straddles
+the board edge). **3D-cosmetic only** → patched the 4 model blocks in the routed
+`channel.kicad_pcb` directly, **no reroute**, DRC unchanged. Datasheet: CONMCX013 = 50 Ω MCX
+jack, board-edge cutout, SMT, snap-on; `-T` = tape-&-reel of the SAME part (BOM PN unchanged).
+
+**Gotcha (cost hours):** `${KIPRJMOD}`-relative 3D model paths do NOT resolve when you render a
+board **copy from another directory** (e.g. scratchpad) — that model silently doesn't render,
+while stock `${KICAD10_3DMODEL_DIR}` models still show. Run test renders from the real design
+dir. Use `kicad-cli pcb render --quality high` (not `basic`) to judge fine 3D.
+
+Old `MCX_CONMCX013_EdgeMount.kicad_mod` left in the lib (now unused) pending the user's call on
+deleting it.
+

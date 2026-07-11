@@ -7,8 +7,9 @@ CR-200 -> CR-210 -> output buffer -> OUT_50), assigns nets from the netlist, dra
 outline + M3 holes, sets net classes (incl. hv_bias 0.6mm), and adds GND/-VDC plane zones
 (filled in a separate fill_zones.py pass). Routing is FreeRouting (DSN/SES) per docs/FREEROUTING.md.
 
-The three SIP-8 Cremat modules are laid flat (rot 90, spanning x). MCX jacks hug the board
-edges with their Edge.Cuts cutout parked on Dwgs.User (restore in GUI at the true edge).
+The three SIP-8 Cremat modules are laid flat (rot 90, spanning x). MCX jacks are placed by
+their footprint ORIGIN at the board edges (left end rot 270, right end rot 90) so the
+edge-mount Edge.Cuts notch opens through the true board edge -- no GUI restore step needed.
 
 Run: "C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py
 Gate: kicad-cli pcb drc channel.kicad_pcb
@@ -20,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 NET = os.path.join(HERE, "channel.net")
 PCB = os.path.join(HERE, "channel.kicad_pcb")
 PRO = os.path.join(HERE, "channel.kicad_pro")
+DRU = os.path.join(HERE, "channel.kicad_dru")
 STOCK_FP = r"C:/Program Files/KiCad/10.0/share/kicad/footprints"
 CREMAT_FP = os.path.join(HERE, "lib", "cremat.pretty")
 
@@ -88,13 +90,14 @@ MCX_BOT  = 41.0    # lower MCX (TEST / BIAS)
 
 PLACE = {
     # ===== COM row (shared): power entry -> reverse-polarity protection -> bulk =====
-    "J5":  (24.0, COM_Y, 0),        # 3-pos screw terminal (power input at the rear/top)
+    "J5":  (24.0, COM_Y, 180),      # 3-pos screw terminal; rot 180 faces the wire entry OUT toward
+                                    #                       the top edge (was 0 = funnels facing inboard)
     "F1":  (38.0,  6.0, 90), "D1": (44.0,  6.0, 90),   # +rail: PTC -> +VDC_F -> Schottky(cathode->+VDC)
     "F2":  (38.0, 13.0, 90), "D2": (44.0, 13.0, 90),   # -rail: PTC -> -VDC_F -> Schottky(anode->-VDC)
     "C10": (58.0, COM_Y, 0), "C11": (72.0, COM_Y, 0),  # 100uF bulk (+VDC / -VDC)
     # ===== left end: IN (SIPM) + TEST edge-mount MCX =====
-    "J2":  (7.5, MCX_TOP, 90),      # SIPM  (detector input)
-    "J3":  (7.5, MCX_BOT, 90),      # TEST_IN
+    "J2":  (6.3, MCX_TOP, 270),     # SIPM (detector input) -- origin-placed; notch opens through x=0
+    "J3":  (6.3, MCX_BOT, 270),     # TEST_IN
     # ===== SiPM bias front-end (near the left/detector end) =====
     "R1":  (19.0, 30.0, 0), "R2": (19.0, 33.0, 0),     # Rf1 / JP_Rf1(DNP)
     "C1":  (24.5, 28.0, 90),                            # Cf -> GND
@@ -123,8 +126,8 @@ PLACE = {
     "R16": (106.0, TOPDEC_Y, 0), "C12": (112.0, TOPDEC_Y, 0),  # BVP (DNP)
     "R17": (106.0, BOTDEC_Y, 0), "C13": (118.0, BOTDEC_Y, 0),  # BVN (DNP)
     # ===== right end: OUT_50 + BIAS edge-mount MCX =====
-    "J4":  (W - 7.5, MCX_TOP, 270), # OUT_50
-    "J1":  (W - 7.5, MCX_BOT, 270), # BIAS_IN (bias supply enters here; routes to the front-end)
+    "J4":  (W - 6.3, MCX_TOP, 90),  # OUT_50 -- origin-placed; notch opens through x=W
+    "J1":  (W - 6.3, MCX_BOT, 90),  # BIAS_IN (bias supply enters here; routes to the front-end)
 }
 MCX_REFS = ("J1", "J2", "J3", "J4")
 
@@ -156,6 +159,8 @@ def main():
         fp = pcbnew.FootprintLoad(fp_dir(nick), fname)
         if fp is None:
             miss += 1; print("MISS", fpid, ref); continue
+        fp.SetFPID(pcbnew.LIB_ID(nick, fname))   # keep the library-prefixed FPID (matches 'Update from Sch'
+                                                 # + lets DRC rules match A.Library_Link == 'cremat:...')
         fp.SetReference(ref); fp.SetValue(val)
         if uid:                                       # link footprint to its schematic symbol UUID
             fp.SetPath(pcbnew.KIID_PATH("/" + uid))    # so 'Update PCB from Schematic' matches, not re-adds
@@ -165,17 +170,18 @@ def main():
         x, y, rot = PLACE.get(ref, (5.0 + placed * 3.0, H - 4.0, 0))
         if rot:
             fp.SetOrientationDegrees(rot)
-        # center the footprint bbox on (x, y)
-        fp.SetPosition(V(0, 0))
-        try: bb = fp.GetBoundingBox(False, False)
-        except TypeError: bb = fp.GetBoundingBox()
-        cx = (bb.GetLeft() + bb.GetRight()) / 2e6
-        cy = (bb.GetTop() + bb.GetBottom()) / 2e6
-        fp.SetPosition(V(x - cx, y - cy))
         if ref in MCX_REFS:
-            for it in fp.GraphicalItems():
-                if it.GetLayer() == pcbnew.Edge_Cuts:
-                    it.SetLayer(pcbnew.Dwgs_User)
+            # edge-mount jacks: place by footprint ORIGIN (pad/cutout are origin-referenced) so the
+            # Edge.Cuts notch opens through the board edge, and keep the cutout ON Edge.Cuts.
+            fp.SetPosition(V(x, y))
+        else:
+            # everything else: center the footprint bbox on (x, y)
+            fp.SetPosition(V(0, 0))
+            try: bb = fp.GetBoundingBox(False, False)
+            except TypeError: bb = fp.GetBoundingBox()
+            cx = (bb.GetLeft() + bb.GetRight()) / 2e6
+            cy = (bb.GetTop() + bb.GetBottom()) / 2e6
+            fp.SetPosition(V(x - cx, y - cy))
         b.Add(fp)
         for pad in fp.Pads():
             key = (ref, pad.GetNumber())
@@ -192,12 +198,39 @@ def main():
         if fp.GetReference() in HIDE_SILK:
             fp.Reference().SetVisible(False)
 
-    # board outline
-    pts = [(0, 0), (W, 0), (W, H), (0, H), (0, 0)]
+    # board outline with edge notches for the edge-mount MCX jacks.  The MCX footprint carries a
+    # CLOSED-rectangle Edge.Cuts cutout; a closed rect straddling the outline yields a malformed
+    # (self-intersecting) board, so we instead CUT the notch into the outline and demote each
+    # footprint's own cutout to Dwgs.User (reference).  Notch geometry is read back from the placed
+    # footprints, so the outline always tracks wherever the MCX end up.
+    EPS = 0.05
+    notches = []   # (edge 'L'/'R', y0, y1, depth)
+    for fp in b.GetFootprints():
+        if "MCX_CONMCX013" not in str(fp.GetFPID().GetLibItemName()): continue
+        ex = []; ey = []
+        for it in fp.GraphicalItems():
+            if it.GetLayer() == pcbnew.Edge_Cuts:
+                for p in (it.GetStart(), it.GetEnd()):
+                    ex.append(pcbnew.ToMM(p.x)); ey.append(pcbnew.ToMM(p.y))
+                it.SetLayer(pcbnew.Dwgs_User)                       # demote so it can't overlap the outline
+        if not ex: continue
+        xlo, xhi, ylo, yhi = min(ex), max(ex), min(ey), max(ey)
+        if abs(xlo) < EPS:        notches.append(('L', ylo, yhi, xhi))      # opens through x=0
+        elif abs(xhi - W) < EPS:  notches.append(('R', ylo, yhi, W - xlo))  # opens through x=W
+    Ln = sorted([n for n in notches if n[0] == 'L'], key=lambda n: n[1])
+    Rn = sorted([n for n in notches if n[0] == 'R'], key=lambda n: n[1])
+    pts = [(0, 0), (W, 0)]                                          # top edge L->R
+    for _, y0, y1, d in Rn:                                         # right edge top->bottom, notch in to W-d
+        pts += [(W, y0), (W - d, y0), (W - d, y1), (W, y1)]
+    pts += [(W, H), (0, H)]                                         # bottom edge R->L
+    for _, y0, y1, d in reversed(Ln):                              # left edge bottom->top, notch in to d
+        pts += [(0, y1), (d, y1), (d, y0), (0, y0)]
+    pts += [(0, 0)]
     for (ax, ay), (bx, by) in zip(pts, pts[1:]):
         seg = pcbnew.PCB_SHAPE(b); seg.SetShape(pcbnew.SHAPE_T_SEGMENT)
         seg.SetStart(V(ax, ay)); seg.SetEnd(V(bx, by))
         seg.SetLayer(pcbnew.Edge_Cuts); seg.SetWidth(mm(0.1)); b.Add(seg)
+    print("outline: %d MCX edge notches (%dL / %dR)" % (len(notches), len(Ln), len(Rn)))
 
     # M3 mounting holes in the COM row (thin channel row has no spare height; corners tile away)
     try:
@@ -240,9 +273,19 @@ def main():
     except Exception as e:
         print("zone:", e)
 
+    write_dru()
     pcbnew.SaveBoard(PCB, b)
     print("saved", PCB)
     write_netclasses()
+
+def write_dru():
+    # The MCX edge-mount shield pads (pad 2) sit at the slot edge by design (the connector's
+    # ground shell nests in the notch), so waive edge-clearance for that footprint only.
+    open(DRU, "w", encoding="utf-8").write(
+        '(version 1)\n'
+        '(rule "MCX edge-mount shield pad straddles its slot by design"\n'
+        '   (constraint edge_clearance (min -2mm))\n'
+        '   (condition "A.Library_Link == \'cremat:MCX_CONMCX013-T\'"))\n')
 
 def write_netclasses():
     if not os.path.exists(PRO):

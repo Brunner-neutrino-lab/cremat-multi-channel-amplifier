@@ -20,6 +20,28 @@ KiCad ends; FreeRouting is a separate free tool.
 > ```
 > Get Java 25 (Temurin JRE) from adoptium.net; the FreeRouting jar from the releases below.
 
+> **Installed on this machine (2026-07) + the headless invocation that actually works.**
+> - Java: **Temurin JRE 25.0.3** at `C:\Users\darro\tools\jdk-25.0.3+9-jre\bin\java.exe`
+>   (v2.2.4 is compiled to class-file 69 — **Java 21 fails** with `UnsupportedClassVersionError`;
+>   25 is mandatory, not a suggestion).
+> - FreeRouting: `C:\Users\darro\tools\freerouting-2.2.4.jar`.
+> - **Two flags are required for a headless CLI route, plus a dead proxy:** without them the CLI
+>   *hangs on startup* — `--gui.enabled=false` (its default headless path still needs this; a bare
+>   `-Djava.awt.headless=true` only gives "couldn't get screen resolution" then hangs), and its
+>   **version-check + Google-BigQuery analytics have no network timeout**, so they block forever.
+>   Point Java at a dead proxy so those calls fail *fast* (`-da` alone did NOT stop it):
+>   ```
+>   JAVA="C:/Users/darro/tools/jdk-25.0.3+9-jre/bin/java.exe"
+>   JAR="C:/Users/darro/tools/freerouting-2.2.4.jar"
+>   "$JAVA" -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=1 \
+>           -Dhttp.proxyHost=127.0.0.1  -Dhttp.proxyPort=1 \
+>           -jar "$JAR" --gui.enabled=false -da -mp 30 -de board.dsn -do board.ses
+>   ```
+>   Verified: the single-channel board routed **84 → 0 unrouted in ~3 s**, and after
+>   `import_ses.py` + `fill_zones.py` the KiCad DRC was **0 errors / 0 unconnected**.
+> - **Route from a shell that FreeRouting can actually run in**, or use these flags — a plain
+>   non-interactive shell (no desktop session) needs `--gui.enabled=false` + the dead proxy.
+
 > **Prerequisite — clean placement first.** The Specctra `.dsn` exporter (and a good
 > autoroute) require **no overlapping copper**. The headless auto-placement in
 > [hardware/gen_pcb.py](../hardware/gen_pcb.py) groups the 12 channels into rows but still
