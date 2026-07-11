@@ -6,6 +6,10 @@
 > were live-verified 2026-07-11 (13-agent sourcing pass; re-check in the JLC BOM tool at
 > order time — stock moves).
 
+**BUILD PLAN: 2 assembled boards.** JLC: fab qty **5** (JLC's 4-layer minimum — the 3 extra
+bare boards are free spares), **assembly qty 2**. DigiKey: hand-solder parts at 2-board
+quantities **+20% spares** (breakage/loss margin); cases exactly 2 (not solderable — no spares).
+
 ## The split
 
 | Who | What | Files |
@@ -31,8 +35,9 @@ edge-mount MCX (not an LCSC part). Everything else lands assembled.
   **ENIG** (+$24.70 → $98.40/5). ENIG is nicer for the MCX edge pads; HASL is fine.
 - The board's 48 edge notches are routed slots ≥5 mm — well within capability; expect at
   most a manual engineering review, no surcharge (routing density ~12 m/m² vs 80 limit).
-- **PCB Assembly: Economic tier, top side** (board qualifies: 4L/1.6 mm/green/one-sided,
-  2–50 pcs; no edge rails or fiducials required). Upload BOM + CPL when prompted.
+- **PCB Assembly: Economic tier, top side, PCBA qty = 2** (board qualifies: 4L/1.6 mm/green/
+  one-sided, 2–50 pcs; no edge rails or fiducials required). Set PCB qty 5, assembly qty 2 —
+  JLC assembles 2 of the 5 and ships 3 bare. Upload BOM + CPL when prompted.
 - Assembly fees (Economic): $8 setup + $1.50 stencil + **4 Extended lines × $3 = $12**
   (8 of 12 lines are Basic = free) + ~$0.0016/joint (~$2/board) + parts (~$18/board).
   ⚠ JLC lists an undocumented per-order assembly "Large Size" fee ($59.23) — it may appear
@@ -67,39 +72,43 @@ JLC BOM/CPL — populate by hand later if wanted).
 
 ## 2. DigiKey order (hand-solder parts) — `models-bom/digikey-hand-bom.csv`
 
-Quick-Add paste (**per board** — multiply by board count; case is one per board):
+Quick-Add paste for the **2-board build + 20% spares** (per-line: ceil(per-board × 2 × 1.2);
+cases exactly 2):
 
 ```
-343-CONMCX013-ND, 48
-612-SS-108-TT-2-ND, 36
-3296W-204LF-ND, 12
-277-1264-ND, 2
-HM1004-ND, 1
+343-CONMCX013-ND, 116
+612-SS-108-TT-2-ND, 87
+3296W-204LF-ND, 29
+277-1264-ND, 5
+HM1004-ND, 2
 ```
 
-≈ **$399/board** (dominated by MCX $155 + sockets $42 + case $169). Optional buffer
-(per board, DNP by default): `296-49085-1-ND, 12` + `311-976CRCT-ND, 24` (+$222).
-⚠ Trimpot stock is thin at DigiKey (~80) — order early or use Mouser `652-3296W-1-204LF`.
+= **$893.04** (MCX $373.52 + sockets $101.79 + trimpots $70.76 + terminals $8.55 + cases
+$338.42). Optional buffer if ever populating (2 boards + 20%, DNP by default):
+`296-49085-1-ND, 29` + `311-976CRCT-ND, 58` (+$536).
+⚠ **Trimpots: order qty 29 vs ~80 in DigiKey stock — order promptly**, or take the balance
+from Mouser `652-3296W-1-204LF` (~1.5k). Per-board reference quantities stay in the CSV.
 
-## 3. Hand-assembly order of operations
+## 3. Hand-assembly order of operations (per board — ×2)
 
 1. JLC boards arrive with all SMD passives mounted.
 2. Solder 36× SIP-8 sockets (plug a Cremat module in while soldering so the 8 sockets align).
 3. Solder 48× MCX edge jacks, 12× trimpots, 2× screw terminals.
 4. Plug in the Cremat modules; set trimpots per the P/Z procedure (`sim/SESSION_REPORT.md`).
-5. Mill the two case-panel slots (~340 × 7 mm — spec in `design/SESSION_LOG.md` session 14),
-   mount on standoffs, slide panels over the protruding board edges.
+5. Mill the two panel slots per case (~340 × 7 mm — spec in `design/SESSION_LOG.md`
+   session 14), mount on standoffs, slide panels over the protruding board edges.
 
-## Cost snapshot (qty 5 boards, indicative)
+## Cost snapshot (the 2-board build plan, indicative)
 
 | Item | Cost |
 |---|---|
-| JLC: 5× PCB (4L, HASL, large-size incl.) | ~$74 (+$25 ENIG option) |
+| JLC: 5× PCB fab (4L, HASL, large-size incl.; 3 bare spares) | ~$74 (+$25 ENIG option) |
 | JLC: assembly setup + stencil + 4 ext lines | ~$22 |
-| JLC: joints + parts, 5 boards | ~$100 |
-| DigiKey hand parts, 5 boards (incl. 5 cases) | ~$1,993 |
-| **Total ex-shipping (modules already owned)** | **~$2,190** |
+| JLC: joints + parts, 2 assembled boards | ~$40 |
+| DigiKey hand parts (2 boards + 20% spares, incl. 2 cases) | ~$893 |
+| **Total ex-shipping (modules already owned)** | **~$1,030** |
 
-Shipping: JLC ~$30 (DHL, ~1.4 kg); DigiKey usual.
+Shipping: JLC ~$30 (DHL, ~1.4 kg); DigiKey usual. (+ possible ~$59 JLC assembly
+large-size fee — see above.)
 
 Full DigiKey-only reference (if ever skipping JLC assembly): `models-bom/PURCHASING.md`.

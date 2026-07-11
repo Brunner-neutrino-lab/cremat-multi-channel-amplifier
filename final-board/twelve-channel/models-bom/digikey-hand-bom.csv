@@ -1,11 +1,11 @@
-Item,MPN,Manufacturer,DigiKey_PN,Qty_per_board,Unit_USD,Notes
-MCX edge jack 50R (BIAS/SIPM/TEST/OUT per ch),CONMCX013,TE Connectivity / Linx,343-CONMCX013-ND,48,3.22,"Hand-solder edge-mount (5 pads). DK stock ~1,050."
-SIP-8 socket (under every Cremat module),SS-108-TT-2,Samtec,612-SS-108-TT-2-ND,36,1.17,"Solder socket, plug module. Insert a module while soldering for alignment. Alt: Harwin D01-9970842."
-200k 25-turn trimpot (CR-200 P/Z),3296W-1-204LF,Bourns,3296W-204LF-ND,12,2.44,THT. DK stock ~80 - order early or use Mouser 652-3296W-1-204LF (~1.5k).
-Screw terminal 3-pos 5.08mm (PWR in + daisy),1715734,Phoenix Contact,277-1264-ND,2,1.71,THT.
-1U vented rack case,RM1U1908VBK,Hammond,HM1004-ND,1,169.21,ONE per board. Mill ~340x7mm slot in front+rear panels (SESSION_LOG s14 spec).
-[OPTIONAL buffer] THS3491 CFA,THS3491IDDAT,Texas Instruments,296-49085-1-ND,12,18.28,DNP by default. CUT TAPE -1-ND (never -2-ND reel). Hand-solder SOIC-8-EP if populating.
-[OPTIONAL buffer] 976R 1% 0805,RC0805FR-07976RL,Yageo,311-976CRCT-ND,24,0.10,DNP by default; hand-solder with buffer.
-[HAVE] Cremat CR-112 CSP,CR-112-R2.1,Cremat Inc,(Cremat-direct),12,55.00,User already has modules - plug into sockets.
-[HAVE] Cremat CR-200-1us shaper,CR-200-1us-R2.1,Cremat Inc,(Cremat-direct),12,55.00,User already has modules.
-[HAVE] Cremat CR-210 BLR,CR-210-R0,Cremat Inc,(Cremat-direct),12,77.00,User already has modules.
+Item,MPN,Manufacturer,DigiKey_PN,Qty_per_board,Order_Qty_2boards,Unit_USD,Ext_USD_2boards,Notes
+MCX edge jack 50R (BIAS/SIPM/TEST/OUT per ch),CONMCX013,TE Connectivity / Linx,343-CONMCX013-ND,48,116,3.22,373.52,"Hand-solder edge-mount (5 pads). DK stock ~1,050. Order qty = ceil(48x2x1.2) = 116 (20% spares for the hand-solder build)."
+SIP-8 socket (under every Cremat module),SS-108-TT-2,Samtec,612-SS-108-TT-2-ND,36,87,1.17,101.79,"Solder socket, plug module. Insert a module while soldering for alignment. Alt: Harwin D01-9970842. Order qty = ceil(36x2x1.2) = 87 (20% spares for the hand-solder build)."
+200k 25-turn trimpot (CR-200 P/Z),3296W-1-204LF,Bourns,3296W-204LF-ND,12,29,2.44,70.76,THT. DK stock ~80 - order early or use Mouser 652-3296W-1-204LF (~1.5k). Order qty = ceil(12x2x1.2) = 29 (20% spares for the hand-solder build).
+Screw terminal 3-pos 5.08mm (PWR in + daisy),1715734,Phoenix Contact,277-1264-ND,2,5,1.71,8.55,THT. Order qty = ceil(2x2x1.2) = 5 (20% spares for the hand-solder build).
+1U vented rack case,RM1U1908VBK,Hammond,HM1004-ND,1,2,169.21,338.42,ONE per board. Mill ~340x7mm slot in front+rear panels (SESSION_LOG s14 spec). Order qty = 2 (one per board; no spares needed).
+[OPTIONAL buffer] THS3491 CFA,THS3491IDDAT,Texas Instruments,296-49085-1-ND,12,29,18.28,530.12,DNP by default. CUT TAPE -1-ND (never -2-ND reel). Hand-solder SOIC-8-EP if populating. Order qty = ceil(12x2x1.2) = 29 (20% spares for the hand-solder build).
+[OPTIONAL buffer] 976R 1% 0805,RC0805FR-07976RL,Yageo,311-976CRCT-ND,24,58,0.10,5.80,DNP by default; hand-solder with buffer. Order qty = ceil(24x2x1.2) = 58 (20% spares for the hand-solder build).
+[HAVE] Cremat CR-112 CSP,CR-112-R2.1,Cremat Inc,(Cremat-direct),12,24,55.00,1320.00,User already has modules - plug into sockets. Already owned - listed for completeness (24 total across 2 boards).
+[HAVE] Cremat CR-200-1us shaper,CR-200-1us-R2.1,Cremat Inc,(Cremat-direct),12,24,55.00,1320.00,User already has modules. Already owned - listed for completeness (24 total across 2 boards).
+[HAVE] Cremat CR-210 BLR,CR-210-R0,Cremat Inc,(Cremat-direct),12,24,77.00,1848.00,User already has modules. Already owned - listed for completeness (24 total across 2 boards).
