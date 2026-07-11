@@ -105,3 +105,28 @@ Followed the recipe above; all items transferred + verified:
 
 Board 138 × 334.7 mm, DRC 0/0/0. **Order-ready pending the enclosure-depth width resize** (widen the
 138 mm dimension so the MCX edges meet the box front/back bulkheads).
+
+---
+
+## 2026-07-11 — session 10 — widened to the Hammond RM2U1908 enclosure (DONE)
+
+The user picked a **Hammond RM2U1908** 2U rack case (8"/203 mm external, ~185 mm internal depth) to
+stack two 12-ch boards. The board must be as **wide as the box is deep** so the two MCX rows land on
+the front and back bulkheads. Widened the board **138 → 180 mm** (one parameter, `gen_pcb.py` `W`,
+conservatively 5 mm shy of the ~185 mm internal — the barrels reach through the panel; **adjust to
+the box's real internal depth**).
+
+- The single-channel **tile stays 138 mm** (`W_CELL`); the board grows only on the **output/bias
+  (right) side** by `DW = W - W_CELL = 42 mm`. Signal integrity is unaffected — the shaper outputs
+  are slow (µs) Gaussian pulses, so the longer OUT_50/BIAS run is immaterial; BIAS is DC.
+- Clone loop: for each right-edge MCX (`RIGHT_MCX = {J_OUT50, J_BIAS}`) record pad-1, `Move(+DW)`,
+  and lay a 0.4 mm **F.Cu extension** from the old pad location to the new one so the moved jack stays
+  connected (this is why unconnected stays 0). The notch reader then sees the MCX at `x≈W` and cuts
+  the right-edge notch there; left-edge (input) MCX are untouched.
+- Re-ran `gen_pcb.py` + `fill_zones.py` + `polish_silk.py`: **180.0 × 334.7 mm, 48 notches (24 L /
+  24 R), DRC 0 / 0 / 0** (incl. 0 unconnected). Render `twelve-channel-3d.png` confirms the output
+  MCX sit on the far edge with the extension traces crossing the right region; input side stays
+  compact. Fab regenerated at 180 mm (`fab/`, git-ignored).
+
+**Order-ready.** Remaining pre-order check is purely mechanical: confirm `W=180` against the actual
+RM2U1908 internal depth before sending gerbers.

@@ -35,11 +35,17 @@ SC_REFMAP, _ = g12.build_refmap(sc.ROLES)          # role -> single-channel ref
 SC_ROLE = {v: k for k, v in SC_REFMAP.items()}     # single-channel ref -> role
 DNP_ROLES = {r for r in CH_ROLES if sc.SPEC[r][2]}
 MCX_ROLES = {"J_BIAS", "J_SIPM", "J_TEST", "J_OUT50"}
+RIGHT_MCX = {"J_OUT50", "J_BIAS"}          # output-side jacks -> shift out to the widened right edge
 def chref(role, n): return g12.stride_ref(CH_BASE_REF[role], n)
 
 PITCH = 25.0            # per-channel vertical pitch (single-channel row ~24.6 mm tall)
 YSPLIT = 20.0           # tracks with min-y >= this belong to the channel (COM row is above it)
-W = 138.0
+# Board width = the enclosure internal DEPTH minus ~2 mm, so both MCX edges reach the front/back
+# bulkheads. Hammond RM2U1908 (8"/203 mm external) ~= 185 mm internal -> 180 mm (conservative; the
+# barrel reaches through the panel). ADJUST this one number to the box's real internal depth.
+W = 180.0               # 12-ch board width (was 138 = single-channel cell)
+W_CELL = 138.0          # single-channel tile width (unchanged); board grows on the OUTPUT (right) side
+DW = W - W_CELL         # right-edge extension: output MCX move out, their signal traces extend
 
 def mm(v): return pcbnew.FromMM(float(v))
 def V(x, y): return pcbnew.VECTOR2I(mm(x), mm(y))
@@ -146,6 +152,15 @@ def main():
                     try: d.SetField(k, fld[k])
                     except Exception: pass
             if role in MCX_ROLES:                       # read the edge notch (cutout stays on Dwgs.User)
+                if role in RIGHT_MCX and DW:            # move the output jack to the new right edge and
+                    p = next((q for q in d.Pads() if q.GetNumber() == "1"), None)   # extend its signal trace
+                    old = (p.GetPosition().x / 1e6, p.GetPosition().y / 1e6) if p else None
+                    d.Move(V(DW, 0))
+                    p = next((q for q in d.Pads() if q.GetNumber() == "1"), None)
+                    new = (p.GetPosition().x / 1e6, p.GetPosition().y / 1e6) if p else None
+                    nm = TW_PADNET.get((nref, "1"))
+                    if old and new and nm:              # start 1 mm left of the old pad so it laps the routed trace
+                        _track(out, nm, pcbnew.F_Cu, [(old[0] - 1.0, old[1]), new], width=0.4)
                 ex, ey = [], []
                 for it in d.GraphicalItems():
                     if it.GetLayer() == pcbnew.Dwgs_User:

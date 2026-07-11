@@ -4,7 +4,9 @@
 > from the reworked single channel (`integration/single-channel/`) as a KiCad **hierarchical**
 > design (channel sheet instantiated 12×) with a **tile-and-replicate** layout (one routed
 > channel row stamped 12× — all 12 blocks geometrically identical = matched parasitics).
-> Board **138 × 335 mm**, 4-layer.
+> Board **180 × 335 mm**, 4-layer (widened from 138 mm so the two MCX rows reach the front/back
+> bulkheads of a **Hammond RM2U1908** 2U rack case — see `design/gen_pcb.py` `W`, adjustable to
+> the box's real internal depth).
 
 ## What this board is — 12 copies of the proven single channel + shared power
 

@@ -36,5 +36,6 @@ change before re-running `gen_pcb.py`).
 
 ## Result
 
-138 × 335 mm, 4-layer. 468 footprints (464 parts + 4 M3), 1836 tracks + 424 vias, 4 plane
-zones. **DRC 0 violations / 0 unconnected / 0 schematic-parity.** Render: `twelve-channel-top.png`.
+180 × 335 mm, 4-layer (widened from 138 mm to span the Hammond RM2U1908 2U case; the output/bias
+MCX row was shifted to the far edge with F.Cu trace extensions). 468 footprints (464 parts + 4 M3),
+4 plane zones. **DRC 0 violations / 0 unconnected / 0 schematic-parity.** Render: `twelve-channel-3d.png`.
