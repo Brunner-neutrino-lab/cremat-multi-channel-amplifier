@@ -1,0 +1,66 @@
+* ============================================================================
+* C3 board-sim -- FULL-CHAIN AC TRANSFER FUNCTION (charge-input -> OUT_50)
+*   Same chain + models as chain_single_event.cir (the DECK OF RECORD), but a
+*   small-signal .ac sweep instead of a transient event. A 1 A AC current is
+*   injected at the CSP input, so |V(OUT_50)| is the charge-path TRANSIMPEDANCE
+*   (V per A) vs frequency. The magnitude shape is the CR-200 shaper BANDPASS:
+*     - low corner  : CR-112 feedback (Rf.Cf ~3.1 kHz) + CR-200 differentiator
+*                     + the 100 nF Cc into the CR-210 (baseline-restore high-pass)
+*     - peak        : the ~1 us shaping characteristic frequency
+*     - high corner : CR-200 integrator; the THS3491 buffer is flat far above.
+*   The buffer is POPULATED here (AV=+2, deck-of-record config). LTspice
+*   linearises the behavioural limit()/E sources about the DC op-point, so the
+*   AC solve is valid small-signal.
+* Run:  LTspice.exe -b -Run chain_ac.cir      (staged via run_ltspice.ps1)
+* ============================================================================
+.include models.inc
+.include cr112_csp.sub
+.include cr200_1us.sub
+.include cr210.sub
+.include ths3491_rgt.lib
+
+* ---- supplies ----
+Vp  VP  0  12
+Vn  VN  0 -12
+Vp6 VP6 0  6
+Vn6 VN6 0 -6
+
+* ---- 1 A AC current into the CSP input -> transimpedance at every node ----
+Iac 0 INJ AC 1
+
+* ---- Stage 1: CR-112 CSP (own +/-6 V rails) ----
+Xcsp INJ CSP_OUT VP6 VN6 CR112_CSP
+
+* ---- Stage 2: CR-200-1us shaper, P/Z = 51 k ----
+Xsh CSP_OUT SHOUT PZ VN VP CR200_1US
+Rpz CSP_OUT PZ 51k
+
+* ---- board polarity convention (see chain_single_event.cir) ----
+.param POL=-1
+Epol SHOUT_P 0 VALUE = { POL*V(SHOUT) }
+Rpolld SHOUT_P 0 1G
+
+* ---- AC coupling into the CR-210 BLR ----
+Cc SHOUT_P NBLR 100n
+Xblr NBLR BLR_OUT VN VP CR210
+
+* ---- Stage 4: THS3491 CFA buffer, AV=+2, 50-ohm back-terminated ----
+Vpd PDN 0 12
+.param AVgain=2
+.param Rfb=976
+.param Rgnd={Rfb/(AVgain-1)}
+Rs  BLR_OUT BPIN 49.9
+Xbuf BPIN BINV FB BUF_OUT PDN VP VN 0 THS3491RGT
+Rfb FB BINV {Rfb}
+Rgnd BINV 0 {Rgnd}
+Rterm BUF_OUT OUT_50 49.9
+Rload OUT_50 0 50
+
+* ---- analysis ----
+.options plotwinsize=0 numdgt=7
+.ac dec 300 0.1 100Meg
+.save V(CSP_OUT) V(SHOUT) V(BLR_OUT) V(BUF_OUT) V(OUT_50)
+* log cross-check FoM (python does the full corner extraction from the raw)
+.meas ac zmax   MAX mag(V(OUT_50))
+.meas ac zmax_db MAX db(V(OUT_50))
+.end

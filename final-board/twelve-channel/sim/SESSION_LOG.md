@@ -100,3 +100,29 @@ size the screw-terminal/feed copper and pick a ≥1 A/rail supply; (2) +rail is 
 (CR-210 asymmetry) — keep the +VDC pour generous (it's the rail without a full inner plane);
 (3) single 100 µF bulk is adequate but consider a 2nd bulk near the far channels for margin
 (optional — the analysis says 100 µF alone is fine). No design change is *required*.
+
+---
+
+## 2026-07-11 — refresh on current design + AC / linearity / noise extension
+
+**Refresh.** Re-ran `run_all.ps1` on this machine against the current (widened, 180 mm) board.
+The widening is mechanical only (netlist identical), so results reproduce **bit-identically**:
+OUT_50 66.998 mV/0.5 pC, 134.0 mV/pC, +584/−536 mA, crosstalk 0.0002 % FS. LTspice ~1.6 s/deck.
+
+**Extension — 3 new analyses** (decks `chain_ac`, `chain_linearity`, `chain_noise`; analysis
+`scripts/analyze_ac_lin.py`; plots+FoM under `plots/` `data/`):
+- **AC transfer function** (charge→OUT_50 transimpedance): band-pass **1.59 kHz … 130 kHz**,
+  peak 336 kΩ @ ~15 kHz. Upper corner (130 kHz↔1.2 µs) confirms the 1 µs shaping; lower corner
+  = CSP 50 µs decay + CR-210 restore high-pass. Needed a complex-`.raw` reader (added to script).
+- **Charge linearity / dynamic range**: 133.4 mV/pC, linear ~1 % to ≈30 pC, **OUT_50 hard-clip
+  5.13 V** set by the **THS3491 buffer** railing at +10.25 V (shaper still linear at 60 pC →
+  buffer is the limit; bypassed variant ~2× headroom). CR-112 max charge 210 pC.
+- **ENC / noise**: design ENC = CR-112 datasheet **7000 e⁻ + 30 e⁻/pF @ 1 µs** (tabulated vs
+  SiPM C; zero-C dynamic range ~34 000:1). `.noise` is only a cross-check — the Cremat
+  macromodels are **noiseless** (no CSP FET series noise); it gives ~9.7 k e⁻ in-band, same
+  order as datasheet, i.e. Rf-thermal/front-end dominated, no board noise blow-up. Honest caveat
+  documented in the report + deck header.
+
+**State:** the 3 original criteria remain MET and are now complemented by bandwidth, dynamic-
+range, and ENC characterisation. No design change indicated. Report section appended to
+`SESSION_REPORT.md` (## 2026-07-11).

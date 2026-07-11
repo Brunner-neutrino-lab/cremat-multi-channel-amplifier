@@ -1,0 +1,9 @@
+{
+  "peak_transimpedance_ohm": 336065.33308968315,
+  "peak_frequency_Hz": 15252.229565391719,
+  "minus3dB_low_Hz": 1587.6507232464264,
+  "minus3dB_high_Hz": 130350.99220425665,
+  "bandwidth_Hz": 128763.34148101023,
+  "engine": "LTspice 24.x .ac dec 300 0.1 100Meg",
+  "note": "1 A AC injected at CSP input -> |V(OUT_50)| = charge-path transimpedance; buffer populated AV=2."
+}

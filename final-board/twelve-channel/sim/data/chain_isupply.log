@@ -1,6 +1,6 @@
 LTspice 24.1.9 for Windows
 Circuit: C:\Temp\ltspice_12ch\chain_isupply.net
-Start Time: Sun Jun 28 01:12:32 2026
+Start Time: Sat Jul 11 02:05:05 2026
 Options: plotwinsize=0 numdgt=7
 solver = Normal
 Maximum thread count: 24
@@ -28,7 +28,7 @@ Gmin = 2.70769e-13
 Gmin = 0
 Gmin stepping succeeded in finding the operating point.
 
-Total elapsed time: 2.166 seconds.
+Total elapsed time: 1.574 seconds.
 
 Files loaded:
 C:\Temp\ltspice_12ch\chain_isupply.net

@@ -42,3 +42,6 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# large regenerable LTspice step-sweep raw (data captured in .log + _fom.json)
+final-board/twelve-channel/sim/data/chain_linearity.raw

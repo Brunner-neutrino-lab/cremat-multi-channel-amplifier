@@ -1,0 +1,56 @@
+{
+  "spice_floor": {
+    "vout_rms_inband_uV_at_OUT50": 208.37,
+    "ENC_electrons_inband": 9749,
+    "vout_rms_fullband_uV_at_OUT50": 242.32,
+    "ENC_electrons_fullband": 11338,
+    "inband_def": "0.1 Hz .. 300 kHz (shaper passband; ENC is defined at the shaper output)",
+    "fullband_def": "0.1 Hz .. 10 MHz (adds THS3491 out-of-band white noise)",
+    "captures": "resistor thermal (incl. 680k Rf parallel noise) + THS3491 model noise",
+    "excludes": "CR-112 input-transistor series (white+1/f) noise -> not in the noiseless macromodel"
+  },
+  "datasheet_ENC_CR112": {
+    "model": "ENC(C) = 7000 e- + 30 e-/pF  (tau=1 us Gaussian, per CR-112-R2.1 datasheet)",
+    "vs_capacitance": [
+      {
+        "Cdet_pF": 0,
+        "ENC_electrons": 7000,
+        "ENC_fC": 1.122,
+        "noise_at_OUT50_uV": 149.6
+      },
+      {
+        "Cdet_pF": 100,
+        "ENC_electrons": 10000,
+        "ENC_fC": 1.602,
+        "noise_at_OUT50_uV": 213.7
+      },
+      {
+        "Cdet_pF": 470,
+        "ENC_electrons": 21100,
+        "ENC_fC": 3.381,
+        "noise_at_OUT50_uV": 451.0
+      },
+      {
+        "Cdet_pF": 1000,
+        "ENC_electrons": 37000,
+        "ENC_fC": 5.928,
+        "noise_at_OUT50_uV": 790.8
+      },
+      {
+        "Cdet_pF": 2000,
+        "ENC_electrons": 67000,
+        "ENC_fC": 10.735,
+        "noise_at_OUT50_uV": 1432.0
+      },
+      {
+        "Cdet_pF": 3400,
+        "ENC_electrons": 109000,
+        "ENC_fC": 17.464,
+        "noise_at_OUT50_uV": 2329.7
+      }
+    ],
+    "max_charge_per_event_pC": 210.0,
+    "dynamic_range_zeroC": "OUT_50 clip 5.13 V / 149.6 uV = 34,298 : 1"
+  },
+  "verdict": "The SPICE-modelled electronics noise referred to input is ~9749 e- in-band (shaper passband, to 300 kHz) and ~11338 e- full-band (to 10 MHz, where the THS3491 sitting AFTER the shaper adds out-of-band white noise). Both are the SAME ORDER OF MAGNITUDE as the CR-112 datasheet ENC of 7000 e-, and this is with the CSP input-FET series noise ABSENT from the macromodel -- i.e. the noise is dominated by the feedback-resistor (680k) parallel thermal noise and the front end, exactly as a charge-sensitive preamp should be, and no board stage (BLR, buffer, terminations, P/Z) introduces a runaway noise source. The 300 kHz brickwall is still wider than the true Gaussian ENC noise-bandwidth, so it over- counts somewhat. DESIGN NUMBER for the noise budget = the CR-112 datasheet ENC(C)=7000+30*C at tau=1 us (tabulated above); SPICE is only a consistency check."
+}

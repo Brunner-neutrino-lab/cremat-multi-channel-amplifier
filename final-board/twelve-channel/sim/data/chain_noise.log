@@ -1,6 +1,6 @@
 LTspice 24.1.9 for Windows
-Circuit: C:\Temp\ltspice_12ch\chain_single_event.net
-Start Time: Sat Jul 11 02:05:00 2026
+Circuit: C:\Temp\ltspice_12ch\chain_noise.net
+Start Time: Sat Jul 11 02:16:14 2026
 Options: plotwinsize=0 numdgt=7
 solver = Normal
 Maximum thread count: 24
@@ -28,10 +28,10 @@ Gmin = 2.70769e-13
 Gmin = 0
 Gmin stepping succeeded in finding the operating point.
 
-Total elapsed time: 1.672 seconds.
+Total elapsed time: 0.431 seconds.
 
 Files loaded:
-C:\Temp\ltspice_12ch\chain_single_event.net
+C:\Temp\ltspice_12ch\chain_noise.net
 C:\Temp\ltspice_12ch\models.inc
 C:\Users\darro\AppData\Local\LTspice\lib\sub\UniversalOpAmp2.lib
 C:\Users\darro\AppData\Local\LTspice\lib\cmp\standard.jft

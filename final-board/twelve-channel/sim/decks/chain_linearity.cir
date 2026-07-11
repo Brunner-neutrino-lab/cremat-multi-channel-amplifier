@@ -1,0 +1,62 @@
+* ============================================================================
+* C3 board-sim -- CHARGE LINEARITY / DYNAMIC RANGE sweep (OUT_50 vs Q_in)
+*   Same chain + models as chain_single_event.cir (the DECK OF RECORD). The
+*   injected charge is swept 0.1 .. 60 pC by scaling the triangle height
+*   (0.5 pC <-> 10 mA peak, i.e. 20 mA/pC over the fixed 100 ps base). For each
+*   charge we .meas the peak at every stage, so the log gives:
+*     - OUT_50 peak vs Q  -> gain (mV/pC) + the departure from linearity (clip)
+*     - BUF_OUT / SHOUT / CSP_OUT peaks -> WHICH stage clips first and at what Q
+*   Buffer POPULATED (AV=+2) = highest-gain / worst-case-for-clipping config;
+*   the buffer-BYPASSED variant has ~2x the OUT_50 headroom (half the gain).
+*   Rails: CSP +/-6 V, chain +/-12 V (THS3491 clips ~+/-10.5 V out).
+* Run:  LTspice.exe -b -Run chain_linearity.cir   (staged via run_ltspice.ps1)
+* ============================================================================
+.include models.inc
+.include cr112_csp.sub
+.include cr200_1us.sub
+.include cr210.sub
+.include ths3491_rgt.lib
+
+* ---- supplies ----
+Vp  VP  0  12
+Vn  VN  0 -12
+Vp6 VP6 0  6
+Vn6 VN6 0 -6
+
+* ---- swept charge impulse: height = 20 mA/pC over the 100 ps base ----
+.param Qpc=0.5
+.param Ipk={Qpc*20m}
+Iinj 0 INJ PWL(0 0  999.95n 0  1000.00n {Ipk}  1000.05n 0  300u 0)
+
+* ---- chain (identical to the deck of record) ----
+Xcsp INJ CSP_OUT VP6 VN6 CR112_CSP
+Xsh CSP_OUT SHOUT PZ VN VP CR200_1US
+Rpz CSP_OUT PZ 51k
+.param POL=-1
+Epol SHOUT_P 0 VALUE = { POL*V(SHOUT) }
+Rpolld SHOUT_P 0 1G
+Cc SHOUT_P NBLR 100n
+Xblr NBLR BLR_OUT VN VP CR210
+Vpd PDN 0 12
+.param AVgain=2
+.param Rfb=976
+.param Rgnd={Rfb/(AVgain-1)}
+Rs  BLR_OUT BPIN 49.9
+Xbuf BPIN BINV FB BUF_OUT PDN VP VN 0 THS3491RGT
+Rfb FB BINV {Rfb}
+Rgnd BINV 0 {Rgnd}
+Rterm BUF_OUT OUT_50 49.9
+Rload OUT_50 0 50
+
+* ---- sweep + per-stage peak measurements ----
+.step param Qpc list 0.1 0.2 0.5 1 2 5 10 20 30 40 50 60
+.options plotwinsize=0 numdgt=7
+.tran 0 60u 0 2n
+.save V(CSP_OUT) V(SHOUT) V(BLR_OUT) V(BUF_OUT) V(OUT_50) I(Iinj)
+* positive-going nodes -> MAX ; CSP/SHOUT are negative -> MIN (magnitude)
+.meas tran out50_pk  MAX V(OUT_50)
+.meas tran buf_pk    MAX V(BUF_OUT)
+.meas tran blr_pk    MAX V(BLR_OUT)
+.meas tran shout_mag MIN V(SHOUT)
+.meas tran csp_mag   MIN V(CSP_OUT)
+.end

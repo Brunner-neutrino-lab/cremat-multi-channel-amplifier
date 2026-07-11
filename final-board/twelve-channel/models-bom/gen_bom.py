@@ -36,6 +36,13 @@ COMMON_META = {
         "Datasheet": "https://industrial.panasonic.com/cdbs/www-data/pdf/RDE0000/RDE0000C1259.pdf",
         "Unit_Cost_USD": "1.17", "Stock_Qty": "~2.8k (DK, 2026-07)",
         "Notes": "Verified 2026-07-08 (provisional Nichicon UWT1V471MNL1GS was fictional: 35V UWT tops at 47uF). Panasonic FN-series, Ø10x10.5mm exact CP_Elec_10x10.5 fit. Up-rated from single-channel 100uF; 35V ~3x margin. Backs the 12x distributed 10uF."},
+    # override the single-channel MCX metadata: it is the SAME jack in all 4 coax roles
+    # (BIAS/SIPM/TEST/OUT), and the SiPM bias is now confirmed <=70V (was "<=60V").
+    "CONMCX013": {"Description": "50 ohm MCX edge-mount jack (BIAS / SIPM / TEST / OUT_50) - 4 per channel",
+        "Block": "IO", "Package": "MCX edge SMT", "HV_Rating": "net rated >=100V (creepage); SiPM bias <=70V",
+        "Datasheet": "https://linxtechnologies.com/wp/wp-content/uploads/conmcx013-ds.pdf",
+        "Unit_Cost_USD": "3.22", "Stock_Qty": "~1050 (DK, 2026-07)",
+        "Notes": "Linx CONMCX013 (TE Connectivity), footprint cremat:MCX_CONMCX013-T. HV on center pin -> creepage is a DRC concern (waived edge_clearance for this fp). 48 total = 4 roles x 12 ch. DK 343-CONMCX013-ND; -T = tape-and-reel packaging of the same connector."},
 }
 
 def load_sc_meta():
@@ -85,7 +92,8 @@ def main():
             "HV_Rating", "Datasheet", "Refs", "Notes"]
     rows = []
     for (mpn, val, fp, is_dnp), g in groups.items():
-        meta = sc.get(mpn) or COMMON_META.get(mpn) or {}
+        # COMMON_META overrides the single-channel metadata for listed keys (e.g. the MCX).
+        meta = {**(sc.get(mpn) or {}), **COMMON_META.get(mpn, {})}
         qty = len(g["refs"])
         try: unit = float(str(meta.get("Unit_Cost_USD", "")).split()[0]); ext = "%.2f" % (unit * qty)
         except Exception: ext = ""

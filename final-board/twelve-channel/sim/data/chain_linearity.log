@@ -1,0 +1,130 @@
+LTspice 24.1.9 for Windows
+Circuit: C:\Temp\ltspice_12ch\chain_linearity.net
+Start Time: Sat Jul 11 02:08:13 2026
+Options: plotwinsize=0 numdgt=7
+solver = Normal
+Maximum thread count: 24
+tnom = 27
+temp = 27
+method = trap
+d_in_clmp: Emission coefficient, N=0.02, too small, this might lead to numerical problems.
+Direct Newton iteration failed to find .op point.  (Use ".option noopiter" to skip.)
+Starting Gmin stepping
+Gmin = 10
+Gmin = 1.07374
+Gmin = 0.115292
+Gmin = 0.0123794
+Gmin = 0.00132923
+Gmin = 0.000142725
+Gmin = 1.5325e-05
+Gmin = 1.6455e-06
+Gmin = 1.76685e-07
+Gmin = 1.89714e-08
+Gmin = 2.03704e-09
+Gmin = 2.18725e-10
+Gmin = 2.34854e-11
+Gmin = 2.52173e-12
+Gmin = 2.70769e-13
+Gmin = 0
+Gmin stepping succeeded in finding the operating point.
+
+.step qpc=0.1
+.step qpc=0.2
+.step qpc=0.5
+.step qpc=1
+.step qpc=2
+.step qpc=5
+.step qpc=10
+.step qpc=20
+.step qpc=30
+.step qpc=40
+.step qpc=50
+.step qpc=60
+Total elapsed time: 16.792 seconds.
+
+Files loaded:
+C:\Temp\ltspice_12ch\chain_linearity.net
+C:\Temp\ltspice_12ch\models.inc
+C:\Users\darro\AppData\Local\LTspice\lib\sub\UniversalOpAmp2.lib
+C:\Users\darro\AppData\Local\LTspice\lib\cmp\standard.jft
+C:\Users\darro\AppData\Local\LTspice\lib\sub\LTC.lib
+C:\Temp\ltspice_12ch\cr112_csp.sub
+C:\Temp\ltspice_12ch\cr200_1us.sub
+C:\Temp\ltspice_12ch\cr210.sub
+C:\Temp\ltspice_12ch\ths3491_rgt.lib
+
+
+Measurement: out50_pk
+  step	MAX(V(OUT_50))	FROM	TO
+     1	0.0150060101391	0	6e-05
+     2	0.0283967382666	0	6e-05
+     3	0.068564078217	0	6e-05
+     4	0.135216829594	0	6e-05
+     5	0.268560933889	0	6e-05
+     6	0.669047358165	0	6e-05
+     7	1.3364675879	0	6e-05
+     8	2.67126346254	0	6e-05
+     9	4.00594778781	0	6e-05
+    10	5.09777945007	0	6e-05
+    11	5.12203445736	0	6e-05
+    12	5.13091481356	0	6e-05
+
+Measurement: buf_pk
+  step	MAX(V(BUF_OUT))	FROM	TO
+     1	0.029982008258	0	6e-05
+     2	0.0567366830567	0	6e-05
+     3	0.136991028278	0	6e-05
+     4	0.27016322553	0	6e-05
+     5	0.53658474591	0	6e-05
+     6	1.33675662161	0	6e-05
+     7	2.67026224063	0	6e-05
+     8	5.33718439816	0	6e-05
+     9	8.00388368005	0	6e-05
+    10	10.1853633412	0	6e-05
+    11	10.2338248458	0	6e-05
+    12	10.2515677975	0	6e-05
+
+Measurement: blr_pk
+  step	MAX(V(BLR_OUT))	FROM	TO
+     1	0.0134550725015	0	6e-05
+     2	0.0268583187381	0	6e-05
+     3	0.0670632073363	0	6e-05
+     4	0.133778295064	0	6e-05
+     5	0.26724712143	0	6e-05
+     6	0.668108007952	0	6e-05
+     7	1.3361524007	0	6e-05
+     8	2.67219623128	0	6e-05
+     9	4.00812907846	0	6e-05
+    10	5.34388598932	0	6e-05
+    11	6.67939254719	0	6e-05
+    12	8.01455538566	0	6e-05
+
+Measurement: shout_mag
+  step	MIN(V(SHOUT))	FROM	TO
+     1	-0.0134289314652	0	6e-05
+     2	-0.0268632270809	0	6e-05
+     3	-0.0671612394426	0	6e-05
+     4	-0.134030747014	0	6e-05
+     5	-0.26780872693	0	6e-05
+     6	-0.669597563963	0	6e-05
+     7	-1.33918891571	0	6e-05
+     8	-2.67832302084	0	6e-05
+     9	-4.01734730289	0	6e-05
+    10	-5.35619262464	0	6e-05
+    11	-6.69478669794	0	6e-05
+    12	-8.03303875474	0	6e-05
+
+Measurement: csp_mag
+  step	MIN(V(CSP_OUT))	FROM	TO
+     1	-0.00128860115144	0	6e-05
+     2	-0.00257771609001	0	6e-05
+     3	-0.00644459488353	0	6e-05
+     4	-0.0128612014642	0	6e-05
+     5	-0.0256981437384	0	6e-05
+     6	-0.0642527304633	0	6e-05
+     7	-0.128505460447	0	6e-05
+     8	-0.257010921483	0	6e-05
+     9	-0.385516382552	0	6e-05
+    10	-0.514021842658	0	6e-05
+    11	-0.642527304198	0	6e-05
+    12	-0.771032760676	0	6e-05

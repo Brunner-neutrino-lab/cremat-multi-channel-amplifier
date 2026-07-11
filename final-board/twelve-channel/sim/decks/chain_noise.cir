@@ -1,0 +1,53 @@
+* ============================================================================
+* C3 board-sim -- NOISE analysis of the full chain (charge-referred ENC floor)
+*   Same chain + models as chain_single_event.cir. .noise integrates the
+*   spectral density at OUT_50 referred to the CSP-input current source Iac.
+*
+*   IMPORTANT modelling caveat: the Cremat CR-112/CR-200/CR-210 macromodels are
+*   BEHAVIOURAL -- their op-amps are noiseless. So this .noise captures ONLY:
+*     - resistor THERMAL noise, incl. the CR-112 feedback Rf=680k (the real
+*       "parallel/current" ENC term) and the 51k P/Z, 10k, 976, 49.9, decoupling;
+*     - the TI THS3491 macromodel's own voltage/current noise (it HAS noise).
+*   It does NOT include the CR-112 input-transistor SERIES (white + 1/f) noise,
+*   which dominates the real front-end ENC. So ENC_sim here is a FLOOR / a check
+*   that the BOARD circuitry (shaper R's, BLR, buffer, terminations) adds little
+*   on top of the datasheet front-end ENC. The DESIGN ENC number is the CR-112
+*   datasheet spec: ENC = 7000 e- + 30 e-/pF at tau=1 us (see analyze_noise.py).
+* Run:  LTspice.exe -b -Run chain_noise.cir     (staged via run_ltspice.ps1)
+* ============================================================================
+.include models.inc
+.include cr112_csp.sub
+.include cr200_1us.sub
+.include cr210.sub
+.include ths3491_rgt.lib
+
+Vp  VP  0  12
+Vn  VN  0 -12
+Vp6 VP6 0  6
+Vn6 VN6 0 -6
+
+* input current source (AC 1 = the noise-referral reference at the CSP input)
+Iac 0 INJ AC 1
+
+Xcsp INJ CSP_OUT VP6 VN6 CR112_CSP
+Xsh CSP_OUT SHOUT PZ VN VP CR200_1US
+Rpz CSP_OUT PZ 51k
+.param POL=-1
+Epol SHOUT_P 0 VALUE = { POL*V(SHOUT) }
+Rpolld SHOUT_P 0 1G
+Cc SHOUT_P NBLR 100n
+Xblr NBLR BLR_OUT VN VP CR210
+Vpd PDN 0 12
+.param AVgain=2
+.param Rfb=976
+.param Rgnd={Rfb/(AVgain-1)}
+Rs  BLR_OUT BPIN 49.9
+Xbuf BPIN BINV FB BUF_OUT PDN VP VN 0 THS3491RGT
+Rfb FB BINV {Rfb}
+Rgnd BINV 0 {Rgnd}
+Rterm BUF_OUT OUT_50 49.9
+Rload OUT_50 0 50
+
+.options plotwinsize=0 numdgt=7
+.noise V(OUT_50) Iac dec 100 0.1 10Meg
+.end

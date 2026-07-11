@@ -2,8 +2,13 @@
 
 > **The summary other tracks read instead of my log.** Keep current (overwrite).
 
-Track: `C3 board-sim` · Aspect: `sim` · Status: `criteria-met`
-Last updated: `2026-06-28`
+Track: `C3 board-sim` · Aspect: `sim` · Status: `criteria-met (+ 2026-07-11 AC/linearity/noise extension)`
+Last updated: `2026-07-11`
+
+> **2026-07-11 extension appended below** — the original 3-criterion system check was
+> re-run bit-identically on the current design, and three headline analyses were added
+> (AC transfer function, charge linearity / dynamic range, ENC / noise). See the section
+> "## 2026-07-11 — AC / linearity / noise extension" at the end of this file.
 
 ## Objective
 A **system-level confidence pass** for the 12-channel final board (the per-channel
@@ -112,3 +117,70 @@ criterion for C3 is met once C1 (DRC-clean fab) + C2 (priced BOM == board) agree
   feasible (two THS3491 macromodels on a soft RC rail give a singular DC op-point) and is
   unnecessary at the resulting <0.001 % FS level. CR-112 modeled on its ±6 V op-point rail (as
   in B2); its ~8 mA/rail is added to the budget analytically.
+
+---
+
+## 2026-07-11 — AC / linearity / noise extension
+
+**Why now.** The board was widened 138 → 180 mm for the Hammond RM2U1908 enclosure. That change
+is **purely mechanical** (the output/bias MCX row shifted to the far edge with F.Cu trace
+extensions); the **schematic / netlist / component values are identical**, so every electrical
+result above is unchanged. The original 3-criterion pipeline (`run_all.ps1`) was re-run on this
+machine and reproduces **bit-identically** (OUT_50 = 66.998 mV / 0.5 pC, 134.0 mV/pC, peaking
+2.47 µs, FWHM 2.53 µs; +584 / −536 mA; crosstalk 0.0002 % FS). Then three headline analyses that
+the system-check hadn't covered were added. Engine = LTspice 24.x batch (`-b -Run`), staged via
+`run_ltspice.ps1`; analysis in `scripts/analyze_ac_lin.py`.
+
+### 1 — Full-chain AC transfer function — `decks/chain_ac.cir`, `data/chain_ac_fom.json`, `plots/chain_ac_bode.png`
+A 1 A AC current at the CSP input → `|V(OUT_50)|` = the charge-path **transimpedance** vs f.
+The chain is a clean **band-pass**:
+- **−3 dB band = 1.59 kHz … 130 kHz** (peak transimpedance 336 kΩ at ~15 kHz).
+- **Upper corner 130 kHz ↔ 1.2 µs** confirms the CR-200 **1 µs shaping**.
+- **Lower corner 1.59 kHz** = CSP 50 µs decay + the 100 nF Cc into the CR-210 baseline-restore
+  high-pass. The THS3491 buffer is flat far above the band (900 MHz), i.e. it does not shape.
+
+### 2 — Charge linearity / dynamic range — `decks/chain_linearity.cir`, `data/chain_linearity_fom.json`, `plots/chain_linearity.png`
+`.step` the injected charge 0.1 … 60 pC (buffer populated, AV = 2 = worst case for clipping):
+- **Small-signal gain 133.4 mV/pC** (matches the deck-of-record 134.0), **linear within ~1 %
+  through ≈30 pC**, soft compression 30–40 pC.
+- **OUT_50 hard-clips at 5.13 V** because the **THS3491 buffer rails at ≈ +10.25 V** (÷2 back-term).
+  The **shaper itself is still linear at 60 pC** (−8.0 V, its ±12 V rail clips ~82 pC) — so the
+  **buffer is the dynamic-range limit**, not the front end. The **buffer-BYPASSED** default
+  variant doubles OUT_50 headroom (shaper-limited ~82 pC) at half the gain (~67 mV/pC).
+- Head-room reference: CR-112 datasheet max charge/event = **210 pC** (1.3×10⁹ e⁻); the buffer
+  clip (~40 pC at OUT_50) is the binding limit when the +2 gain stage is fitted.
+
+### 3 — ENC / noise — `decks/chain_noise.cir`, `data/chain_noise_fom.json`, `plots/chain_noise.png`
+**Design number = the CR-112-R2.1 datasheet ENC** (measured through a τ = 1 µs Gaussian shaper —
+exactly our CR-200-1µs): **ENC(C) = 7000 e⁻ + 30 e⁻/pF**. Referred to OUT_50 (133 mV/pC):
+
+| detector C | ENC (e⁻ RMS) | ENC (fC) | noise @ OUT_50 |
+|---|---|---|---|
+| 0 (unconn.) | 7 000 | 1.12 | 150 µV |
+| 100 pF | 10 000 | 1.60 | 214 µV |
+| 470 pF | 21 100 | 3.38 | 451 µV |
+| 1 nF | 37 000 | 5.93 | 791 µV |
+| 2 nF | 67 000 | 10.7 | 1.43 mV |
+| 3.4 nF | 109 000 | 17.5 | 2.33 mV |
+
+Zero-C **dynamic range ≈ 34 000 : 1** (OUT_50 5.13 V clip / 150 µV). For a SiPM (single-PE
+charge ≈ 10⁶ e⁻ at gain 1e6) even the 1–3 nF ENC of tens-of-thousands of e⁻ is ≪ 1 PE → the
+preamp does not limit single-photon resolution; SiPM dark-count/cross-talk dominate.
+
+**SPICE `.noise` cross-check (honest limitation).** The Cremat CR-112/200/210 macromodels are
+**behavioural and noiseless** (only resistor thermal noise + the TI THS3491 model's own noise are
+present; the CSP input-FET series noise is **not** modelled). So `.noise` cannot produce the true
+ENC — it gives ~**9 700 e⁻ in-band** (to 300 kHz) / ~11 300 e⁻ full-band (to 10 MHz, where the
+post-shaper THS3491 adds out-of-band white noise). Both are the **same order** as the datasheet
+7000 e⁻ *with the dominant FET term absent*, i.e. the noise is **front-end / 680 k feedback-
+resistor-thermal dominated** (as any CSP is) and **no board stage (BLR, buffer, terminations,
+P/Z) adds a runaway noise source**. Use the **datasheet ENC** for the budget; `.noise` is only a
+consistency check.
+
+### Deliverables added
+- Decks: `decks/{chain_ac, chain_linearity, chain_noise}.cir`.
+- Script: `scripts/analyze_ac_lin.py` (complex-raw AC reader + `.step`/`.noise` log/raw parse).
+- Plots: `plots/{chain_ac_bode, chain_linearity, chain_noise}.png`.
+- FoM: `data/{chain_ac_fom, chain_linearity_fom, chain_noise_fom}.json`.
+- One-shot for the extension: `python scripts\analyze_ac_lin.py` after running the three decks
+  via `run_ltspice.ps1 chain_ac|chain_linearity|chain_noise`.
