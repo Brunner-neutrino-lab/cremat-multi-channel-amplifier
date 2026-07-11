@@ -3392,17 +3392,17 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "MPN" "GRM21AR72A224KAC5K"
+		(property "MPN" "C0805C224K1RACTU"
 			(at 93.98 115.57 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Manufacturer" "Murata Electronics"
+		(property "Manufacturer" "KEMET"
 			(at 93.98 115.57 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "490-8306-1-ND"
+		(property "Distributor PN" "399-C0805C224K1RACTUCT-ND"
 			(at 93.98 115.57 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -3612,7 +3612,7 @@
 			(at 122.65 126.15 0)
 			(effects (font (size 1.0 1.0)))
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical"
 			(at 120.65 120.65 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -3892,7 +3892,7 @@
 			(at 187.42 126.15 0)
 			(effects (font (size 1.0 1.0)))
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical"
 			(at 185.42 120.65 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -4228,7 +4228,7 @@
 			(at 252.19 126.15 0)
 			(effects (font (size 1.0 1.0)))
 		)
-		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical"
 			(at 250.19 120.65 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
@@ -4579,7 +4579,7 @@
 			(hide yes)
 			(effects (font (size 1.27 1.27)))
 		)
-		(property "Distributor PN" "296-49085-2-ND"
+		(property "Distributor PN" "296-49085-1-ND"
 			(at 317.5 115.57 0)
 			(hide yes)
 			(effects (font (size 1.27 1.27)))

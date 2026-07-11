@@ -9,8 +9,26 @@ FULL pad connection keeps the planes low-Z (no starved-thermal spokes).
 import os, pcbnew
 HERE = os.path.dirname(os.path.abspath(__file__))
 PCB = os.path.join(HERE, "twelve-channel.kicad_pcb")
+PRO = os.path.join(HERE, "twelve-channel.kicad_pro")
+
+def ensure_netclasses():
+    # Zone fill uses the project netclass clearances (hv_bias = 0.6 mm). A KiCad GUI save can
+    # FLATTEN the .kicad_pro (netclasses gone) -> the fill silently violates the HV rule and a
+    # subsequent DRC passes vacuously (bit us twice on 2026-07-11). Heal + warn loudly.
+    if "hv_bias" in open(PRO, encoding="utf-8").read():
+        return
+    print("*" * 78)
+    print("WARNING: twelve-channel.kicad_pro had NO netclasses (GUI save flattened it?).")
+    print("         Restoring from gen_sch.build_pro() before filling. If KiCad has this")
+    print("         project open, CLOSE IT WITHOUT SAVING or it will clobber it again.")
+    print("*" * 78)
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("tw_gen_sch", os.path.join(HERE, "gen_sch.py"))
+    g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
+    g.build_pro()
 
 def main():
+    ensure_netclasses()
     b = pcbnew.LoadBoard(PCB)
     gnd = b.FindNet("GND")
     bb = b.GetBoardEdgesBoundingBox()

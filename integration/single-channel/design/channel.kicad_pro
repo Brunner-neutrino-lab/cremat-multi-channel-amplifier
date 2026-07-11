@@ -330,11 +330,11 @@
       },
       {
         "netclass": "hv_bias",
-        "pattern": "FE"
+        "pattern": "*/FE"
       },
       {
         "netclass": "hv_bias",
-        "pattern": "N_filt"
+        "pattern": "*/N_filt"
       },
       {
         "netclass": "signal",
@@ -346,15 +346,15 @@
       },
       {
         "netclass": "signal",
-        "pattern": "SH_OUT"
+        "pattern": "*/SH_OUT"
       },
       {
         "netclass": "signal",
-        "pattern": "BLR_OUT"
+        "pattern": "*/BLR_OUT"
       },
       {
         "netclass": "signal",
-        "pattern": "SHAPER_OUT"
+        "pattern": "*/SHAPER_OUT"
       },
       {
         "netclass": "signal",
@@ -362,7 +362,7 @@
       },
       {
         "netclass": "signal",
-        "pattern": "BUF_*"
+        "pattern": "*/BUF_*"
       },
       {
         "netclass": "power",
@@ -390,27 +390,27 @@
       },
       {
         "netclass": "power",
-        "pattern": "SHVP"
+        "pattern": "*/SHVP"
       },
       {
         "netclass": "power",
-        "pattern": "SHVN"
+        "pattern": "*/SHVN"
       },
       {
         "netclass": "power",
-        "pattern": "BLVP"
+        "pattern": "*/BLVP"
       },
       {
         "netclass": "power",
-        "pattern": "BLVN"
+        "pattern": "*/BLVN"
       },
       {
         "netclass": "power",
-        "pattern": "BVP"
+        "pattern": "*/BVP"
       },
       {
         "netclass": "power",
-        "pattern": "BVN"
+        "pattern": "*/BVN"
       }
     ]
   },

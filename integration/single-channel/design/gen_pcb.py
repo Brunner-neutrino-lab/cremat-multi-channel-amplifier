@@ -300,20 +300,25 @@ def write_netclasses():
         {"name": "hv_bias", "clearance": 0.6, "track_width": 0.4,    "via_diameter": 0.9, "via_drill": 0.4},
         {"name": "signal",  "clearance": 0.2, "track_width": 0.33,   "via_diameter": 0.8, "via_drill": 0.4},
     ]
+    # Local (label-derived) nets are named "/NAME" flat / "/chNN/NAME" hierarchical, so exact
+    # patterns MUST carry a "*/" prefix -- a bare "FE" matches nothing. (This bug silently
+    # excluded FE/N_filt from hv_bias: the 2026-07-11 reroute packed the SiPM-bias front-end
+    # at default 0.2mm clearance instead of the 0.6mm HV rule. Globals GND/+VDC/-VDC have no
+    # slash and stay bare.)
     ns["netclass_patterns"] = [
         {"netclass": "hv_bias", "pattern": "*BIAS*"}, {"netclass": "hv_bias", "pattern": "*SIPM*"},
-        {"netclass": "hv_bias", "pattern": "FE"}, {"netclass": "hv_bias", "pattern": "N_filt"},
+        {"netclass": "hv_bias", "pattern": "*/FE"}, {"netclass": "hv_bias", "pattern": "*/N_filt"},
         {"netclass": "signal",  "pattern": "*CSP_OUT*"}, {"netclass": "signal", "pattern": "*CSP_IN*"},
-        {"netclass": "signal",  "pattern": "SH_OUT"}, {"netclass": "signal", "pattern": "BLR_OUT"},
-        {"netclass": "signal",  "pattern": "SHAPER_OUT"}, {"netclass": "signal", "pattern": "*OUT_50*"},
-        {"netclass": "signal",  "pattern": "BUF_*"},
+        {"netclass": "signal",  "pattern": "*/SH_OUT"}, {"netclass": "signal", "pattern": "*/BLR_OUT"},
+        {"netclass": "signal",  "pattern": "*/SHAPER_OUT"}, {"netclass": "signal", "pattern": "*OUT_50*"},
+        {"netclass": "signal",  "pattern": "*/BUF_*"},
         {"netclass": "power", "pattern": "GND"}, {"netclass": "power", "pattern": "+VDC"},
         {"netclass": "power", "pattern": "-VDC"},
         {"netclass": "power", "pattern": "*VDC_IN*"}, {"netclass": "power", "pattern": "*VDC_F*"},
         {"netclass": "power", "pattern": "*VS_F*"},
-        {"netclass": "power", "pattern": "SHVP"}, {"netclass": "power", "pattern": "SHVN"},
-        {"netclass": "power", "pattern": "BLVP"}, {"netclass": "power", "pattern": "BLVN"},
-        {"netclass": "power", "pattern": "BVP"}, {"netclass": "power", "pattern": "BVN"},
+        {"netclass": "power", "pattern": "*/SHVP"}, {"netclass": "power", "pattern": "*/SHVN"},
+        {"netclass": "power", "pattern": "*/BLVP"}, {"netclass": "power", "pattern": "*/BLVN"},
+        {"netclass": "power", "pattern": "*/BVP"}, {"netclass": "power", "pattern": "*/BVN"},
     ]
     json.dump(d, open(PRO, "w", encoding="utf-8"), indent=2)
     print("re-applied net classes (.kicad_pro)")

@@ -36,6 +36,15 @@ COMMON_META = {
         "Datasheet": "https://industrial.panasonic.com/cdbs/www-data/pdf/RDE0000/RDE0000C1259.pdf",
         "Unit_Cost_USD": "1.17", "Stock_Qty": "~2.8k (DK, 2026-07)",
         "Notes": "Verified 2026-07-08 (provisional Nichicon UWT1V471MNL1GS was fictional: 35V UWT tops at 47uF). Panasonic FN-series, Ø10x10.5mm exact CP_Elec_10x10.5 fit. Up-rated from single-channel 100uF; 35V ~3x margin. Backs the 12x distributed 10uF."},
+    # Cremat modules at the qty-12 tier of the 2026-01 US price list (10-99 pcs): CR-112 $55,
+    # CR-200-1us $55, CR-210 $77 -> modules subtotal $2,244. (List q1 prices: $65/$65/$86.)
+    # Qty 12 exceeds Cremat's Amazon <=10 limit: order by email (info@cremat.com).
+    "CR-112-R2.1":     {"Unit_Cost_USD": "55.00",
+        "Notes": "Not a Digi-Key part. 2026-01 US list: $65 (1-9) / $55 (10-99) / $47 (100+) - qty 12 = $55 tier. Order by email (qty > Amazon's 10 limit). Long lead - order early."},
+    "CR-200-1us-R2.1": {"Unit_Cost_USD": "55.00",
+        "Notes": "Not a Digi-Key part. 2026-01 US list: $65 (1-9) / $55 (10-99) / $47 (100+) - qty 12 = $55 tier. Order by email. Long lead - order early."},
+    "CR-210-R0":       {"Unit_Cost_USD": "77.00",
+        "Notes": "Not a Digi-Key part. 2026-01 US list: $86 (1-9) / $77 (10-99) / $73.10 (100+) - qty 12 = $77 tier. XOR with JP_BLR. DNP in CR-210-bypassed variant."},
     # override the single-channel MCX metadata: it is the SAME jack in all 4 coax roles
     # (BIAS/SIPM/TEST/OUT), and the SiPM bias is now confirmed <=70V (was "<=60V").
     "CONMCX013": {"Description": "50 ohm MCX edge-mount jack (BIAS / SIPM / TEST / OUT_50) - 4 per channel",
@@ -105,6 +114,24 @@ def main():
             "Stock_Qty": meta.get("Stock_Qty", ""), "Package": meta.get("Package", ""),
             "HV_Rating": meta.get("HV_Rating", ""), "Datasheet": meta.get("Datasheet", ""),
             "Refs": summarize_refs(g["refs"]), "Notes": meta.get("Notes", "")})
+    # Hardware with no schematic ref: the SIP-8 sockets soldered at every Cremat-module site
+    # (the modules PLUG IN and are never soldered). Samtec SS-108-TT-2 is Cremat's own
+    # eval-board socket (CR-160-R7 BOM lists it as DigiKey SAM1119-08-ND, now 612-SS-108-TT-2-ND);
+    # its machined contact accepts 0.38-0.56 mm leads = the modules' 0.51 x 0.25 mm flat pins.
+    # All specs live-verified 2026-07-11.
+    rows.append({
+        "Value": "SIP-8 socket", "Block": "MODULES",
+        "Description": "8-pin SIP socket strip under EVERY Cremat module (CR-112/CR-200/CR-210) - solder the socket, plug the module in",
+        "Footprint": "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical",
+        "MPN": "SS-108-TT-2", "Manufacturer": "Samtec", "DigiKey_PN": "612-SS-108-TT-2-ND",
+        "Qty": 36, "Populate": "FIT", "Unit_Cost_USD": "1.17", "Ext_Cost_USD": "42.12",
+        "Stock_Qty": "~650 (DK, 2026-07)", "Package": "SIP-8 THT", "HV_Rating": "-",
+        "Datasheet": "https://suddendocs.samtec.com/catalog_english/ss.pdf",
+        "Refs": "under U1 .. U47 (36 module sites)",
+        "Notes": "Cremat's own eval-board socket (CR-160 BOM SAM1119-08-ND). Machined BeCu contact, tin plating; "
+                 "accepts 0.38-0.56 mm leads (module pin 0.51x0.25 mm flat). Hand-solder with a module inserted "
+                 "so all 8 sockets align. Verified alt (gold flash, ~3.9k stk): Harwin D01-9970842 "
+                 "(DK D01-9970842-ND, $0.75 @ 40). Do NOT sub Mill-Max/Preci-Dip 801-series (0.7-0.9 mm pins only)."})
     # order: FIT first, then by block/value
     rows.sort(key=lambda r: (r["Populate"] == "DNP", r["Block"], r["Value"]))
 
@@ -113,7 +140,8 @@ def main():
 
     fit = sum(r["Qty"] for r in rows if r["Populate"] == "FIT")
     dnpq = sum(r["Qty"] for r in rows if r["Populate"] == "DNP")
-    nometa = sorted({r["MPN"] for r in rows if not (sc.get(r["MPN"]) or COMMON_META.get(r["MPN"]))})
+    nometa = sorted({r["MPN"] for r in rows
+                     if not (sc.get(r["MPN"]) or COMMON_META.get(r["MPN"]) or r["Description"])})
     print("wrote %s: %d line items, %d parts (%d FIT + %d DNP)" % (OUT, len(rows), fit + dnpq, fit, dnpq))
     if nometa: print("  MPNs missing metadata:", nometa)
 

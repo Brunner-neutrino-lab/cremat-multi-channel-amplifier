@@ -447,3 +447,24 @@ dir. Use `kicad-cli pcb render --quality high` (not `basic`) to judge fine 3D.
 Old `MCX_CONMCX013_EdgeMount.kicad_mod` left in the lib (now unused) pending the user's call on
 deleting it.
 
+---
+
+## 2026-07-11 — session 9 — SIP-8 sockets for the Cremat modules + HV netclass-pattern fix
+
+**Sockets:** U1/U2/U3 module sites now use stock
+`Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical` (`FP_SIP` in `gen_sch.py`) —
+**pad-for-pad + courtyard-identical** to the PinHeader_1x08 placeholder it replaces, so no
+copper/routing impact. Solder the socket, plug the module. Part: **Samtec SS-108-TT-2**
+(DK 612-SS-108-TT-2-ND; Cremat's own CR-160 eval-board socket; accepts the modules'
+0.51 × 0.25 mm flat pins; live-verified 2026-07-11). BOM CSV: 3 module rows re-pointed +
+`SKT1-SKT3` socket row (qty 3). Alt: Harwin D01-9970842. NOT 801-series (0.7–0.9 mm pins).
+
+**HV netclass-pattern bug (root-caused here, hit the 12-ch):** `write_netclasses()` wrote
+exact patterns `FE`, `N_filt`, `SH_OUT`, … — but local label nets are named `/FE` etc., so
+the patterns **matched nothing** and the session-8 reroute packed the SiPM-bias front-end at
+default 0.2 mm instead of hv_bias **0.6 mm**. Fixed with `*/` prefixes (`*/FE` matches both
+`/FE` and `/chNN/FE`), regenerated + **re-routed with the HV rule live in the DSN**
+(hv_bias class = `/BIAS_IN /FE /N_filt`, `width 400 clearance 600`). **DRC 0 errors /
+0 unconnected** (4 intentional MCX warnings). This board is the 12-ch tiling source — the
+12-ch was re-tiled from it (see its SESSION_LOG session 12).
+

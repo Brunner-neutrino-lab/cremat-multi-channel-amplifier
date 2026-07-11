@@ -126,7 +126,10 @@ def lib_symbols_block():
 FP_R     = "Resistor_SMD:R_0805_2012Metric"
 FP_C     = "Capacitor_SMD:C_0805_2012Metric"
 FP_CPELEC= "Capacitor_SMD:CP_Elec_6.3x7.7"
-FP_SIP   = "Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical"
+FP_SIP   = "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical"  # SIP-8 socket strip: solder the
+                                                                         # socket, plug the Cremat module in
+                                                                         # (pads+courtyard identical to the
+                                                                         # PinHeader_1x08 it replaces)
 FP_TRIM  = "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical"
 FP_MCX   = "cremat:MCX_CONMCX013-T"   # Linx CONMCX013-T edge-mount jack (user-downloaded footprint)
 FP_SCREW = "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal"
@@ -138,7 +141,7 @@ FP_PTC     = "Fuse:Fuse_1206_3216Metric"        # Littelfuse 1206L010/60WR reset
 # (Value, MPN, Manufacturer, DigiKey_PN). Value strings aligned to the B3 single-channel BOM.
 PARTS = {
     "Cf":     ("100nF 100V X7R",      "CL21B104KCFNNNE",   "Samsung Electro-Mechanics", "1276-6840-1-ND"),
-    "Cc":     ("0.22uF 100V X7R",     "GRM21AR72A224KAC5K","Murata Electronics",        "490-8306-1-ND"),
+    "Cc":     ("0.22uF 100V X7R",     "C0805C224K1RACTU",  "KEMET",                     "399-C0805C224K1RACTUCT-ND"),  # was Murata GRM21AR72A224KAC5K (DK 0-stock 2026-07); equal-spec 100V X7R
     "C_test": ("1pF 50V C0G",         "CC0805CRNPO9BN1R0", "Yageo",                     "311-1089-1-ND"),
     "Rf1":    ("10k",                 "RC0805FR-0710KL",   "Yageo",                     "311-10.0KCRCT-ND"),
     "Rf2":    ("10k",                 "RC0805FR-0710KL",   "Yageo",                     "311-10.0KCRCT-ND"),
@@ -164,7 +167,7 @@ PARTS = {
     "C_BLNb": ("10uF 25V X5R",        "C0805C106K3PACTU",  "KEMET",                     "399-11939-1-ND"),
     "C_BULKP":("100uF 35V",           "UWT1V101MCL1GS",    "Nichicon",                  "493-2203-1-ND"),
     "C_BULKN":("100uF 35V",           "UWT1V101MCL1GS",    "Nichicon",                  "493-2203-1-ND"),
-    "U_BUF":  ("THS3491",             "THS3491IDDAT",      "Texas Instruments",         "296-49085-2-ND"),
+    "U_BUF":  ("THS3491",             "THS3491IDDAT",      "Texas Instruments",         "296-49085-1-ND"),  # -1 = cut tape; -2 is a 250-pc reel
     "R_FB":   ("976",                 "RC0805FR-07976RL",  "Yageo",                     "311-976CRCT-ND"),
     "R_GAIN": ("976",                 "RC0805FR-07976RL",  "Yageo",                     "311-976CRCT-ND"),
     "R_BSER": ("49.9",                "RC0805FR-0749R9L",  "Yageo",                     "311-49.9CRCT-ND"),

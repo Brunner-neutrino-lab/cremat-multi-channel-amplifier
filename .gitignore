@@ -14,7 +14,12 @@ fp-info-cache
 *-drc.json
 
 # Generated fab outputs (regenerate from the KiCad project + job set)
-**/fab/
+**/fab/*
+# ...but keep the JLC assembly BOM/CPL (part of the ordering record; zip is regenerable)
+!**/fab/jlc
+**/fab/jlc/*.zip
+# packaged fab zip (regenerable; OneDrive-synced anyway)
+**/*-fab.zip
 **/gerbers/
 **/pcbfab/
 **/assembly/

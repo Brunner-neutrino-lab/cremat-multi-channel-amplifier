@@ -40,10 +40,13 @@ def chref(role, n): return g12.stride_ref(CH_BASE_REF[role], n)
 
 PITCH = 25.0            # per-channel vertical pitch (single-channel row ~24.6 mm tall)
 YSPLIT = 20.0           # tracks with min-y >= this belong to the channel (COM row is above it)
-# Board width = the enclosure internal DEPTH minus ~2 mm, so both MCX edges reach the front/back
-# bulkheads. Hammond RM2U1908 (8"/203 mm external) ~= 185 mm internal -> 180 mm (conservative; the
-# barrel reaches through the panel). ADJUST this one number to the box's real internal depth.
-W = 180.0               # 12-ch board width (was 138 = single-channel cell)
+# Board width: SLOT-THROUGH scheme (2026-07-11, user decision). Each front/rear panel of the
+# Hammond RM1U1908 gets a milled slot (~340 x 7 mm) and the BOARD PASSES THROUGH, protruding
+# 5.0 mm past each panel OUTER face -> the MCX faces sit ~8.6 mm proud (face is ~3.6 mm past
+# the board edge), snap-on fully in the open, and the slot absorbs all hole-alignment tolerance.
+#   W = external case depth 203.20 + 2 x 5.0 protrusion = 213.2 mm
+# (internal depth 196.85 / panels 3.2 - factory drawing, verified 2026-07-11)
+W = 213.2               # 12-ch board width (was 180 = flush-inside; 138 = single-channel cell)
 W_CELL = 138.0          # single-channel tile width (unchanged); board grows on the OUTPUT (right) side
 DW = W - W_CELL         # right-edge extension: output MCX move out, their signal traces extend
 
@@ -184,6 +187,10 @@ def main():
     add_outline(out, H, notches)
     write_dru()
     pcbnew.SaveBoard(PCB, out)
+    # Re-assert the project netclasses AFTER SaveBoard: an open KiCad GUI session (or SaveBoard
+    # itself) can rewrite twelve-channel.kicad_pro with the netclasses FLATTENED, which silently
+    # disables the hv_bias 0.6 mm DRC rule (bit us twice on 2026-07-11).
+    g12.build_pro()
     print("saved", PCB)
 
 # ---- common power section: J_PWR + J_DAISY + up-rated PTC/Schottky + 470uF bulk ----

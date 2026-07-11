@@ -159,3 +159,214 @@ Board layout unchanged this session (still 180 × 335 mm, DRC 0/0/0). Work was o
   regenerate every artifact, and the open user-decisions. **A new session should read that first.**
 
 Commits: `58d0945` (SPICE + BOM), `ab68975` (widening). **Next machine: start at `HANDOFF.md`.**
+
+---
+
+## 2026-07-11 — session 12 — SOCKETED Cremat modules + HV-clearance defect found & fixed
+
+**User request:** never solder the Cremat modules — solder SIP-8 **sockets** at every module
+site and plug the modules in; add sockets to the BOM.
+
+**Socket part (live-verified by 4 parallel agents, 2026-07-11):** **Samtec SS-108-TT-2**
+(DigiKey **612-SS-108-TT-2-ND**, legacy `SAM1119-08-ND` — the exact part **Cremat's own
+CR-160 eval-board BOM specifies** for these modules). Machined BeCu contacts accept
+0.38–0.56 mm leads; the modules have **flat 0.51 × 0.25 mm** stamped pins (CR-112/CR-210
+datasheet drawings), squarely in range. $1.37 (1) / $1.17 (10-99); DK stock ~650.
+Verified alternate: **Harwin D01-9970842** (gold flash, ~3.9k stock, $0.75 @ 40).
+**Do NOT sub Mill-Max/Preci-Dip 801-series** — their contacts take 0.7–0.9 mm pins.
+Cremat sells no standalone sockets. Our 1.0 mm holes: oversized vs Samtec's 0.66 mm
+recommendation but verified fits-and-hand-solders; insert a module while soldering to align.
+
+**Footprint:** stock `Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical` is
+**pad-for-pad and courtyard-identical** to the PinHeader_1x08 it replaces (verified in
+pcbnew) → zero copper change. `FP_SIP` updated in the single-channel `gen_sch.py` (12-ch
+inherits); both schematics regenerated, ERC 0, netlist membership IDENTICAL (29 / 271 nets).
+
+**HV-clearance defect (found while verifying):** regenerating `twelve-channel.kicad_pro`
+re-instated the netclasses — and DRC then showed **499 hv_bias (0.6 mm) clearance errors**.
+Root cause chain: (1) the single-channel `.kicad_pro` netclass patterns `FE`/`N_filt` lacked
+the leading `/` and so matched NOTHING — the 2026-07-11 MCX reroute packed the SiPM-bias
+front-end at default 0.2 mm; (2) a GUI save had **flattened the 12-ch `.kicad_pro`
+netclasses** (hv_bias deleted), committed unnoticed in `4554c4c`, so sessions 9–11 ran DRC
+blind to the HV rule — the "DRC 0/0/0 order-ready" claim was **vacuously passing**.
+**Fix at the source:** single-channel `gen_pcb.py` patterns now `*/`-prefixed
+(`*/FE`, `*/N_filt`, …); single channel re-routed with hv_bias 0.6 mm/0.4 mm live in the
+DSN (verified `width 400 clearance 600` on `/BIAS_IN /FE /N_filt`), DRC 0/0;
+12-ch re-tiled (gen_pcb + fill_zones + polish_silk). **Final 12-ch DRC (parity): 0 errors /
+0 unconnected / 0 parity**, 48 warning-level intentional `lib_footprint_mismatch` (MCX).
+36 sockets, 0 headers, 48 MCX-T, 48 notches, 180 × 334.7 mm. Fab package regenerated.
+
+**BOM:** `gen_bom.py` appends the socket row (qty 36, FIT, full sourcing metadata);
+`gen_purchasing.py` SRC has the SS-108-TT-2 entry. Single-channel BOM CSV: 3 module rows →
+PinSocket footprint + SKT1-3 socket row (qty 3). **12-ch CSV regen was blocked — both
+`twelve-channel-bom.csv` and `twelve-channel-purchasing.csv` were share-locked by an open
+Excel session; re-run `gen_bom.py` then `gen_purchasing.py` after closing Excel.**
+
+**Lesson (keep):** never commit a GUI-saved `.kicad_pro` over the generated one — a KiCad
+GUI save flattens the generator's netclasses and silently disables the HV DRC rule. Regen
+with `gen_sch.py` (12-ch) / `gen_pcb.py` (single-channel) instead, and treat "netclass
+patterns present in `.kicad_pro`" as part of the pre-order checklist.
+
+---
+
+## 2026-07-11 — session 13 — enclosure: 2U → 1U (one board per case) + MCX-recess analysis
+
+**User decision:** one amplifier per box, 1U. BOM updated: **Hammond RM1U1908VBK** (vented,
+DK HM1004-ND, $169.21, 70 stk; solid alt RM1U1908SBK HM995-ND $162.45). Vented chosen
+because the board dissipates ~13.4 W under a 40 mm lid. `gen_purchasing.py` CASE + regen.
+
+**Factory-drawing-verified dims (both 1U + 2U drawings fetched from hammfg.com, local
+copies in the session scratchpad):** RM1U1908 internal depth **196.85 mm** [7.750] exact,
+internal height **40.09 mm** [1.578], internal width 415.30 mm; front/rear panels =
+separate flat 3.2 mm extruded plates, removable & interchangeable; no PCB bosses (mount on
+standoffs off the bottom cover; Hammond offers free STEP models + factory machining).
+**1U height check PASSES:** standoff ~4.8 + board 1.6 + socket seat 4.45 + module body
+20.8 = **~31.7 mm < 40.09 mm** (~8 mm margin; trimpot/electrolytics are shorter). NOTE
+there is NO 12"-deep RM; depths are 8"/13"/18" (13" = RM1U1913SBK if ever needed).
+
+**MCX recess at the panels — options compared (all live-priced 2026-07-11):**
+- **(A) Widen the board `W` 180 → ~194 mm — RECOMMENDED.** At W=180 the jack faces sit
+  ~8.4 mm behind each panel (user: "push the cable ~1 cm through the hole"). At W=194 the
+  board-edge-to-panel gap is ~1.4 mm/side; the CONMCX013 face protrudes ~3.6 mm past the
+  board edge → the face lands ~1 mm inside the panel outer surface; a ~5.5 mm panel hole
+  lets the plug nose engage at the panel. Assembly is a non-issue with the removable flat
+  panels: mount the board, then slide each panel on axially over the jack barrels and screw
+  it down (no angle-insertion needed). One `W` param + scripted re-run (the widening
+  mechanism from session 10 — tile stays 138 mm, right-side extension traces stretch).
+  Verify the 3.6 mm face protrusion on the CONMCX013 drawing before drilling panels.
+- **(B) Panel bulkheads — REJECTED on sourcing.** MCX F-F feedthrough barrels are
+  effectively non-stocked (~$370–500/48 at factory lead, PLUS 48 board→panel jumpers).
+  MCX-bulkhead pigtail assemblies: unavailable ($500–2,200/48 or 250-pc MOQs). Cheapest
+  real route = Molex 73415-5230 crimp bulkheads (~$112/48) + hand-built RG-316 pigtails
+  ×48 + crimp tool — heavy labor, 96 extra RF joints. In-stock hybrid exists (Taoglas
+  CAB.0130 SMA-bulkhead→MCX-plug pigtails, ~$314/48) but changes the panel connector to SMA.
+- **(C) Open/semi-open box — ADVISED AGAINST for operation.** The shaping band is
+  1.6–130 kHz; mains harmonics + SMPS hash land IN band, and the FE node (fC-scale, ENC
+  ≈1.1 fC) sits ~1 cm from the would-be open face. Two full open faces make the box a poor
+  shield at these frequencies (aperture-dominated); Cremat's own eval boxes are fully
+  closed. The vented covers (Ø4.3 mm holes) already give the "semi-open" thermal benefit
+  with EMI-negligible apertures. Open-air is fine for BENCH testing, not for the rack.
+
+**Pending user go-ahead:** run the W=194 resize (gen_pcb + fill + polish + DRC + fab).
+
+---
+
+## 2026-07-11 — cross-session note (from the ets-breakout session — NOT the owning session)
+
+A Claude session working in `ets-breakout` briefly operated on this tree (user redirected it
+back to ets-breakout; it made **no commits**). What it found and did, ~13:40–13:50:
+
+- **Found the HV defect reintroduced:** the 13:22 GUI save had re-flattened
+  `twelve-channel.kicad_pro` (hv_bias netclass gone) and the zones had been refilled at the
+  0.5 mm zone clearance — DRC (with netclasses restored) showed **505 hv_bias 0.6 mm
+  clearance violations**, and the **13:32 fab exports carried that bad fill. Do not order
+  from the 13:32 gerbers.**
+- **Repair (per this project's own session-12 procedure):** re-ran `gen_sch.py` (schematics
+  byte-identical; `.kicad_pro` netclasses restored), `fill_zones.py` refill, then
+  `kicad-cli pcb drc --schematic-parity` → **0 errors / 0 unconnected / 0 parity, 48
+  warning-level lib_footprint_mismatch (intentional MCX)**. ERC 0. Fab re-exported
+  (gerbers/drill/pos/STEP, ~13:43) + `twelve-channel-fab.zip`.
+- **BOM:** re-ran `gen_bom.py` + `gen_purchasing.py` (the session-12 Excel lock is gone) —
+  outputs match session-12 totals ($2,682.12 FIT / $221.76 buffer / $189.67 case).
+- Render images (`twelve-channel-3d.png`, `-top.png`, `.pdf`) regenerated from the fixed
+  fill; a verification pass (Hammond RM2U1908 internal depth, per-line BOM re-check) was
+  also run — results, if material, will be added below this note by the user or a later session.
+
+Everything above is uncommitted working-tree state; the owning session should review,
+re-verify (netclasses present in `.kicad_pro` → DRC), and commit.
+
+**Addendum (same ets-breakout session, ~14:10) — verification-workflow results for the owning session:**
+
+- **Case fit CONFIRMED from Hammond's own drawings** (`hammfg.com/files/parts/pdf/RM2U1908SBK.pdf`,
+  §DD-DD; VBK identical): internal clear depth **196.85 mm** [7.750 in], panels 3.18 mm, external
+  203.20 mm. The 180 mm board fits with 16.85 mm total margin. Interior W 415.30 mm / H 84.53 mm.
+  HANDOFF open item 1 is closed — no width change needed; RM2U1912 not required.
+- **Cremat prices stale** (official US list effective 2026-01-01, tiers 1-9/10-99/100+):
+  CR-112 $65/$55/$47, CR-200-1us $65/$55/$47, CR-210 $86/$77/$73.10. At qty 12 → CR-112 $660
+  (not $780), CR-200 $660 (not $708), CR-210 $924 (unchanged). Modules total **$2,244, -$168 vs
+  PURCHASING.md**. Qty 12 > Amazon's ≤10 limit → order by email (info@cremat.com).
+- **THS3491 buffer option: PN trap** — `296-49085-2-ND` is the 250-pc reel (~$3,020, can't order 12).
+  Use cut tape **`296-49085-1-ND`**, $18.28 q1, same 680-pc DK stock.
+- **Murata 0.22 µF 100 V (490-8306-1-ND): DK stock ZERO, 17-wk lead.** Buy Mouser
+  `81-GRM21AR72A224KAC5K` (~$0.24, tens of k, reconfirm) or DK alt KEMET
+  `399-C0805C224K1RACTUCT-ND` (95,632 stk, $0.49 q1). Update gen_purchasing.py SRC accordingly.
+- All other 17 catalog lines re-verified OK (incl. MCX CONMCX013 DK 1,050 stk; SS-108-TT-2 $1.168 @36).
+- **PCB fab (indicative, qty 5 = practical min at both):** JLCPCB ~$62 HASL / ~$85 ENIG (+~$30 ship);
+  PCBWay ~$172 / ~$202. 180×335 accepted by both, no large-board surcharge (JLC threshold 650 cm²;
+  board is 603 cm² — don't grow the outline).
+- BOM arithmetic audit: exact pass (380 FIT / 120 DNP; totals match). Renders + PDF regenerated
+  13:56 from the fixed fill; `twelve-channel-fab.zip` at 13:49.
+
+---
+
+## 2026-07-11 — session 14 — SLOT-THROUGH panels: board 180 → 213.2 mm (+ 2nd re-flatten caught)
+
+**User decision (option A, improved):** instead of 48 panel holes, mill ONE slot in each
+front/rear panel and let the **board pass through, protruding 5.0 mm past each panel outer
+face**. Easier machining (one straight op), the slot absorbs all alignment tolerance, MCX
+snap-on happens fully in the open, and the board can slide in/out with the panels mounted.
+
+**Executed:** `W = 213.2 mm` (= external depth 203.20 + 2 × 5.0) in `gen_pcb.py`; full
+pipeline (gen_pcb → fill_zones → polish_silk). **Honest DRC: 0 / 0 / 0** (48 intentional
+MCX warnings), 48 notches (24/edge), board **213.2 × 334.7 mm**, fab + render regenerated.
+
+**Panel slot spec (mill BOTH panels identically):**
+- ~**340 mm long × 7 mm tall**, centered horizontally (board 334.7 long; panel internal
+  width 415.3 → ≥37 mm meat each end; slot must be CONTINUOUS — the board edge is).
+- Vertical: centered on the board mid-plane = standoff height + 0.8 mm above the
+  bottom-cover inner face (4.8 mm standoffs → slot spans ≈2–9 mm above the floor).
+  **Measure against the assembled case + real standoffs before milling.**
+- Board edge 5.0 mm proud; MCX faces ≈8.6 mm proud (face ~3.6 mm past the edge — confirm on
+  the CONMCX013 drawing; cosmetic only). EMI: the ~340×7 aperture is mostly filled by the
+  board + grounded shells; FE nodes are 10–25 mm inboard — negligible in the 1.6k–130 kHz band.
+
+**⚠ .kicad_pro re-flattened AGAIN (incident #2) — root cause found: an OPEN pcbnew GUI**
+(`twelve-channel — PCB Editor`) was holding the project; its saves rewrite the netclasses
+away (and its stale in-memory board would overwrite the disk board on Ctrl+S). The first
+W=213.2 DRC ran vacuously and its fill/fab were bad — caught, healed, re-verified.
+**Pipeline is now self-healing:** `gen_pcb.py` re-asserts `build_pro()` after SaveBoard, and
+`fill_zones.py` refuses to fill blind (checks for hv_bias, restores it + warns loudly).
+Rule stands: close the 12-ch pcbnew window (without saving) before running the pipeline.
+
+**BOM corrections folded in** (from the ets-session verification addendum above): Cremat
+2026-01 price list at the qty-12 tier → modules **$2,244** (CR-112/CR-200 $55, CR-210 $77;
+q1 $65/$65/$86); **FIT subtotal $2,514.12**. THS3491 DK PN → cut-tape **296-49085-1-ND**
+(the -2-ND is a 250-pc reel!) — fixed in gen_sch PARTS (schematics/netlists regenerated,
+ERC 0, membership identical) + both CSVs + purchasing. Murata 0.22 µF 100 V: DK stock 0 →
+buy Mouser 81-GRM21AR72A224KAC5K or KEMET alt (noted). Case = RM1U1908VBK $169.21/board.
+
+**Fab-cost flag:** at 213.2 × 334.7 the board is ~714 cm², ABOVE JLCPCB's 650 cm²
+large-board threshold (it was 603 cm² at W=180) — expect a surcharge or use PCBWay; get a
+fresh quote before ordering.
+
+---
+
+## 2026-07-11 — session 15 — JLCPCB fab+assembly package + KEMET swap (order-ready v2)
+
+**User decisions:** (a) HV coupling cap primary = **KEMET C0805C224K1RACTU** (Murata went
+DK 0-stock; Murata retained as alt) — swapped in gen_sch PARTS, both CSVs, purchasing SRC;
+full regen chain re-run (ERC 0, membership identical, re-tile, DRC 0/0/0, hv_bias verified,
+fab re-exported). (b) **Buy boards from JLCPCB with SMT assembly of the passives**; the
+rest in a DigiKey hand-BOM. Cremat modules: user already has them.
+
+**JLC feasibility (13-agent live verification, incl. a live wizard quote):**
+- Fab: 4L 213.2×334.7 fits easily (max 1016×596); large-size fee just **$5**/order.
+  Live quote qty 5: **$73.70 HASL / $98.40 ENIG** (incl. $25 eng fee). Edge notches fine
+  (routing ~12 m/m² vs 80 limit).
+- Assembly: qualifies for the cheap **Economic tier** (single PCB to 470×500, 4L/1.6mm,
+  top-side, no rails/fiducials). $8 setup + $1.50 stencil + $3/Extended line.
+  ⚠ possible undocumented $59.23 per-order assembly large-size fee — confirm in the live
+  assembly quote.
+
+**Package written → `design/fab/jlc/` + `ORDERING.md` (master buy sheet):**
+- `gerber-twelve-channel-jlc.zip`, `bom-twelve-channel-jlc.csv` (JLC headers, 12 lines,
+  LCSC C-numbers), `cpl-twelve-channel-jlc.csv` (246 FIT-SMD placements; DNP/THT excluded).
+- LCSC mapping policy: **Basic-library part when spec-equal-or-better** (8/12 lines free),
+  exact MPN when no Basic exists (0.22µF-100V KEMET C2167405, 1pF C513668, 470µF C494847,
+  PTC C207066 → 4×$3 fees). Notable subs: 10µF 25V → Samsung CL21A106KAYNNNE C15850
+  (KEMET 25V not at LCSC in 0805 — beware their 106K8 = 10V parts); SSA24 → **MDD SS34
+  C8678** (SMA 40V 3A, Basic; onsemi had 2 pcs). Resistors → UNI-ROYAL 1% Basic equivalents.
+- Rotation caveat: check D1/D2 + C10/C11 polarity in JLC's parts-review preview.
+- DigiKey hand-BOM (`models-bom/digikey-hand-bom.csv` + Quick-Add in ORDERING.md):
+  MCX ×48, SS-108-TT-2 ×36, 3296W ×12, terminals ×2, case ×1 ≈ **$399/board**; optional
+  buffer +$222. `.gitignore`: fab/* stays ignored but `fab/jlc` BOM/CPL are tracked.
