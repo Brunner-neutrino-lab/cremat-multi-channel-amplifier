@@ -12,8 +12,8 @@ reference systems. Quantities below are per board.
 
 Use the KiCad pipeline established by `ets-breakout` (KiCad 9/10 CLI + bundled Python):
 
-1. **Open** `hardware/multi-channel-cremat-amplifier.kicad_pro` (once the hardware track
-   has created it).
+1. **Open** `hardware/multi-channel-cremat-amplifier.kicad_pro` (the board is built and
+   DRC-clean).
 2. **DRC gate:** `kicad-cli pcb drc <pcb>` → must be **0 errors** (clearance, creepage,
    etc. — see [../hardware/pcb-design-rules.md](../hardware/pcb-design-rules.md)).
 3. **Fill zones** as a *separate* pass on the saved file (headless in-memory zone fill
@@ -37,7 +37,7 @@ Use the KiCad pipeline established by `ets-breakout` (KiCad 9/10 CLI + bundled P
 
 | Parameter | Value |
 |---|---|
-| Layers | 4 (preferred; 2 acceptable with a ground plane) |
+| Layers | **4** (finalized — F.Cu / In1 GND / In2 −VDC / B.Cu +VDC), ordered from JLCPCB |
 | Material | FR4 (1 oz outer copper) |
 | Thickness | 1.6 mm |
 | Min track / clearance | per net class; **HV bias clearance set by bias voltage** |
@@ -68,14 +68,17 @@ both**:
 
 - Bias filter: `Rf1`,`Rf2`,`Cf` **xor** `JP_Rf1`,`JP_Rf2`
 - CR-210: `U_BLR` **xor** `JP_BLR`
+- Output buffer (THS3491): the buffer **xor** its 0R bypass — the **default build fits the bypass** (THS3491 DNP)
 
 Populating both shorts out / parallels the block. Check this per channel after placement.
 
 ### Order of assembly
 1. **SMD first** (reflow / stencil): 0805 R/C, 0R jumpers, op-amps. Apply the DNP list so
    the wrong path isn't placed.
-2. **Trimpots, then Cremat SIP-8 modules** (CR-11X, CR-200-X, and CR-210 if fitted) —
-   through-hole, hand-soldered; observe **pin-1** (white dot on Cremat modules).
+2. **Trimpots, then the Cremat module sockets** (Samtec SS-108-TT-2 SIP-8, **36/board** — 3
+   socket strips per module site × 12) — through-hole, hand-soldered. Then **plug in** the
+   Cremat modules (CR-112, CR-200-1µs, and CR-210 if fitted) — the modules are **never
+   soldered**; observe **pin-1** (white dot on Cremat modules).
 3. **Coax jacks and connectors** last (align to board edge).
 
 ### HV / SiPM cautions during bring-up
@@ -96,7 +99,7 @@ Populating both shorts out / parallels the block. Check this per channel after p
 4. **Bias bring-up:** with a detector or a test pulse, ramp `BIAS_IN`; verify the
    front-end node biases and a pulse appears at `OUT`.
 5. **Per-channel functional test:** inject charge (test-pulse cap into the CSP input) and
-   confirm shaped pulses on all 12 `OUT` jacks; trim P/Z and gain per channel.
+   confirm shaped pulses on all 12 `OUT` jacks; trim the P/Z per channel (there is no per-channel gain trim).
 
 ---
 

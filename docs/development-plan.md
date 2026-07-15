@@ -1,5 +1,7 @@
 # Development Plan — Tracks
 
+> **Superseded 2026-07-11** — final board is 213.2 x 334.7 mm, one per Hammond RM1U1908VBK 1U case (slot-through, daisy-chained); THS3491 output buffer (DNP-by-default); socketed Cremat modules (Samtec SS-108-TT-2). See final-board/twelve-channel/ (SESSION_LOG sessions 12-15, ORDERING.md).
+
 How the build is divided into work tracks, what each owns, and what can run in parallel.
 The integration track (Track 0) owns this document and the gates between tracks.
 
@@ -100,7 +102,7 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
   | CR-11X CSP (CR-110/-111/-112/-113) | `reference/cremat-CR-150-R5` | symbol + 8-pin SIP footprint + BOM line |
   | CR-200-X shaper | `reference/cremat-CR-160-R7` | symbol + `8pinSIP` footprint |
   | **CR-210 BLR** | `reference/cremat-CR-160-R7` | symbol + `8pinSIP` footprint (pinout confirmed) |
-  | EL5167 / buffer | `reference/cremat-CR-160-R7`, `reference/cremat-x6-board` | symbol |
+  | **THS3491** CFA output buffer (DNP default) | TI THS3491 datasheet (replaces EL5167) | symbol |
   | passives, jumpers, coax | `reference/cremat-x6-board`, KiCad std libs | symbols |
 - **New / to-source:** 0805 R/C footprints, 0R-jumper footprint, op-amp package, coax jack
   (MCX/SMA per Track 4), HV `BIAS_IN` connector, trimpots, 3D STEP for the SIP-8 module.
@@ -120,7 +122,7 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 - **AC coupling:** `Cc` value + voltage rating (≥ bias V).
 - **Polarity:** SiPM terminal (cathode/anode-bias) vs CR-11X input polarity.
 - **Power/decoupling:** per-module decoupling values, bulk caps, rail sizing.
-- **Output:** buffer gain, `49.9R` termination, P/Z and gain-trim ranges.
+- **Output:** THS3491 CFA buffer (DNP by default, 0R bypass), `49.9R` back-termination, per-channel P/Z trim range (no buffer gain/offset trims).
 - **Deliverable:** [hardware/circuit-design.md](hardware/circuit-design.md) — **done**:
   values + calculations + rationale for the **Hamamatsu VUV4** (Rf1=Rf2=10 kΩ, Cf=100 nF,
   Cc=0.22 µF; cathode-on-node +45–55 V; CR-112). Bench-verify items listed there.
@@ -142,12 +144,13 @@ tracks (5→6→7) are serial. Track 0 runs throughout.
 
 ### Track 4 — Mechanical, Connectors & I/O
 
-- Specified (D2/D3/D5): MCX `CONMCX013` I/O; **3-pos screw terminal** for ±Vs/GND;
-  **1U open tray**, board ≈ 225 × 235 mm on M3 standoffs, tall parts < ~35 mm. Remaining:
+- Specified (D2/D3/D5): MCX `CONMCX013` I/O; **two 3-pos 5.08 mm screw terminals** (`J_PWR` supply-in + `J_DAISY` daisy-chain-out) for ±Vs/GND;
+  **one board per Hammond RM1U1908VBK 1U case** (slot-through), board **213.2 × 334.7 mm** on standoffs off the bottom cover, tall parts < ~40 mm (interior 40.09 mm). Remaining:
   finalize jack placement + outline (a layout detail, handed to Track 6).
-- **Jack placement:** inputs (24 `BIAS_IN`+`SIPM`) on one long edge, outputs (12 `OUT`) on
-  the opposite long edge → channel flows input-edge → amplifier → output-edge
-  ([hardware/board.md](hardware/board.md)). No bulkhead cutouts (open tray).
+- **Jack placement:** **48 MCX** total — **4 per channel** (`BIAS_IN`,`SIPM`,`TEST`,`OUT`),
+  **24 per long edge** → channel flows input-edge → amplifier → output-edge
+  ([hardware/board.md](hardware/board.md)). Panel **slot-through** — the board protrudes ~5 mm
+  through a milled slot; no bulkhead-flush cutouts.
 - **Deliverable:** `docs/hardware/mechanical.md` + an outline/placement constraint sketch.
 - **Done when:** Track 6 has fixed connector parts, an outline, and a placement strategy.
 - **Needs from user:** cabling standard (MCX/SMA), enclosure intent (see Decisions).
@@ -206,8 +209,8 @@ track also reads [CLAUDE.md](../CLAUDE.md) (iron rules) and this plan once.
 - **Track 4 — Mechanical, Connectors & I/O.** *Read:* [hardware/board.md](hardware/board.md)
   (§ Mechanical + Connectors), [§ Decisions](#decisions--resolved-2026-06-24) (D2/D3/D5);
   the TE `CONMCX013` and the chosen screw-terminal datasheets. *Do:* write
-  `hardware/mechanical.md` — outline ≈ 225 × 235 mm, M3 standoff pattern, the
-  inputs-one-edge / outputs-other-edge MCX placement, and the 1U height check (< ~35 mm).
+  `hardware/mechanical.md` — outline **213.2 × 334.7 mm**, standoff pattern off the 1U case bottom cover, the
+  inputs-one-edge / outputs-other-edge MCX placement (**48 MCX**, slot-through the front/rear panels), and the 1U height check (interior 40.09 mm).
 
 ### Phase 2 (serial: 5 → 6 → 7)
 
@@ -222,9 +225,9 @@ track also reads [CLAUDE.md](../CLAUDE.md) (iron rules) and this plan once.
 - **Track 6 — Layout.** *Read:* [hardware/pcb-design-rules.md](hardware/pcb-design-rules.md),
   [hardware/board.md](hardware/board.md) (§ Mechanical + Layout intent), the Track 5 netlist +
   Track 1 footprints; and `reference/ets-breakout/` (README + `tools/` for the
-  generate→fill-zones→DRC pipeline gotchas). *Do:* place the 12 cells into the **≈225 × 235 mm,
-  1U** envelope (tall parts < ~35 mm), inputs (`BIAS_IN`+`SIPM`) one long edge / `OUT` the
-  other, apply net classes (`hv_bias` ~1.0 mm creepage on the ≤60 V bias nets, guarded
+  generate→fill-zones→DRC pipeline gotchas). *Do:* place the 12 cells into the **213.2 × 334.7 mm,
+  1U** envelope (tall parts < ~40 mm; interior 40.09 mm), inputs (`BIAS_IN`+`SIPM`) one long edge / `OUT`+`TEST` the
+  other, apply net classes (`hv_bias` **0.6 mm** clearance on the ≤70 V bias nets, guarded
   front-end node, 50 Ω `OUT`), pour/stitch grounds; reach **DRC 0/0**.
 - **Track 7 — Fab/Assembly.** *Read:* [fabrication/fabrication-guide.md](fabrication/fabrication-guide.md),
   [hardware/bom.md](hardware/bom.md) (DNP tables), [hardware/board.md](hardware/board.md)
@@ -270,16 +273,16 @@ are this board's additions on top of the single-channel CR-160-R7 reference.
 
 | # | Decision | Answer | Gates |
 |---|---|---|---|
-| D1 | SiPM bias voltage range | **≤ 60 V**; keep all HV parts (`Cc`,`Cf`) rated **100 V** → `hv_bias` creepage from the ≤100 V row (~1.0 mm) | T2, T3, PCB rules |
+| D1 | SiPM bias voltage range | **≤ 70 V**; keep all HV parts (`Cc`,`Cf`) rated **100 V** → `hv_bias` clearance **0.6 mm** (track 0.4 mm) as implemented | T2, T3, PCB rules |
 | D2 | `SIPM`/`OUT` jack | **MCX edge-mount, TE Connectivity Linx `CONMCX013`** (DK `343-CONMCX013-ND`), 50 Ω SMT board-edge | T1, T4 |
 | D3 | `BIAS_IN` connector | **Same MCX `CONMCX013`** — *not* SHV | T1, T4 |
 | D4 | Modules to order | shaper **CR-200-1µs**; CSP **CR-112** (reference x6-board used CR-113) | T1 (BOM) |
-| D5 | Enclosure | **1U rack tray ≈ 482 × 244 mm**; boards **open** (no enclosure / panel / bulkhead cutouts), mounted flat on standoffs → per-board outline **≈ 225 × 235 mm**, tall parts **< ~35 mm** (1U). See [hardware/board.md](hardware/board.md) | T4 |
+| D5 | Enclosure | **Hammond RM1U1908VBK 1U vented case, ONE board per case** (multiple boxes daisy-chained via `J_DAISY`); board **213.2 × 334.7 mm** on standoffs off the bottom cover, passing through a **~340 × 7 mm slot** in each front/rear panel (slot-through, not an open tray); tall parts **< ~40 mm** (interior 40.09 mm). See [hardware/board.md](hardware/board.md) | T4 |
 | D6 | First-build variant | **Full (bias filter fitted + CR-210 fitted)** — confirmed; changeable per build | T7 |
 
 ### ⚠ Connector clarification (architecture-affecting)
-**`SIPM`, `OUT`, and `BIAS_IN` are all per-channel** — three MCX `CONMCX013` jacks per
-channel → **36 MCX per board**. `BIAS_IN` is **not** a single shared rail; each channel has
+**`SIPM`, `OUT`, `TEST`, and `BIAS_IN` are all per-channel** — four MCX `CONMCX013` jacks per
+channel → **48 MCX per board** (24 per long edge). `BIAS_IN` is **not** a single shared rail; each channel has
 its own bias-input connector feeding its own (optional) bias filter. The bias supply is
 fanned to the per-channel `BIAS_IN` jacks externally (e.g. an external splitter), or each
 channel is biased independently.

@@ -13,7 +13,7 @@ in the docs. Bench-verify items are listed at the end.
 | Active area / pitch | 6 × 6 mm, 75 µm micro-cells | Hamamatsu (the "70 µm" pixel) |
 | Terminal capacitance `Cdet` | **≈ 1.28 nF** | Hamamatsu / nEXO characterization |
 | Breakdown `Vbr` | ≈ 55 V (room) / ≈ 42 V (86 K) | Hamamatsu |
-| Operating reverse bias | **45–55 V** (≤ 60 V → D1 OK, 100 V parts) | user |
+| Operating reverse bias | **45–55 V** (≤ 70 V design ceiling, 100 V parts) | user |
 | Charge / avalanche | **≈ 220 fC per 1 V overvoltage** (≈ 1.37×10⁶ e⁻/V) | user; matches Hamamatsu gain 5.8×10⁶ @ 4 V OV |
 | Polarity | reverse-biased (cathode positive) | user |
 
@@ -87,10 +87,10 @@ not preferred.)
 
 | Part | Value | Footprint |
 |---|---|---|
-| `Cc` | **0.22 µF, 100 V, X5R/X7R** | 0805 |
+| `Cc` | **0.22 µF, 100 V, X7R** (KEMET C0805C224K1RACTU) | 0805 |
 
-- Blocks the ≤ 55 V DC bias from the CR-112 input; 100 V rating gives margin (matches the
-  reference board's `0.22 µF 100 V X5R`).
+- Blocks the ≤ 55 V DC bias from the CR-112 input; 100 V rating gives margin (the reference
+  board used `0.22 µF 100 V X5R`; this board uses the same value in **X7R**).
 - **Charge transfer:** `Cc (0.22 µF) ≫ Cdet (1.28 nF)` by ~170×, so ≈ **99.4 %** of the
   SiPM charge transfers into the (virtual-ground) CR-112 input. This is why `Cc` is large —
   a small coupling cap comparable to `Cdet` would lose a large fraction of the signal.
@@ -106,8 +106,9 @@ not preferred.)
     signals, **CR-113** (10× lower gain, pin-compatible) is the drop-in fallback — but D4
     selected CR-112; revisit only if saturation is observed.
 - **CR-200-1µs shaper** + pole-zero trim: as on the reference board; 1 µs shaping (D4).
-- **Output buffer** (EL5167 / LM7321) + **49.9 Ω** series source termination into 50 Ω coax;
-  gain/offset trims per channel — unchanged from the reference.
+- **Output buffer** (**TI THS3491** CFA, **DNP by default** — 0R-bypassed so the shaper drives
+  the termination directly) + **49.9 Ω** series source termination into 50 Ω coax. No buffer
+  gain/offset trims (the EL5167-era trims are gone).
 
 ---
 

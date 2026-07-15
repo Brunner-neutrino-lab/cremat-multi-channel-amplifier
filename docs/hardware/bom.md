@@ -17,7 +17,8 @@ flag), the same convention `ets-breakout` and the reference board use.
   tightest spots).
 - **Voltage-rated exceptions stay 0805 but with HV dielectric:** the AC-coupling cap `Cc`
   and the bias-filter `Cf`/`Rf*` see the full SiPM bias. Spec `Cc` ≥ bias voltage
-  (reference: `0.22 µF 100 V X5R`); spec `Cf` similarly. An 0805 100 V X7R/X5R is fine;
+  (this board: `0.22 µF 100 V X7R`, KEMET **C0805C224K1RACTU**); spec `Cf` similarly. An
+  0805 100 V X7R is fine;
   do not drop the rating to hit a size.
 - **Never 0805** (different package): Cremat SIP-8 modules, op-amps, trimpots, coax jacks,
   power/HV connectors.
@@ -28,22 +29,22 @@ flag), the same convention `ets-breakout` and the reference board use.
 
 | Class | Ref(s) | Part | Package | Always fitted? |
 |---|---|---|---|---|
-| Charge-sens. preamp | `U_CSP` | Cremat **CR-112** (ref. board used CR-113) | SIP-8 TH | yes |
-| Shaping amp | `U_SHAPER` | Cremat **CR-200-1µs** | SIP-8 TH | yes |
-| Baseline restorer | `U_BLR` | Cremat **CR-210** | SIP-8 TH | **optional** |
-| Output buffer | `U_BUF` | EL5167 / LM7321 | SOT-23-5 / SO-8 | yes |
-| AC coupling | `Cc` | 0.22 µF 100 V X5R (bias ≤ 60 V; keep 100 V) | 0805 | yes |
+| Charge-sens. preamp | `U_CSP` | Cremat **CR-112** (ref. board used CR-113) | SIP-8 module, **socketed** | yes (plugged in) |
+| Shaping amp | `U_SHAPER` | Cremat **CR-200-1µs** | SIP-8 module, **socketed** | yes (plugged in) |
+| Baseline restorer | `U_BLR` | Cremat **CR-210** | SIP-8 module, **socketed** | **optional** |
+| Module sockets | (one per module site) | **Samtec SS-108-TT-2** SIP-8 socket (alt Harwin D01-9970842) | `PinSocket_1x08_P2.54mm_Vertical` | yes — **36/board** (3 × 12) |
+| Output buffer | `U_BUF` | **TI THS3491** CFA line driver | 8-pin SOIC/PowerPAD | **DNP by default** (0R-bypassed) |
+| AC coupling | `Cc` | 0.22 µF 100 V **X7R**, KEMET **C0805C224K1RACTU** (bias ≤ 70 V; keep 100 V) | 0805 | yes |
 | Bias filter R | `Rf1`,`Rf2` | **10 kΩ** each (VUV4; [circuit-design.md](circuit-design.md)) | 0805 | **optional** |
 | Bias filter C | `Cf` | **100 nF, 100 V, X7R** | 0805 | **optional** |
 | Bias-filter bypass | `JP_Rf1`,`JP_Rf2` | 0R | 0805 | **optional** |
 | BLR bypass | `JP_BLR` | 0R | 0805 | **optional** |
-| P/Z trim | `RV_PZ` | trimpot ~100 kΩ | TH/SMD trim | yes |
-| Gain/offset trim | `RV_*` | trimpot (per reference) | TH/SMD trim | yes |
+| P/Z trim | `RV_PZ` | **Bourns 3296W** 200 kΩ 25-turn trimpot | TH trim | yes (**12/board**) |
 | Source termination | `R_OUT` | 49.9 Ω | 0805 | yes |
 | Decoupling | `C_*` | 0.1 µF / 1 µF / 10 µF | 0805 | yes |
-| `BIAS_IN`,`SIPM`,`OUT` jacks | `J_BIAS`,`J_SIPM`,`J_OUT` | MCX TE Linx `CONMCX013` (DK `343-CONMCX013-ND`) | edge SMT | yes (×3) |
+| `BIAS_IN`,`SIPM`,`TEST`,`OUT_50` jacks | `J_BIAS`,`J_SIPM`,`J_TEST`,`J_OUT` | MCX TE Linx `CONMCX013` (DK `343-CONMCX013-ND`) | edge SMT | yes (×4) |
 
-Multiply per-channel quantities by **12** (→ **36 MCX**), then add the shared power-entry
+Multiply per-channel quantities by **12** (→ **48 MCX**), then add the shared power-entry
 parts once. `BIAS_IN` is per-channel, so its jack is in the per-channel count, not shared.
 
 ---
@@ -78,8 +79,9 @@ Two independent options, **per channel**. Exactly one path in each pair is popul
 | Class | Part | Notes |
 |---|---|---|
 | Bulk decoupling | 10 µF + 100 µF electrolytic per rail | At ±Vs entry |
-| Power connector | **3-pos screw terminal**, low-profile (< 1U) | ±Vs, GND (the only shared connector) |
-| Mounting | M3 holes / standoffs | Per outline |
+| Power in `J_PWR` | **3-pos 5.08 mm Phoenix screw terminal** | ±Vs, GND supply in |
+| Daisy-chain out `J_DAISY` | **3-pos 5.08 mm Phoenix screw terminal** | Raw ±Vs, GND out to the next 1U box (not the only shared connector) |
+| Mounting | M3 holes / standoffs (off the case bottom cover) | Per outline |
 
 ---
 

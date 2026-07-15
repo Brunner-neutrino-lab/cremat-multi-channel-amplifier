@@ -1,5 +1,7 @@
 # Brief — `twelve-channel` final board (Phase C)
 
+> **Superseded 2026-07-11** — final board is 213.2 x 334.7 mm, one per Hammond RM1U1908VBK 1U case (slot-through, daisy-chained); THS3491 output buffer (DNP-by-default); socketed Cremat modules (Samtec SS-108-TT-2). See final-board/twelve-channel/ (SESSION_LOG sessions 12-15, ORDERING.md).
+
 Multiply the **proven single channel ×12** and produce the **final fabricable PCB**.
 Tracks: **C1 design** (primary), **C2 models-bom**, **C3 sim**. **Gate:** `single-channel`
 must be **COMPLETE**. Read [00-CHARTER.md](../00-CHARTER.md) +

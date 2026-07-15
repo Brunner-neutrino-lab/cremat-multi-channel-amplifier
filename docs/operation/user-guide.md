@@ -8,18 +8,24 @@ firmware, no commands, no channel selection. All 12 channels amplify continuousl
 
 ## What you connect
 
-All per-channel jacks are **MCX** (TE Linx `CONMCX013`). Each channel has **three**:
+All per-channel jacks are **MCX** (TE Linx `CONMCX013`). Each channel has **four**:
 
 | Connector | Qty | Connect to |
 |---|---|---|
-| `BIAS_IN` (per channel) | 12 | Detector bias supply (HV, ≤ 60 V), one feed per channel |
+| `BIAS_IN` (per channel) | 12 | Detector bias supply (HV, ≤ 70 V), one feed per channel |
 | `SIPM` (per channel) | 12 | One detector each (coax). Carries **DC bias + signal** on the same line. |
+| `TEST` (per channel) | 12 | Test-pulse injection input (coax) for per-channel calibration; leave open in normal use. |
 | `OUT` (per channel) | 12 | DAQ / digitizer / scope input (50 Ω, coax). |
-| Power (±Vs, GND) | 1 | Dual analog supply (Cremat-style, typically ±12 V — confirm module ratings). |
+| `J_PWR` — power in (±Vs, GND) | 1 | Dual analog supply (Cremat-style, typically ±12 V — confirm module ratings). 3-pos 5.08 mm screw terminal. |
+| `J_DAISY` — daisy-chain out (±Vs, GND) | 1 | Passes the raw ±Vs rails on to the next 1U box. 3-pos 5.08 mm screw terminal. |
 
 **`BIAS_IN` is per-channel**, so channels can be biased independently. To run them all at
 one voltage, fan a single bias supply out to the 12 `BIAS_IN` jacks (external splitter /
 daisy-chain). The board does not distribute bias internally.
+
+**Multiple boards daisy-chain box-to-box:** each board lives in its own Hammond
+RM1U1908VBK 1U case; `J_DAISY` passes the raw ±Vs rails from one box on to the next
+board's `J_PWR`.
 
 ---
 
@@ -69,7 +75,9 @@ detector charge ─► SiPM (DC-biased via filter) ─► Cc (AC) ─► CR-11X 
 - The SiPM's **current pulse** passes through `Cc` into the charge-sensitive preamp (AC
   path) — the DC bias is blocked from the amplifier.
 - The shaper produces a Gaussian pulse; if the **CR-210** is fitted it holds the baseline
-  at ground (better at high rate); the buffer drives it into 50 Ω coax at `OUT`.
+  at ground (better at high rate); the output stage drives it into 50 Ω coax at `OUT` — the
+  shaper directly via the 49.9 Ω back-termination by default, or the optional **THS3491**
+  buffer if that channel is populated.
 
 ---
 
@@ -78,8 +86,9 @@ detector charge ─► SiPM (DC-biased via filter) ─► Cc (AC) ─► CR-11X 
 - **Pole-zero (P/Z):** each channel has a P/Z trimpot on the CR-200-X. With a test pulse
   (or detector pulses) on the scope, adjust until the shaped pulse returns cleanly to
   baseline with no undershoot/overshoot.
-- **Gain/offset:** the buffer trimpots set per-channel gain/offset; match channels if your
-  DAQ expects uniform amplitude.
+- **Output buffer:** there are **no gain/offset trims**. The per-channel output buffer is a
+  TI **THS3491** CFA, fitted as a **populate option (DNP by default)**; in the default build a
+  0R jumper bypasses it and the shaper drives the 49.9 Ω back-termination directly.
 - **Shaping time** is fixed by the CR-200-**X** part installed (chosen at order time).
 
 ---
@@ -89,7 +98,7 @@ detector charge ─► SiPM (DC-biased via filter) ─► Cc (AC) ─► CR-11X 
 | Symptom | Likely cause | Action |
 |---|---|---|
 | No pulses on a channel | bias not reaching detector | check `BIAS_IN`, and that the filter path or its 0R bypass is populated (not neither) |
-| Output railed / large DC offset | `Cc` not blocking, or buffer offset | verify `Cc` populated & rated; trim offset |
+| Output railed / large DC offset | `Cc` not blocking (leaky / unpopulated) | verify `Cc` populated & rated for the bias voltage |
 | Baseline shifts with rate | CR-210 bypassed | rebuild with CR-210 fitted, or accept for low-rate use |
 | Excess noise on all channels | bias-supply noise / filter bypassed | fit the bias filter; check `GND` integrity |
 | One channel oscillates | P/Z mis-trim or layout | re-trim P/Z; inspect that channel's front-end |

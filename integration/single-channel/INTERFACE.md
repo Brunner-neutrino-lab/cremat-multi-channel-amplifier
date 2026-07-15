@@ -18,7 +18,7 @@
 ## What this board is — one complete channel
 
 ```
-BIAS_IN(MCX,<=60V) ─Rf1─┬─Rf2─ FE ── SIPM(MCX, DC to detector)
+BIAS_IN(MCX,<=70V) ─Rf1─┬─Rf2─ FE ── SIPM(MCX, DC to detector)
                         Cf(HV)│        │
                         GND   │       Cc(HV) ─► CR-112 ─CSP_OUT─► CR-200(1µs) ─SH_OUT─► CR-210(BLR)
 TEST_IN(MCX) ─┬─47R─ GND       │       (+ P/Z trim 200k)          (JP_BLR 0R bypass)   │ SHAPER_OUT
@@ -45,7 +45,7 @@ output → CR-200 shaper input on one board, no MCX between; CR-210 output drive
 
 | Port | Dir | Connector | Signal | Range / notes |
 |------|-----|-----------|--------|---------------|
-| `BIAS_IN` | in | MCX (J1) | SiPM bias DC | **≤ 60 V** (HV net, `hv_bias` class 0.6 mm). Through RC+R filter to `FE`. |
+| `BIAS_IN` | in | MCX (J1) | SiPM bias DC | **≤ 70 V** (HV net, `hv_bias` class 0.6 mm). Through RC+R filter to `FE`. |
 | `SIPM`    | i/o | MCX (J2) | detector bias + charge | DC-coupled to filtered bias node `FE`; carries HV. Detector connects here. |
 | `TEST_IN` | in | MCX (J3) | test pulse | Coax-terminated charge injector: 47 Ω shunt to GND (`R5`) + 1 pF series (`C3`) → CSP input. A V step `Vt` injects `Q = 1 pF × Vt`. (2026-07 rework — `R5` is now the shunt termination, **not** a series R; net `TEST_N` is gone.) |
 | `OUT_50`  | out | MCX (J4) | shaped Gaussian pulse | **Zout = 50 Ω (back-terminated)**, drives a 50 Ω DAQ/scope. Peaking ≈ 1 µs (CR-200-1µs). **B2 sim (0.5 pC): OUT_50 peak = +67.1 mV into 50 Ω** (= 0.5 pC × 13.3 mV/pC × 10.2 shaper × 1.0 BLR × 2.0 buffer × 0.5 back-term). Unipolar positive (see Polarity below). |

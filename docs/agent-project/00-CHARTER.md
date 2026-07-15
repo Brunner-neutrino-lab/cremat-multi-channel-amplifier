@@ -1,5 +1,7 @@
 # Project Charter — Agent-Developed Multi-Channel Cremat Amplifier
 
+> **Superseded 2026-07-11** — final board is 213.2 x 334.7 mm, one per Hammond RM1U1908VBK 1U case (slot-through, daisy-chained); THS3491 output buffer (DNP-by-default); socketed Cremat modules (Samtec SS-108-TT-2). See final-board/twelve-channel/ (SESSION_LOG sessions 12-15, ORDERING.md).
+
 This repository is being developed **end-to-end by parallel Claude Code sessions**, run as
 if by a team of engineers: each session is a **track** with a scoped job, explicit
 **success/failure criteria**, a chronological **session log** (ground truth), and a concise

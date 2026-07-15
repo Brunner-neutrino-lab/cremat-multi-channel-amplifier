@@ -120,8 +120,8 @@ def main():
     L.append(f"| Other DNP (variant jumpers/spares) | {sum(int(r['Qty']) for r in dnp if r['Block']!='BUFFER')} | ${sum(r['_ext'] for r in dnp if r['Block']!='BUFFER'):,.2f} |")
     L.append(f"| Enclosure (Hammond {CASE['mpn']}, ONE per board) | 1 | ${case_price:,.2f} |")
     L.append("")
-    L.append(f"- **One board, default build + case share:** ~${fit_total + case_price/2:,.2f} "
-             f"(${fit_total:,.2f} parts + half a ${case_price:,.0f} case).")
+    L.append(f"- **One board, default build + its 1U case:** ~${fit_total + case_price:,.2f} "
+             f"(${fit_total:,.2f} parts + one ${case_price:,.0f} case; one case per board).")
     L.append(f"- **Fully buffered board (add THS3491 block):** ~${fit_total + sum(r['_ext'] for r in dnp if r['Block']=='BUFFER'):,.2f} parts.")
     L.append("- The BOM is **Cremat-module dominated** (~%.0f%% of parts cost); passives are noise.\n"
              % (100 * crem_total / fit_total))
@@ -163,7 +163,7 @@ def main():
     L.append("")
 
     # ---- enclosure ----
-    L.append("## 4. Enclosure — Hammond 2U rack case (one per two stacked boards)\n")
+    L.append("## 4. Enclosure — Hammond 1U rack case (one per board)\n")
     L.append(f"- **Order:** {CASE['mfr']} **{CASE['mpn']}** — DigiKey [{CASE['dk']}]({CASE['url']}) "
              f"**${CASE['price']}** ({CASE['stock']} in stock) · Mouser [{CASE['mou']}]({CASE['mou_url']}) "
              f"· Hammond [part page]({CASE['vendor_url']}).")

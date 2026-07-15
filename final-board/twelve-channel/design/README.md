@@ -36,6 +36,9 @@ change before re-running `gen_pcb.py`).
 
 ## Result
 
-180 × 335 mm, 4-layer (widened from 138 mm to span the Hammond RM2U1908 2U case; the output/bias
-MCX row was shifted to the far edge with F.Cu trace extensions). 468 footprints (464 parts + 4 M3),
-4 plane zones. **DRC 0 violations / 0 unconnected / 0 schematic-parity.** Render: `twelve-channel-3d.png`.
+213.2 × 334.7 mm, 4-layer (widened 138 → 180 → 213.2 mm to span the Hammond RM1U1908VBK 1U case —
+one board per case, slot-through the front/rear panels; the output/bias MCX row was shifted to the
+far edge with F.Cu trace extensions). 468 footprints (464 refdes'd parts + 4 M3), 4 plane
+zones. (The BOM lists 500 line-item parts = the 464 placed + the 36 SIP-8 sockets, which
+share the module sites' PinSocket_1x08 footprints.)
+**DRC 0 violations / 0 unconnected / 0 schematic-parity.** Render: `twelve-channel-3d.png`.

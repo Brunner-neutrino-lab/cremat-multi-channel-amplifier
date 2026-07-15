@@ -3,7 +3,7 @@
 Net classes, trace widths, clearances, and HV considerations for the 12-channel amplifier.
 Modeled on the reference board and on `ets-breakout`'s net-class scheme, with the addition
 of an explicit **HV bias** class because this board now carries the per-channel detector
-bias nets (12× `BIAS_IN`, ≤ 60 V).
+bias nets (12× `BIAS_IN`, ≤ 70 V).
 
 Set these in the KiCad project (`*.kicad_pro`) so they apply automatically by net name.
 
@@ -44,25 +44,29 @@ only HV class; give it the most clearance and keep it off plane edges.
 | Clearance | 0.2 mm |
 
 Use for `OUT` (50 Ω-driven). Match the reference board's pattern of a dedicated class for
-the coax-driven nets. Apply controlled impedance only if `OUT` runs are long.
+the coax-driven nets. This board is **not** ordered as controlled impedance — see
+[Stackup](#stackup) for why transmission-line effects are negligible at the ~1 µs pulse
+bandwidth.
 
 ---
 
 ## HV clearance / creepage (per-channel bias nets)
 
-The detector bias sets the minimum spacing on the `hv_bias` class. **Bias is ≤ 60 V (D1)**
-→ use the **≤ 100 V row (~1.0 mm)**; parts (`Cc`,`Cf`) stay rated 100 V for margin.
+The detector bias sets the minimum spacing on the `hv_bias` class. **Bias is confirmed
+≤ 70 V**, so the `hv_bias` class is fabbed with **0.6 mm clearance/creepage** (with the
+0.4 mm track above); parts (`Cc`,`Cf`) stay rated 100 V for margin.
 
 | Bias voltage | Min clearance/creepage (uncoated FR4, guide) |
 |---|---|
 | ≤ 50 V | 0.5 mm |
-| **≤ 100 V (this board, 60 V)** | **1.0 mm** |
+| **≤ 70 V (this board → `hv_bias` class)** | **0.6 mm (as fabbed)** |
 | ≤ 250 V | 2.0 mm |
 
 These are conservative starting points (IPC-2221 B internal/external, no conformal
 coating). Tighten only with justification. Enforce via the `hv_bias` clearance and KiCad's
 **creepage** DRC rule (treat creepage/clearance violations as **errors**, as the reference
-project does).
+project does). The final board's live DRC confirms the 0.6 mm `hv_bias` clearance with
+**0 errors**.
 
 ---
 
@@ -91,9 +95,25 @@ same gate `ets-breakout` enforces.
 
 ## Stackup
 
-- Start from the fab's default **4-layer 1.6 mm** stack (sig / GND / GND or power / sig),
-  as `ets-breakout` did, for a continuous ground reference under the analog chain.
-- A 2-layer board is acceptable if density allows, but a ground plane under the front-end
-  and output is strongly preferred for noise.
-- If `OUT` is run as controlled impedance, **order as controlled impedance** so the fab
-  tunes trace width to their measured stack (per `ets-breakout`'s note).
+Fabbed at **JLCPCB on their standard 4-layer 1.6 mm stackup `JLC04161H-7628`** — a **normal,
+non-impedance-controlled** build:
+
+| Layer | Copper | Assignment | Dielectric below |
+|---|---|---|---|
+| **L1 (F.Cu)** | 1 oz | signal / pour | 0.2104 mm **7628 prepreg** (Dk ≈ 4.4) |
+| **L2 (In1)** | 0.5 oz | **GND plane** | 1.065 mm **core** (Dk ≈ 4.6) |
+| **L3 (In2)** | 0.5 oz | **−VDC plane** | 0.2104 mm **7628 prepreg** |
+| **L4 (B.Cu)** | 1 oz | **+VDC pour** | — |
+
+Total ≈ 1.6 mm. A solid **GND plane (In1)** sits directly under the outer signal layers for a
+continuous return reference under the analog chain.
+
+- **Do NOT order controlled impedance.** The fastest signal on the board is a ~1 µs Gaussian
+  pulse (knee ≈ 300–350 kHz); a quarter-wave in FR-4 at that bandwidth is ~100 m — roughly
+  1000× any trace here — so reflections / ringing / mismatch are negligible. Controlled
+  impedance would only add cost, lock the stackup, and tighten the design rules for zero
+  benefit. Order as a **normal (non-impedance) 4-layer** build.
+- **Impedance reference (informational, not ordered):** a 50 Ω single-ended microstrip on an
+  outer layer over the adjacent In1 plane (across the 0.2104 mm 7628 prepreg) is ≈ 0.35 mm
+  wide on this stack. The `signal` class (0.33 mm) lands ~51–53 Ω over that plane essentially
+  by coincidence — keep 0.33 mm for **etch / current robustness**, not for impedance.

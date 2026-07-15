@@ -19,9 +19,10 @@ coax IN ─► Cc ─► CR-113 (CSP) ─► CR-200-X (shaper, P/Z trim) ─► 
 - Instantiate the channel cell **12 times** instead of 6.
 - Power entry + bulk decoupling (the shared `±Vs`/`GND`) scale to 12 channels; bias is
   per-channel (no shared rail — see Change 4).
-- Mechanical: ~2× the channel area; the outline is sized for **two boards side-by-side in
-  a rack box** and must fit **36 MCX jacks** (12× `BIAS_IN` + `SIPM` + `OUT`) plus the
-  ±Vs/GND entry. See [hardware/board.md](hardware/board.md).
+- Mechanical: ~2× the channel area; the outline (**213.2 × 334.7 mm**) fits **one board per
+  1U Hammond RM1U1908VBK case** (boards daisy-chained, each in its own box) and must fit
+  **48 MCX jacks** (12× `BIAS_IN` + `SIPM` + `TEST` + `OUT_50`) plus the two 3-pos power
+  terminals (`J_PWR` in, `J_DAISY` out). See [hardware/board.md](hardware/board.md).
 
 **Rationale:** denser detector coverage per board; same per-channel electronics.
 
@@ -34,7 +35,7 @@ coax IN ─► Cc ─► CR-113 (CSP) ─► CR-200-X (shaper, P/Z trim) ─► 
   zero-ohm link). Solder-jumper footprints remain an option for the smallest bypasses.
 - **Not 0805** (physically can't be), keep as-is:
   - Cremat modules **CR-11X / CR-200-X / CR-210** — 8-pin SIP through-hole, 0.1" pitch.
-  - Op-amps **EL5167** (SOT-23-5) / **LM7321** (SOT-23-5 / SO-8).
+  - Output buffer **TI THS3491** (8-pin SOIC / PowerPAD) — DNP by default, a 0R jumper bypasses it.
   - Trimpots (`RV*`), coax jacks (`SIPM`, `OUT`), power entry.
 - Watch voltage rating when forcing 0805: the AC-coupling cap `Cc` and the bias-filter
   parts see the full SiPM bias — keep them in an 0805 part **rated ≥ the bias voltage**
@@ -76,8 +77,11 @@ This mirrors Cremat's own open-source eval board
   | **CR-210** | input | **GND** | GND | -Vs | +Vs | GND | GND | output |
   | CR-200 | input | P/Z | GND | -Vs | +Vs | GND | GND | output |
 
-  Reuse the existing CR-200 SIP-8 footprint; the symbol/footprint live in the reference
-  board's `CR-160-R7-cache.lib` ([hardware/component-libraries.md](hardware/component-libraries.md)).
+  The CR-210 uses the same SIP-8 module footprint as the CR-200. **All three Cremat modules
+  are socketed** — the board mounts Samtec **SS-108-TT-2** SIP-8 sockets (stock KiCad
+  `PinSocket_1x08_P2.54mm_Vertical`, 36/board) and the modules plug in (never soldered). The
+  symbol lives in the reference board's `CR-160-R7-cache.lib`
+  ([hardware/component-libraries.md](hardware/component-libraries.md)).
 - The CR-210 shares the `+VDC`/`-VDC`/`GND` rails and gets its own decoupling, like the
   other modules.
 
@@ -90,9 +94,10 @@ low-rate / minimal-latency use (bypassed) without a layout change.
 
 This is the largest topology change. The reference board had **one coax input** carrying
 an already-biased signal. This board adds, **per channel**, its own **`BIAS_IN` jack and
-`SIPM` jack** (both MCX `CONMCX013`, alongside the channel's `OUT` jack → 3 MCX/channel),
-with an optional bias filter, arranged so the detector and the amplifier share one biased
-node. **`BIAS_IN` is per-channel — there is no shared on-board bias rail** (bias ≤ 60 V):
+`SIPM` jack** (both MCX `CONMCX013`, alongside the channel's `TEST` and `OUT_50` jacks →
+4 MCX/channel, 48/board), with an optional bias filter, arranged so the detector and the
+amplifier share one biased node. **`BIAS_IN` is per-channel — there is no shared on-board
+bias rail** (bias ≤ 70 V):
 
 ```
                           bias filter (optional, 0R-bypassable)

@@ -109,7 +109,7 @@ tracks + vias appear on the board.
 
 ## Notes
 
-- Net classes (`hv_bias` 1.0 mm, `power`, `signal`, `Default`) are in the `.kicad_pro` and
+- Net classes (`hv_bias` 0.6 mm, `power`, `signal`, `Default`) are in the `.kicad_pro` and
   are written into the DSN, so FreeRouting honors the HV bias clearance.
 - FreeRouting respects the board outline (`Edge.Cuts`) as the routing boundary and treats
   zones/keepouts accordingly.

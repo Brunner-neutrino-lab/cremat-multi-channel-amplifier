@@ -9,7 +9,7 @@ confirmed from the Cremat open-source boards; values from
 ```
 multi-channel-cremat-amplifier.kicad_sch   (root)
   ├─ power: J_PWR screw terminal → +VDC / -VDC / GND distributed to all sheets
-  └─ channel.kicad_sch  ×12   (each instance carries its own 3 MCX jacks)
+  └─ channel.kicad_sch  ×12   (each instance carries its own 4 MCX jacks)
 ```
 
 The channel sheet has **three hierarchical pins only: `+VDC`, `-VDC`, `GND`** (the shared
@@ -31,8 +31,11 @@ is therefore per-channel (its own `J_BIAS` MCX on the sheet), not a shared rail.
 | 8 | output | output | output |
 
 (CR-200/CR-210 from `reference/cremat-CR-160-R7`; CR-11X from `reference/cremat-CR-150-R5`.
-CR-210 = CR-200 except pin 2: P/Z → GND.) Buffer `U_BUF` (EL5167/LM7321, SOT-23-5):
-1=OUT, 2=V-, 3=+IN, 4=-IN, 5=V+.
+CR-210 = CR-200 except pin 2: P/Z → GND.) Buffer `U_BUF` (**TI THS3491**, 8-pin
+HSOIC/DDA PowerPAD): as WIRED IN THIS DESIGN (`gen_sch.py`) — 1=GND (REF), 2=VIN− (feedback),
+3=VIN+ (input), 4=−VS, 5=NC, 6=VOUT, 7=+VS, 8=+VS (tied to pin 7 → PD held high = enabled).
+The **thermal pad (EP, pin 9) ties to −VS** (the DDA PowerPAD is internally connected to −VS),
+**not** to GND.
 
 ## Per-channel net → pin map
 
@@ -48,30 +51,42 @@ BUF_OUT, OUT`. Shared (hierarchical): `+VDC, -VDC, GND`.
 | `CSP_OUT` | `U_CSP`.8 · `U_SHAPER`.1 |
 | `PZ` | `U_SHAPER`.2 · `RV_PZ` (pole-zero network, see note) |
 | `SH_OUT` | `U_SHAPER`.8 · `U_BLR`.1 · `JP_BLR`.1 |
-| `BLR_OUT` | `U_BLR`.8 · `JP_BLR`.2 · buffer input network (→ `U_BUF`.3 via reference Rin) |
-| `BUF_OUT` | `U_BUF`.1 · `R_OUT`.1 · buffer feedback network |
-| `OUT` | `R_OUT`.2 · `J_OUT`.1 (center) |
-| `+VDC` | `U_CSP`.6 · `U_SHAPER`.5 · `U_BLR`.5 · `U_BUF`.5 · decoupling |
-| `-VDC` | `U_CSP`.5 · `U_SHAPER`.4 · `U_BLR`.4 · `U_BUF`.2 · decoupling |
-| `GND` | `U_CSP`.{2,4,7} · `U_SHAPER`.{3,6,7} · `U_BLR`.{2,3,6,7} · `Cf`.2 · `J_*`.2 (shields) · decoupling returns |
+| `BLR_OUT` | `U_BLR`.8 · `JP_BLR`.2 · `JP_BUF`.1 · buffer input network (→ `U_BUF`.3 = VIN+ via Rin) |
+| `BUF_OUT` | `U_BUF`.6 (VOUT) · `R_OUT`.1 · `JP_BUF`.2 · buffer feedback network (→ `U_BUF`.2 = VIN−) |
+| `OUT` | `R_OUT`.2 · `J_OUT`.1 (center, the 50 Ω `OUT_50` jack) |
+| `+VDC` | `U_CSP`.6 · `U_SHAPER`.5 · `U_BLR`.5 · `U_BUF`.7 (+VS) · `U_BUF`.8 (+VS, tied to pin 7) · decoupling |
+| `-VDC` | `U_CSP`.5 · `U_SHAPER`.4 · `U_BLR`.4 · `U_BUF`.4 (−VS) · `U_BUF`.9 (thermal pad / EP → −VS) · decoupling |
+| `GND` | `U_CSP`.{2,4,7} · `U_SHAPER`.{3,6,7} · `U_BLR`.{2,3,6,7} · `U_BUF`.1 (REF → GND) · `U_BUF`.5 (NC) · `Cf`.2 · `J_*`.2 (shields) · decoupling returns |
 
-## The two bypass jumpers (populate-XOR)
+> Each channel has a **4th MCX, `J_TEST`** (charge-injection input), in addition to
+> `J_BIAS`, `J_SIPM`, `J_OUT` (= the 50 Ω `OUT_50`) above — 4 jacks/channel, 48/board. It
+> couples into the CSP input (`CSP_IN`) through a small test capacitor per the reference
+> channel; its exact network is finalized at schematic capture.
+
+## The three bypass jumpers (populate-XOR)
 
 - **Bias filter:** `JP_Rf1` parallels `Rf1` (`BIAS_IN`↔`N_filt`); `JP_Rf2` parallels `Rf2`
   (`N_filt`↔`FE`). Fitted filter ⇒ `Rf1/Rf2/Cf` populated, `JP_Rf*` DNP. Bypassed ⇒ `JP_Rf*`
   = 0 Ω, `Rf1/Rf2/Cf` DNP ⇒ `BIAS_IN`=`FE` (straight through).
 - **CR-210:** `JP_BLR` parallels the module (`SH_OUT`↔`BLR_OUT`). Fitted ⇒ `U_BLR`
   populated, `JP_BLR` DNP. Bypassed ⇒ `JP_BLR` = 0 Ω, `U_BLR` DNP ⇒ `SH_OUT`=`BLR_OUT`.
+- **THS3491 buffer:** `JP_BUF` parallels the buffer (`BLR_OUT`↔`BUF_OUT`). **Default build
+  is bypassed** ⇒ `JP_BUF` = 0 Ω, `U_BUF` DNP ⇒ `BLR_OUT`=`BUF_OUT` (shaper/BLR drives
+  `R_OUT` directly). Buffered ⇒ `U_BUF` populated, `JP_BUF` DNP.
 
 This mirrors the CR-160-R7 `JU1`-across-the-module pattern (now an 0805 0R).
 
 ## Notes for capture (carry from the reference channel)
 
-- **Pole-zero network** (`U_SHAPER`.2) and the **output buffer** (gain/offset trims
-  `RV_GAIN`/`RV_OFS`, feedback + input resistors, decoupling) follow
-  `reference/cremat-x6-board/channel.kicad_sch` — reuse that sub-circuit verbatim, only
-  resizing passives to 0805. The reference buffer used EL5163/LM7321 with a `49.9 Ω`
-  series output; values R14/R22/R23/R24/R26/R27/… carry over.
+- **Pole-zero network** (`U_SHAPER`.2, `RV_PZ` 200 kΩ 25-turn) follows
+  `reference/cremat-x6-board/channel.kicad_sch` — reuse that sub-circuit, resizing passives
+  to 0805.
+- **Output buffer** is now a **TI THS3491** CFA (8-pin HSOIC/PowerPAD), **DNP by default**
+  with a `JP_BUF` 0R bypass so the shaper/BLR drives `R_OUT` (49.9 Ω) directly. When fitted,
+  set gain with its own `Rf`/`Rg` per the THS3491 datasheet — **there are no gain/offset
+  trimpots** (the EL5163/LM7321-era `RV_GAIN`/`RV_OFS` are gone). Give it its own ±VS
+  decoupling. Per the schematic: pin 8 ties to +VS (holds PD high = enabled), pin 1 (REF)
+  ties to GND, and the thermal pad (EP, pin 9) ties to −VS.
 - **Decoupling:** 0.1 µF / 1 µF / 10 µF per `±Vs` rail at each module, per the reference.
 - **Capture technique:** internal nets can be wired by **local labels** (the names above);
   only `+VDC/-VDC/GND` need hierarchical pins. This keeps the 12× instantiation clean.

@@ -7,9 +7,10 @@
 > from the reworked single channel (`integration/single-channel/`) as a KiCad **hierarchical**
 > design (channel sheet instantiated 12×) with a **tile-and-replicate** layout (one routed
 > channel row stamped 12× — all 12 blocks geometrically identical = matched parasitics).
-> Board **180 × 335 mm**, 4-layer (widened from 138 mm so the two MCX rows reach the front/back
-> bulkheads of a **Hammond RM2U1908** 2U rack case — see `design/gen_pcb.py` `W`, adjustable to
-> the box's real internal depth).
+> Board **213.2 × 334.7 mm**, 4-layer (widened 138 → 180 → 213.2 mm so the two MCX rows pass
+> through ~340 × 7 mm milled slots in the front/rear panels of a **Hammond RM1U1908VBK** 1U rack
+> case — one board per case, slot-through, board edge protruding ~5 mm — see `design/gen_pcb.py`
+> `W`, adjustable to the box's real internal depth).
 
 ## What this board is — 12 copies of the proven single channel + shared power
 
@@ -28,19 +29,19 @@ Each channel is the frozen single-channel cell reproduced verbatim (SiPM bias fr
 CR-112 CSP → CR-200 1 µs shaper → CR-210 BLR → TI THS3491 CFA buffer, 50 Ω back-terminated).
 The 4 MCX per channel (SIPM/TEST left edge, OUT_50/BIAS right edge) tile to 24 per long edge.
 
-## Power — one input feeds two stacked boards (24 channels in a 19" rack)
+## Power — one input feeds a daisy-chain of 1U boxes (12 channels per box)
 
-A 19" box can't fit 24 channels on one board, so the system is **two identical 12-channel
-boards stacked**. Each board self-protects and passes the raw supply through:
+A 1U box holds one 12-channel board, so more channels means **more daisy-chained boxes**, not
+boards stacked in one case. Each board self-protects and passes the raw supply through:
 
-- **`J_PWR`** (3-pos screw terminal): supply in — `+VDC_IN / GND / -VDC_IN`.
-- **`J_DAISY`** (3-pos screw terminal): same raw rails, in parallel → short cable to the next
-  board's `J_PWR`. So one supply feeds board 1; board 1 daisies to board 2.
-- Per board: reverse-polarity **series Schottky** (`D_RP/D_RN`, SS24 2 A) + fault-interrupt
+- **`J_PWR`** (3-pos 5.08 mm screw terminal): supply in — `+VDC_IN / GND / -VDC_IN`.
+- **`J_DAISY`** (3-pos 5.08 mm screw terminal): same raw rails, in parallel → short cable to the
+  next box's `J_PWR`. So one supply feeds box 1; box 1 daisies to box 2, and so on.
+- Per board: reverse-polarity **series Schottky** (`D_RP/D_RN`, SSA24 2 A) + fault-interrupt
   **PTC** (`F_P/F_N`, ~1.1 A hold — up-rated from the single channel's 0.1 A for 12× current)
   → board rails; **470 µF** central bulk (`C_BULKP/C_BULKN`) backs the 12× distributed 10 µF.
-- Board 1's input trace/connector carries **both** boards' current (~0.9-1.1 A/rail); each
-  board's protection sees only its own 12 channels (~0.3-0.5 A/rail).
+- Box 1's input trace/connector carries the current for every downstream box (~0.9-1.1 A/rail for
+  two boxes); each board's protection sees only its own 12 channels (~0.3-0.5 A/rail).
 
 ## Nets — hierarchical scoping
 
@@ -68,8 +69,9 @@ moves refdes to F.Fab. Gate: `kicad-cli pcb drc --schematic-parity`.
 
 ## Status / open items
 
-- **BOM** — `models-bom/twelve-channel-bom.csv` regenerated (23 line items, 464 parts: 344 FIT
-  + 120 DNP), enriched from the single-channel BOM. Generator: `models-bom/gen_bom.py`.
+- **BOM** — `models-bom/twelve-channel-bom.csv` regenerated (24 line items, 500 parts: 380 FIT
+  + 120 DNP, including the 36 socketed-Cremat SIP-8 sockets), enriched from the single-channel
+  BOM. Generator: `models-bom/gen_bom.py`.
 - **Common-power MPNs verified in-stock 2026-07-08** (`models-bom/SOURCING-VERIFICATION-2026-07-08.md`):
   Littelfuse `1812L110/24DR` PTC (1.1 A/24 V), onsemi `SSA24` Schottky (2 A/40 V SMA), Panasonic
   `EEE-FN1V471UP` 470 µF/35 V — all three provisional picks were rejected (obsolete / wrong

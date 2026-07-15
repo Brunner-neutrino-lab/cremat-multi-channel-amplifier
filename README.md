@@ -27,8 +27,8 @@ from the Brunner-lab **6-channel Cremat CSP & Shaper board**
                     Cf            ├─────────────► SIPM   (DC-coupled: reverse-biases the detector)
                      │            │
                     GND           └─► Cc ─► CR-11X ─► CR-200-X ─► [CR-210] ─► buffer ─► OUTPUT
-                                     (AC)   CSP        shaper     BLR(opt)   EL5167/    (50 Ω
-                                                       +P/Z trim  0R-byp.    LM7321      coax)
+                                     (AC)   CSP        shaper     BLR(opt)   THS3491    (50 Ω
+                                                       +P/Z trim  0R-byp.    DNP-def     coax)
 ```
 
 - **`BIAS_IN` → bias filter → front-end node.** "RC in series with R": series `Rf1`,
@@ -92,15 +92,20 @@ git submodule update --init --recursive
   + fab (Tracks 6–7)** remain — guide: [hardware/BUILD-IN-KICAD.md](hardware/BUILD-IN-KICAD.md).
 - **CR-210 pinout + bypass-jumper integration: confirmed** against Cremat's open-source
   [CR-160-R7](reference/cremat-CR-160-R7/) board (pin 2 = GND vs the CR-200's P/Z).
-- **Build decisions resolved** (D1–D6, see the plan): bias ≤ 60 V (100 V parts); all
-  per-channel I/O is **MCX `CONMCX013`** (`BIAS_IN`, `SIPM`, `OUT` — **`BIAS_IN` is
-  per-channel**, 36 MCX/board); modules **CR-112** + **CR-200-1µs** (+ CR-210); rack-mounted,
-  two boards per box; first build = Full.
+- **Build decisions resolved** (D1–D6, see the plan): bias ≤ 70 V (100 V parts); all
+  per-channel I/O is **MCX `CONMCX013`** (`BIAS_IN`, `SIPM`, `TEST`, `OUT_50` — **`BIAS_IN` is
+  per-channel**, 4/channel → 48 MCX/board); modules **CR-112** + **CR-200-1µs** (+ CR-210),
+  **socketed** on Samtec SS-108-TT-2 SIP-8 sockets (36/board), the modules plug in; rack-mounted,
+  **one board per 1U Hammond RM1U1908VBK case, boards daisy-chained**; first build = Full.
 - **Front-end designed for the Hamamatsu VUV4** (S13370, 45–55 V, ≈220 fC/V, Cdet≈1.28 nF):
   bias filter `Rf1=Rf2=10 kΩ`, `Cf=100 nF`, `Cc=0.22 µF`; cathode-on-node +45–55 V; CR-112
   ([docs/hardware/circuit-design.md](docs/hardware/circuit-design.md)).
-- **Enclosure (D5):** **1U** rack tray ≈ 482 × 244 mm; boards **open** (no panel/cutouts),
-  two side-by-side on standoffs → per-board outline ≈ 225 × 235 mm, tall parts < ~35 mm.
-  Inputs (`BIAS_IN`+`SIPM`) on one long edge, outputs (`OUT`) on the other.
-- **Open items**: power-connector choice + final jack/outline placement (Track 4), and
-  bench-verify (CR-112 output sign, warm/cold OV offset, single-p.e. range, P/Z trim).
+- **Enclosure (D5):** **Hammond RM1U1908VBK** (1U, vented), **one board per case**; boards are
+  **daisy-chained** (each board in its own 1U box, `J_DAISY` passes the raw rails box-to-box).
+  Board outline **213.2 × 334.7 mm**; it mounts on standoffs off the bottom cover and passes
+  **through a ~340 × 7 mm milled slot** in each front/rear panel (slot-through, protruding ~5 mm;
+  the MCX faces sit ~8.6 mm proud). Usable interior height 40.09 mm; tall parts must clear it.
+  Inputs (`BIAS_IN`+`SIPM`) on one long edge, outputs (`OUT_50`) on the other (24 MCX per long edge).
+- **Open items**: final jack/outline placement (Track 4), and bench-verify (CR-112 output
+  sign, warm/cold OV offset, single-p.e. range, P/Z trim). Power terminals are resolved —
+  two 3-pos 5.08 mm Phoenix screw terminals, `J_PWR` (supply in) + `J_DAISY` (raw rails out).

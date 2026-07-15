@@ -1,5 +1,10 @@
 # Building the board in KiCad (Tracks 5 → 6 → 7)
 
+> **Superseded 2026-07-11.** The board was ultimately built via `integration/single-channel/`
+> → `final-board/twelve-channel/` (213.2 × 334.7 mm, 4-layer, order-ready), not this `hardware/`
+> skeleton. Use `final-board/twelve-channel/` (HANDOFF.md, ORDERING.md) as the source of truth;
+> the steps below describe the earlier `hardware/`-track plan.
+
 Everything up to schematic capture is done and validated: the symbol library
 ([lib/cremat.kicad_sym](lib/cremat.kicad_sym)), the project + net classes
 ([multi-channel-cremat-amplifier.kicad_pro](multi-channel-cremat-amplifier.kicad_pro)),
@@ -34,7 +39,7 @@ buffer for the reference's exact gain/P-Z network, or tidying placement). **Trac
    [integration-notes.md](integration-notes.md):
    - Place: `J_BIAS`, `J_SIPM`, `J_OUT` (Conn_Coaxial), `Rf1`, `Rf2`, `Cf`, `JP_Rf1`,
      `JP_Rf2`, `Cc`, `U_CSP` (cremat:CR-11X), `U_SHAPER` (cremat:CR-200), `U_BLR`
-     (cremat:CR-210), `JP_BLR`, `U_BUF` (cremat:EL5167), `R_OUT`, trimpots, decoupling.
+     (cremat:CR-210), `JP_BLR`, `U_BUF` (cremat:THS3491xDDA, DNP by default), `R_OUT`, trimpots, decoupling.
    - Wire by the **net→pin table** in integration-notes.md. Internal nets (`BIAS_IN`,
      `N_filt`, `FE`, `CSP_IN`, `CSP_OUT`, `SH_OUT`, `PZ`, `BLR_OUT`, `BUF_OUT`, `OUT`) =
      local labels; `+VDC`/`-VDC`/`GND` = **hierarchical labels** (the only sheet ports).
@@ -75,7 +80,7 @@ grid, and the edge-launch MCX cutouts must be moved to the board edge. So the GU
    against the real tray interior first.
 3. **Placement:** 12 identical channel cells in rows; **inputs (`J_BIAS`+`J_SIPM`) on one
    long edge, `J_OUT` on the other** (signal flows across). Keep each front-end node compact.
-4. **Net classes** apply automatically (`hv_bias` ~1.0 mm creepage on `BIAS*`/`SIPM*`/`FE*`;
+4. **Net classes** apply automatically (`hv_bias` 0.6 mm clearance on `BIAS*`/`SIPM*`/`FE*`;
    `signal` 0.33 mm for `OUT*`; `power` 0.5 mm). Guard the front-end node.
 5. **Route** — either the KiCad interactive router, or **autoroute with FreeRouting**:
    clean placement (no clearance/short DRC) → `export_dsn.py` (or GUI Specctra DSN export)

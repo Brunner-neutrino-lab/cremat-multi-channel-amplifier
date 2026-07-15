@@ -1,5 +1,10 @@
 # Track Index & Status Board
 
+> **Superseded 2026-07-11** — historical coordination log. Dated gate entries below (e.g.
+> "235.1 × 264.1 mm", "bias ≤ 60 V") reflect intermediate states. Final board: 213.2 × 334.7 mm,
+> one per Hammond RM1U1908VBK 1U case (slot-through, daisy-chained), THS3491 buffer
+> (DNP-by-default), socketed Cremat modules, bias ≤ 70 V. See `final-board/twelve-channel/`.
+
 The Coordinator (Track 0) keeps this current. Each track updates its **own row** when its
 state changes (and keeps its `SESSION_REPORT.md` current). Status: `not-started` →
 `in-progress` → `blocked(<on>)` → `criteria-met` → `COMPLETE` (Coordinator sets COMPLETE).

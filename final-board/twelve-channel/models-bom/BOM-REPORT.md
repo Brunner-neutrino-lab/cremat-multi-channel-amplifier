@@ -1,7 +1,7 @@
 # BOM report — twelve-channel
 
 `twelve-channel-bom.csv` is generated from the board netlist + board by `gen_bom.py` (groups
-the 464 placed parts by MPN/value/DNP into purchasing line items, enriches each from the
+the 500 placed parts by MPN/value/DNP into purchasing line items, enriches each from the
 single-channel BOM by MPN; up-rated common-power parts from the sourcing verification).
 
 Regenerate: `"C:/Program Files/KiCad/10.0/bin/python.exe" gen_bom.py` (after any schematic/PCB
@@ -9,9 +9,11 @@ change + `sch export netlist`).
 
 ## Summary
 
-- **464 parts**, **23 line items** — **344 FIT** (default variant) + **120 DNP**.
-- Default variant ≈ **$237** in passives/connectors/protection **+ the 3 Cremat modules**
-  (CR-112 $65, CR-200 $59, CR-210 $77 each × 12 = **$2,412**) ≈ **$2,649/board**. The Cremat
+- **500 parts**, **24 line items** — **380 FIT** (default variant) + **120 DNP**. (The FIT count
+  now includes the 36 socketed-Cremat SIP-8 sockets, Samtec `SS-108-TT-2`.)
+- Default variant ≈ **$273** in passives/connectors/protection/sockets (incl. the 36 SIP-8
+  sockets) **+ the 3 Cremat modules** (CR-112 $55, CR-200 $55, CR-210 $77 each × 12 =
+  **$2,244**) ≈ **$2,517/board** (ex-case; matches `PURCHASING.md`). The Cremat
   SIP modules dominate cost and lead time — order early (made-to-order).
 
 ## Variants (populate options, per the single-channel scheme, × 12 channels)

@@ -1,5 +1,12 @@
 # Session report — Multi-channel Cremat amplifier (integration track)
 
+> **Superseded 2026-07-11 (historical setup-phase handoff).** The board is now BUILT and
+> order-ready: 213.2 × 334.7 mm, 4-layer, one per Hammond RM1U1908VBK 1U case (slot-through,
+> daisy-chained), THS3491 output buffer (DNP-by-default), socketed Cremat modules (Samtec
+> SS-108-TT-2). The mechanical/part figures below (e.g. 225 × 235 mm, two boards side-by-side,
+> EL5167) reflect the initial plan, not the final board. Current truth: `final-board/twelve-channel/`
+> (INTERFACE.md, HANDOFF.md, ORDERING.md, SESSION_LOG sessions 12–15).
+
 Handoff from the **organizing / integrating / managing** track. This session set up the
 repository, integrated the two reference projects as submodules, and authored the full
 design-specification documentation set for the modified 12-channel board. It did **not**

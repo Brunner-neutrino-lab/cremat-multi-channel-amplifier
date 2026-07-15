@@ -40,7 +40,7 @@ designed for it in [circuit-design.md](hardware/circuit-design.md).
    │   └─────────────────────────────────────────────┘                           │
    │            ⋮  (12 identical channels)             BIAS_IN12 / SIPM12 / OUT12 │
    └───────────────────────────────────────────────────────────────────────────┘
-        Every channel has its own 3 MCX jacks: BIAS_IN, SIPM, OUT (36 MCX total).
+        Every channel has its own 4 MCX jacks: BIAS_IN, SIPM, TEST, OUT_50 (48 MCX total).
 ```
 
 All 12 channels are **electrically identical** and instantiated from one hierarchical
@@ -61,9 +61,9 @@ supply is fanned to the 12 `BIAS_IN` jacks externally, or each channel is biased
                      │            │                    (DC-coupled: reverse-biases detector)
                     GND           │
                                   └─► Cc ─► [ CR-11X ] ─► [ CR-200-X ] ─► [ CR-210 ] ─► [ buffer ] ─► OUT
-                                     AC      charge-       Gaussian        baseline      EL5167 /     50 Ω
-                                     coupling sensitive     shaper          restorer      LM7321       coax
-                                              preamp        (+P/Z trim)     (optional)    (+gain trim)
+                                     AC      charge-       Gaussian        baseline      THS3491      50 Ω
+                                     coupling sensitive     shaper          restorer      CFA buf      coax
+                                              preamp        (+P/Z trim)     (optional)    (DNP by def)
 ```
 
 | Stage | Part (reference board) | Function | New? |
@@ -74,7 +74,7 @@ supply is fanned to the 12 `BIAS_IN` jacks externally, or each channel is biased
 | Charge-sensitive preamp | Cremat **CR-112** (CR-113 on ref.) | Integrate detector charge → voltage step | existing |
 | Shaping amplifier | Cremat **CR-200-1µs** | Gaussian pulse shaping (1 µs); pole-zero trimmed | existing |
 | Baseline restorer | Cremat **CR-210** | Hold baseline at ground at high rate | **New, optional** |
-| Output buffer | EL5167 / LM7321 + `49.9R` series | Drive 50 Ω coax; gain/offset trims | existing |
+| Output buffer | **TI THS3491** CFA + `49.9R` series | Drive 50 Ω coax — **DNP by default**; a 0R jumper bypasses it so the shaper/BLR drives the 49.9 Ω back-termination directly | existing (now **opt., DNP**) |
 
 See [hardware/channel.md](hardware/channel.md) for component-level detail and the bypass
 jumper scheme.
@@ -95,7 +95,7 @@ network onto the board means the **detector connects with one cable** (the on-bo
 bias-tee both biases the SiPM and reads it out on the `SIPM` jack), removes an external
 bias-tee, and lets the bias filter sit right at the detector node where it does the most
 good. The penalty is that the board now carries HV (the 12 per-channel `BIAS_IN` nets,
-≤ 60 V) — handled by net-class spacing and 100 V-rated parts (see
+≤ 70 V) — handled by net-class spacing and 100 V-rated parts (see
 [pcb-design-rules.md](hardware/pcb-design-rules.md)).
 
 ### Why everything optional is a jumper, not a switch
@@ -111,10 +111,10 @@ runtime switching. This matches the reference board's existing use of `SolderJum
 | Domain | Nets | Source | Notes |
 |---|---|---|---|
 | Analog supply | `+VDC` / `-VDC` (±Vs), `GND` | External dual rail (Cremat-style, typ. ±12 V) | Per-module + bulk decoupling; **shared** across channels |
-| Detector bias | `BIAS_IN<n>` (HV, ≤ 60 V) | External bias supply, fanned out | **Per-channel** jack → per-channel filter → SiPM. No shared on-board rail. |
+| Detector bias | `BIAS_IN<n>` (HV, ≤ 70 V) | External bias supply, fanned out | **Per-channel** jack → per-channel filter → SiPM. No shared on-board rail. |
 
 The analog supply and the detector bias are **independent**. `GND` is the common
-reference for both. The 12 `BIAS_IN<n>` nets are the only HV nets (≤ 60 V; parts rated
+reference for both. The 12 `BIAS_IN<n>` nets are the only HV nets (≤ 70 V; parts rated
 100 V) and each is kept on its own routing with widened creepage near its filter.
 
 ---

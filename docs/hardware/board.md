@@ -39,7 +39,7 @@ single distribution network on the root sheet feeds every channel.
 - Decoupling values follow the reference (per-rail 0.1 µF / 1 µF / 10 µF near modules),
   resized to 0805 where the voltage rating allows.
 - Keep each **`BIAS_IN<n>` net away from the ground plane edges** and honor HV creepage
-  (≤ 60 V → ~1.0 mm, [pcb-design-rules.md](pcb-design-rules.md)).
+  (≤ 70 V → 0.6 mm, [pcb-design-rules.md](pcb-design-rules.md)).
 
 ---
 
@@ -47,16 +47,20 @@ single distribution network on the root sheet feeds every channel.
 
 | Connector | Qty | Purpose | Part |
 |---|---|---|---|
-| `BIAS_IN` (per channel) | 12 | HV detector bias in (≤ 60 V), one per channel | **MCX edge-mount, TE Linx `CONMCX013`** (DK `343-CONMCX013-ND`) |
+| `BIAS_IN` (per channel) | 12 | HV detector bias in (≤ 70 V), one per channel | **MCX edge-mount, TE Linx `CONMCX013`** (DK `343-CONMCX013-ND`) |
 | `SIPM` (per channel) | 12 | Coax to each detector (DC bias + signal) | same `CONMCX013` |
-| `OUT` (per channel) | 12 | 50 Ω shaped output to DAQ | same `CONMCX013` |
-| Power (±Vs, GND) | 1 | Analog supply (shared) | **Screw terminal** (3-pos: +Vs / -Vs / GND), low-profile (< 1U) |
+| `TEST` (per channel) | 12 | Per-channel test-pulse injection / monitor | same `CONMCX013` |
+| `OUT_50` (per channel) | 12 | 50 Ω shaped output to DAQ | same `CONMCX013` |
+| `J_PWR` (supply in) | 1 | Analog supply in (±Vs, GND) | **3-pos 5.08 mm Phoenix screw terminal** |
+| `J_DAISY` (rails out) | 1 | Raw ±Vs / GND daisy-chained to the next 1U box | **3-pos 5.08 mm Phoenix screw terminal** |
 
-- **All three per-channel jacks are the same MCX part — `CONMCX013` — so 36 MCX/board.**
+- **All four per-channel jacks are the same MCX part — `CONMCX013` — so 48 MCX/board.**
   50 Ω, female, board-edge cutout, SMT. Track 1 pulls its datasheet/footprint/3D model
   ([component-libraries.md](component-libraries.md)).
-- Group each channel's `BIAS_IN` + `SIPM` + `OUT` near its cell to keep the bias node and
-  the output trace short. 36 edge jacks dominate the board outline and the panel layout.
+- **Two power terminals, not one:** `J_PWR` takes the supply in and `J_DAISY` passes the raw
+  rails out to the next 1U box — the power connector is not the only shared connector.
+- Group each channel's `BIAS_IN` + `SIPM` + `TEST` + `OUT_50` near its cell to keep the bias
+  node and the output trace short. 48 edge jacks dominate the board outline and the panel layout.
 
 ---
 
@@ -69,35 +73,36 @@ single distribution network on the root sheet feeds every channel.
    minimize the high-impedance amplifier-input copper. Consider a guard around it
    (the reference and `ets-breakout` both guard sensitive analog nodes).
 3. **Bias-net isolation.** Route each `BIAS_IN<n>` and its filtered bias as the `hv_bias`
-   net class with extra clearance (≤ 60 V → ~1.0 mm); do not run signal traces under it.
-4. **Output side is 50 Ω.** The `49.9R` + buffer drive coax; keep `OUT` traces short and
-   reference them to ground (controlled impedance only if trace length warrants).
+   net class with extra clearance (≤ 70 V → 0.6 mm); do not run signal traces under it.
+4. **Output side is 50 Ω.** The `49.9R` (with the THS3491 buffer DNP-bypassed by default)
+   drives the coax; keep `OUT` traces short and reference them to ground. The board is **not**
+   ordered controlled-impedance — the ~1 µs pulse bandwidth makes transmission-line effects
+   negligible (see [pcb-design-rules.md](pcb-design-rules.md)).
 5. **Ground plane** continuous under the analog chain for low-noise return.
 
 ---
 
-## Mechanical (D5 — 1U rack tray ≈ 482 × 244 mm, two open boards side-by-side)
+## Mechanical (D5 — 1U vented rack case, one board per case, slot-through panels)
 
-- **Box ≈ 482 mm × 244 mm × 1U** (482 mm ≈ 19" rack width, 244 mm deep, 1U ≈ 44.45 mm tall).
-- **Open mounting — the boards are NOT enclosed.** Each board is **mounted flat to the box
-  base** with the edge jacks exposed for **direct cable access from above/around. No front
-  panel, no bulkhead cutouts.** This removes the panel-alignment constraint entirely.
-- **Two 12-channel boards side-by-side** across the 482 mm → per-board outline budget
-  **≈ 225 (W) × 235 (D) mm** (482 ÷ 2 minus walls / center gap / clearance). Confirm against
-  the real interior.
-- **Height (1U):** every part — the vertical Cremat SIP-8 modules, trimpots, electrolytics,
-  and the MCX + its mated cable — must clear **~44.45 mm** above the base, minus
-  mounting-standoff height (~5–10 mm) → **keep the tallest parts under ~35 mm.** Board-edge
-  MCX with **horizontal cable exit** is a good fit for an open 1U tray (no vertical jacks).
-- **Connectors — the open tray relaxes the density problem.** With no single front panel,
-  jacks line **any edge** and cables exit directly. Recommended split (also matches signal
-  flow):
-  - **One long (~235 mm) edge = inputs:** 24 jacks (`BIAS_IN` + `SIPM`), ~9.8 mm pitch.
-  - **Opposite long edge = outputs:** 12 `OUT`, ~19.6 mm pitch.
-  This lays each channel out as **input-edge → amplifier chain → output-edge**. (36 MCX on a
-  single ~225 mm edge would be ~6.3 mm pitch — too tight — so split across the two long edges.)
-- **Power** connector on a free (short) edge.
-- **Mounting:** M3 standoffs from the board to the box base plate (no card guides needed).
+- **Board outline:** **213.2 × 334.7 mm**, 4-layer — **one** 12-channel board per case.
+- **Enclosure:** **Hammond RM1U1908VBK**, a **1U vented** rack case (1U outer ≈ 44.45 mm).
+  Usable interior: **196.85 mm deep × 40.09 mm high × 415.30 mm wide**. **One board per
+  case** — boards are never stacked or set side-by-side inside one box.
+- **Slot-through panel mount.** Each long (334.7 mm) board edge passes **through a
+  ~340 × 7 mm milled slot** in the front/rear panel and **protrudes ~5 mm**, so the
+  edge-mount MCX faces sit **~8.6 mm proud** of the panel and mate in the open (snap-on MCX).
+  This is **not** a bulkhead-flush mount and **not** an open tray — the board is captured by
+  the two panel slots and stands off the case **bottom cover** on M3 standoffs.
+- **Height (1U):** every part — the vertical socketed Cremat SIP-8 modules, the trimpots, the
+  bulk electrolytics, and the MCX + its mated cable — must fit the **40.09 mm** usable
+  interior height, minus standoff height.
+- **Edge jacks:** the **48 MCX** split **24 per long edge / panel** — one panel presents the
+  inputs (`BIAS_IN` + `SIPM`), the other presents `TEST` + `OUT_50` — so each channel lays out
+  as **input-edge → amplifier chain → output-edge**.
+- **Scaling: daisy-chain, don't widen.** More channels means more boards, each in its **own
+  1U RM1U1908VBK box**; **`J_DAISY`** carries the raw ±Vs / GND rails from one box to the next,
+  so supplies chain box-to-box instead of sharing a backplane. **Never** two boards in one
+  case, never an open rack tray, never open-air.
 - This drives Track 4 (mechanical) and constrains Track 6 (layout).
 
 > Board dimensions, exact jack placement, and the outline are defined in the KiCad PCB

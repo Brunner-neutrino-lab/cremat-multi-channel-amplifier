@@ -15,7 +15,7 @@
 | Other DNP (variant jumpers/spares) | 84 | $11.52 |
 | Enclosure (Hammond RM1U1908VBK, ONE per board) | 1 | $169.21 |
 
-- **One board, default build + case share:** ~$2,601.72 ($2,517.12 parts + half a $169 case).
+- **One board, default build + its 1U case:** ~$2,686.33 ($2,517.12 parts + one $169 case; one case per board).
 - **Fully buffered board (add THS3491 block):** ~$2,738.88 parts.
 - The BOM is **Cremat-module dominated** (~89% of parts cost); passives are noise.
 
@@ -62,7 +62,7 @@ The **output buffer** (THS3491 + 976R Rf) is DNP — bypassed by a 0R jumper. Po
 | 0R | RC0805JR-070RL | [311-0.0ARCT-ND](https://www.digikey.com/en/products/detail/yageo/RC0805JR-070RL/731163) | 36 | $0.10 | $3.60 | CSP |  |
 | 4.7 | RC0805JR-074R7L | [311-4.7ARCT-ND](https://www.digikey.com/en/products/detail/yageo/RC0805JR-074R7L/731273) | 24 | $0.10 | $2.40 | CSP |  |
 
-## 4. Enclosure — Hammond 2U rack case (one per two stacked boards)
+## 4. Enclosure — Hammond 1U rack case (one per board)
 
 - **Order:** Hammond Manufacturing **RM1U1908VBK** — DigiKey [HM1004-ND](https://www.digikey.com/en/products/detail/hammond-manufacturing/RM1U1908VBK/2094741) **$169.21** (70 (+26 factory) in stock) · Mouser [546-RM1U1908VBK](https://www.mouser.com/ProductDetail/Hammond-Manufacturing/RM1U1908VBK) · Hammond [part page](https://www.hammfg.com/part/RM1U1908VBK).
 - 1U 19-in rack case, VENTED black (Ø4.3 mm holes, 7.9 mm pitch - EMI-negligible apertures in the 1.6k-130 kHz signal band, needed for the ~13 W dissipation). ONE case per 12-ch board. Ext 203.2 D x 421.6 W x 43.7 H mm; internal depth 196.85 mm / height 40.09 mm / width 415.30 mm (factory drawing, verified 2026-07-11). Solid-cover alt: RM1U1908SBK (DK HM995-ND, $162.45, 123 stk). 13-in-deep alt if ever needed: RM1U1913SBK. Board W vs 196.85 mm interior sets the MCX recess at the panels - see design/SESSION_LOG.md session 13. Mount on standoffs off the bottom cover (no PCB bosses).
