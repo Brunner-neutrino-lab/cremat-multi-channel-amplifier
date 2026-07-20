@@ -125,13 +125,16 @@ def root_power_sym(net, x, y, key, rot=0):
 # =====================================================================================
 #  header / footer helpers
 # =====================================================================================
-def sheet_file(file_uuid, paper, nodes):
+def sheet_file(file_uuid, paper, nodes, is_root=False):
+    # ONLY the root sheet carries (sheet_instances (path "/" ...)). A hierarchical CHILD must NOT
+    # declare itself root -- if it does, KiCad opens the child (channel) as the top sheet instead
+    # of twelve-channel. Matches reference/cremat-x6-board, whose child has no sheet_instances block.
+    tail = '\n\t(sheet_instances\n\t\t(path "/" (page "1"))\n\t)' if is_root else ''
     return ('(kicad_sch\n\t(version 20260306)\n\t(generator "gen_sch.py")\n\t(generator_version "10.0")\n'
             '\t(uuid "%s")\n\t(paper "%s")\n'
             '\t(title_block\n\t\t(title "12-channel SiPM CSP+shaper+buffer")\n'
             '\t\t(company "Yale / Brunner Neutrino Lab")\n\t)\n%s\n%s\n\t(embedded_fonts no)\n)\n'
-            % (file_uuid, paper, sc.lib_symbols_block(),
-               "\n".join(nodes) + '\n\t(sheet_instances\n\t\t(path "/" (page "1"))\n\t)'))
+            % (file_uuid, paper, sc.lib_symbols_block(), "\n".join(nodes) + tail))
 
 # =====================================================================================
 #  CHILD  channel.kicad_sch
@@ -230,7 +233,7 @@ def build_root():
             '\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s" (page "%d"))\n\t\t\t)\n\t\t)\n\t)'
             % (x, y, SW, SHH, SHEET[n], n + 1, x, y - 0.7, x, y + SHH + 0.5, PROJ, ROOT_UUID, n + 2))
     open(os.path.join(HERE, "%s.kicad_sch" % PROJ), "w", encoding="utf-8").write(
-        sheet_file(ROOT_UUID, "A2", nodes))
+        sheet_file(ROOT_UUID, "A2", nodes, is_root=True))
     print("wrote %s.kicad_sch: %d sheet instances + %d common-power parts" % (PROJ, NCH, len(ROOT_ROLES)))
 
 # =====================================================================================

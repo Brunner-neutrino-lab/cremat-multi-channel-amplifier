@@ -6635,8 +6635,5 @@
 	(junction (at 320.04 63.5) (diameter 0.9144) (color 0 0 0 0) (uuid "25ca30e1-122d-57bc-b6da-ad7a78fdb21a"))
 	(junction (at 320.04 177.8) (diameter 0.9144) (color 0 0 0 0) (uuid "c3fc20f4-3fbc-5464-8ea9-ee334824f1c3"))
 	(junction (at 325.12 115.57) (diameter 0.9144) (color 0 0 0 0) (uuid "8db4df35-d22c-5b2a-9aa9-e169a9d61347"))
-	(sheet_instances
-		(path "/" (page "1"))
-	)
 	(embedded_fonts no)
 )
