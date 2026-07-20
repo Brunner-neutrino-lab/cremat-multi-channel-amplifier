@@ -40,7 +40,7 @@ only HV class; give it the most clearance and keep it off plane edges.
 ### `signal` — amplifier I/O, `OUT`
 | Parameter | Value |
 |---|---|
-| Track width | ~0.33 mm (≈50 Ω microstrip on a typical 4-layer stack, as `ets-breakout` used) |
+| Track width | ~0.33 mm signal (etch / current robustness; **not** impedance-tuned — the outer nets are grounded coplanar, see Stackup) |
 | Clearance | 0.2 mm |
 
 Use for `OUT` (50 Ω-driven). Match the reference board's pattern of a dedicated class for
@@ -113,7 +113,12 @@ continuous return reference under the analog chain.
   1000× any trace here — so reflections / ringing / mismatch are negligible. Controlled
   impedance would only add cost, lock the stackup, and tighten the design rules for zero
   benefit. Order as a **normal (non-impedance) 4-layer** build.
-- **Impedance reference (informational, not ordered):** a 50 Ω single-ended microstrip on an
-  outer layer over the adjacent In1 plane (across the 0.2104 mm 7628 prepreg) is ≈ 0.35 mm
-  wide on this stack. The `signal` class (0.33 mm) lands ~51–53 Ω over that plane essentially
-  by coincidence — keep 0.33 mm for **etch / current robustness**, not for impedance.
+- **The outer traces are grounded coplanar (GCPW), not microstrip.** Every F.Cu signal runs
+  inside the GND pour *and* over the In1 GND plane, so the coplanar side grounds add capacitance
+  and pull the impedance **below** a microstrip of the same width — a "microstrip 50 Ω" width
+  would read < 50 Ω here. Because we do **not** order controlled impedance (slow, sub-MHz analog
+  — see above), the exact width is immaterial: `signal` stays **0.33 mm for etch / current
+  robustness**, not for a target impedance. If impedance ever mattered, model it as **GCPW**
+  (trace width **and** the coplanar gap, plus the plane below) and **order controlled impedance**
+  so JLC tunes it to their etched stack — do not hand them a bare microstrip width, which ignores
+  the surrounding ground.

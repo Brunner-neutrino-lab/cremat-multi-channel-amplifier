@@ -33,6 +33,10 @@ edge-mount MCX (not an LCSC part). Everything else lands assembled.
 - Detected size 213.2 × 334.7 mm, **4 layers**, 1.6 mm, 1 oz outer / 0.5 oz inner, green.
 - Surface finish: **leaded HASL** ($73.70/5 boards incl. $25 eng fee + $5 large-size) or
   **ENIG** (+$24.70 → $98.40/5). ENIG is nicer for the MCX edge pads; HASL is fine.
+- **Impedance: leave OFF (normal build).** Do **not** request controlled impedance. If a
+  remarks/note field is offered, paste (≤200 char, JLC's limit):
+  > `4-layer, 1.6mm, JLC04161H-7628 stackup. No controlled impedance. Do not tune trace
+  > width; signals are grounded-coplanar (GND pour + inner GND plane), not microstrip.` *(165 chars)*
 - The board's 48 edge notches are routed slots ≥5 mm — well within capability; expect at
   most a manual engineering review, no surcharge (routing density ~12 m/m² vs 80 limit).
 - **PCB Assembly: Economic tier, top side, PCBA qty = 2** (board qualifies: 4L/1.6 mm/green/
