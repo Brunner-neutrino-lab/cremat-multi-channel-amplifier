@@ -257,6 +257,11 @@ def build_pro():
     d.setdefault("net_settings", {})["netclass_patterns"] = [
         {"netclass": nc, "pattern": p} for nc, p in NETCLASS_PATTERNS]
     d["sheets"] = [[ROOT_UUID, PROJ]] + [[SHEET[n], "ch%02d" % (n + 1)] for n in range(NCH)]
+    # CRITICAL: the single-channel .kicad_pro we copied lists channel.kicad_sch as the top-level
+    # sheet. Left as-is, KiCad's GUI opens the CHILD (channel) instead of twelve-channel. Point
+    # top_level_sheets at THIS project's root (kicad-cli ignores this key, but the GUI honors it).
+    d.setdefault("schematic", {})["top_level_sheets"] = [
+        {"filename": "%s.kicad_sch" % PROJ, "name": PROJ, "uuid": ROOT_UUID}]
     json.dump(d, open(os.path.join(HERE, "%s.kicad_pro" % PROJ), "w", encoding="utf-8"), indent=2)
     print("wrote %s.kicad_pro (%d net-class patterns, %d sheets)" % (PROJ, len(NETCLASS_PATTERNS), NCH + 1))
 

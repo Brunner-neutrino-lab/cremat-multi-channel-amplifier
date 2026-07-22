@@ -394,3 +394,21 @@ Engineer reviewing the board hit two issues:
    -o twelve-channel.pdf` → 13 pages (root block-diagram page 1 + 12 channel sheets). Regenerate
    the reviewable schematic PDF with that command; the PCB is viewed via `twelve-channel-3d.png`
    / the fab gerbers.
+
+---
+
+## 2026-07-11 — session 17 — REAL fix for "KiCad GUI opens the channel sheet"
+
+Session 16's guess (child `sheet_instances`) was NOT the cause — the engineer reproduced it on
+the fixed files. Actual root cause: **`twelve-channel.kicad_pro` → `schematic.top_level_sheets`
+pointed at `channel.kicad_sch`.** `build_pro()` copies the single-channel `channel.kicad_pro`
+(whose root genuinely IS channel) as its base and never re-pointed `top_level_sheets` to this
+project's root. **`kicad-cli` ignores `top_level_sheets` (filename-based root → opened
+twelve-channel, 13-page export)**, which is why every headless check passed — but the **GUI
+honors `top_level_sheets`** and opened the child. That's the kicad-cli-vs-GUI split.
+
+Fix: `build_pro()` now sets `top_level_sheets = [{filename: twelve-channel.kicad_sch, name:
+twelve-channel, uuid: ROOT_UUID}]`; patched the committed `.kicad_pro` in place too. Schematic
+`.kicad_sch` files unchanged (regen byte-identical), ERC 0, netclasses intact, board untouched.
+The single-channel `channel.kicad_pro` correctly keeps channel as its own root (not touched).
+(The session-16 `sheet_instances` cleanup + the schematic `twelve-channel.pdf` are still valid.)

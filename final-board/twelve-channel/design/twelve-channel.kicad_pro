@@ -430,9 +430,9 @@
     "legacy_lib_list": [],
     "top_level_sheets": [
       {
-        "filename": "channel.kicad_sch",
-        "name": "channel",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "filename": "twelve-channel.kicad_sch",
+        "name": "twelve-channel",
+        "uuid": "34920c42-dfa3-528a-8705-b164f9d1a6e1"
       }
     ]
   },
