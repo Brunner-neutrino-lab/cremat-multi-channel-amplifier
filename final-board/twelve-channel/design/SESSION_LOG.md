@@ -448,3 +448,78 @@ child's 5 rot-180 parts use centred justify so the swap is a no-op); `.kicad_pro
 root (session-17 fix intact). Refreshed `twelve-channel.pdf`. Fab outputs (gerber/CPL/BOM) are
 untouched — they derive from the PCB, not the schematic. Renders (KiCad → PDF, rasterised with
 the bundled PyMuPDF) confirmed each rail reads cleanly with no overlaps.
+
+---
+
+## 2026-07-22 — session 19 — clear the 48 `lib_footprint_mismatch` DRC warnings (MCX)
+
+`kicad-cli pcb drc --schematic-parity` on the final board reported **0 unconnected, 0 schematic
+parity**, and **48 `lib_footprint_mismatch` warnings** — the "tremendous amount of parity
+warnings" the engineer saw are these 48 (KiCad groups them with the parity section of the DRC
+dialog). All 48 were the MCX jack `cremat:MCX_CONMCX013-T`, each "Local override".
+
+Root cause: the library copy `lib/cremat.pretty/MCX_CONMCX013-T.kicad_mod` was **legacy
+KiCad-6/7 format** (`tedit`, `fp_text reference`) and, crucially, kept the MCX edge notch on
+**`Edge.Cuts`**, whereas the as-placed board footprints carry that notch on **`Dwgs.User`**
+(the deliberate "demote" `gen_pcb` documents, so the 48 notches don't each become a board-edge
+cut — the real notches are drawn once in the board outline). Orientation-normalised geometry
+diff (`pcbnew`): OLD vs board-as-built differ ONLY by those 3 notch lines' layer
+(Edge.Cuts→Dwgs.User); all 3 pads, courtyard, fab, silk, mask/paste and the 3D model are
+identical.
+
+Fix (what the engineer asked — "add the footprint to our library"): exported one board MCX
+instance, normalised to origin/0°/REF**, nets stripped, via `pcbnew.FootprintSave()` back into
+`cremat.pretty`, so the library copy is now the **as-built KiCad-10 footprint**. Did the same
+for the single-channel `integration/.../lib/cremat.pretty`. Only the two `.kicad_mod` library
+files changed — **no `.kicad_pcb` touched**.
+
+Verification: final board DRC now **0 / 0 / 0 / 0** (violations / unconnected / parity /
+mismatches); library footprint geometry proven equivalent to the as-built copy (only the notch
+layer moved, matching the board); the `${KIPRJMOD}/lib/cremat.pretty/CONMCX013-T.step` model is
+preserved and the 3D top render shows all 48 MCX jacks resolving; fab outputs untouched (board
+unchanged). Single-channel board also cleared its 4 MCX mismatches; its **45
+`footprint_symbol_field_mismatch`** are pre-existing on that dev testbed (session-18 changed no
+component fields — diff shows only power-symbol #PWR/#FLG markers moved, and those have no
+footprint — and the final board is 0 parity), so they're out of scope for the ordered board.
+(`MCX_CONMCX013_EdgeMount.kicad_mod` in the single-channel lib is an older, unreferenced name —
+harmless, left as-is.)
+
+---
+
+## 2026-07-22 — session 20 — REAL cause of GUI parity 199+: broken footprint↔symbol PATHS
+
+Engineer's GUI DRC showed **Schematic Parity 199+**, components looking disconnected, and —
+the decisive clue — **"Update PCB from Schematic" DUPLICATED every component**. That symptom =
+the footprint↔symbol **link is broken**: KiCad matches footprints to symbols by **UUID sheet-path**,
+not by reference.
+
+Root cause (in `gen_pcb.py`): **`parse_netlist` grabbed only the 36-char component tstamp and set
+each footprint path to `/<symbol_uuid>`**, dropping the per-channel sheet prefix. Our child sheet
+is instantiated **12× sharing ONE symbol uuid per role**, so the sheet prefix is the *only* thing
+that makes the 12 instances unique. Result: **468 footprints but only 47 distinct paths** — massive
+collisions, and none match the schematic's real symbol paths (`/<sheet>/<symbol>`). KiCad therefore
+links nothing → 199+ parity + duplicate-on-update. (My earlier ref-based parity check matched by
+`(ref,pad)` so it read "0 mismatches" — nets *were* right; only the UUID linkage was broken.)
+
+The correct path = **`sheetpath.tstamps` (root-omitted, e.g. `/559c…/`) + `component.tstamps`**,
+proven against the flat single-channel board (there sheetpath is just `/`, so `/symbol` is right —
+which is why *it* was never broken). Fixes:
+- **`gen_pcb.py`**: `parse_netlist` now builds the full `/sheet/symbol` path; both `SetPath()` sites
+  use it directly (root parts collapse to `/symbol` automatically).
+- **The existing routed board**: re-pathed in place with `pcbnew.SetPath()` (a metadata-only edit —
+  **no track/pad/zone touched**). 456 footprints re-pathed → **464 distinct paths** (+4 mounting
+  holes, no symbol). Verified: **DRC 0/0, pad-net parity 0, identical segment count (routing intact),
+  and a full BIJECTION** — every one of the 464 schematic symbols maps to exactly one footprint and
+  vice-versa (0 orphans either way). So "Update PCB from Schematic" now finds everything already
+  placed (no duplicates) and parity clears.
+
+Also fixed two real cosmetics found while investigating:
+- **Coax shield GND symbols pointed into the jack body** (legibility). New `coax_gnd()` helper stubs
+  each shield away and points GND outward (J_BIAS/J_TEST up, J_SIPM right, J_OUT50 down); added a
+  text-angle term to the power-symbol emitters so a rotated GND keeps upright "GND" text.
+- **`gen_sch` stamped a fictitious `(version 20260306)`** (real KiCad-10 = 20250114) → **20250114**.
+  Good hygiene (avoids a "newer-file" warning) but NOT the parity cause — the paths were.
+
+Not defects (confirmed): the "blue X" on U4 pin 2 is the correct `no_connect` on the THS3491 NC pin;
+a from-scratch dangling-end detector found **0 stray wire ends**; ERC 0. The single-channel dev
+board's 45 `footprint_symbol_field_mismatch` remain pre-existing/out-of-scope.

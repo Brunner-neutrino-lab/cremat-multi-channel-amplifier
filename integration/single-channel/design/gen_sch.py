@@ -42,7 +42,8 @@ CREMAT_SYM = os.path.join(HERE, "lib", "cremat.kicad_sym")
 STOCK = r"C:/Program Files/KiCad/10.0/share/kicad/symbols"
 PROJ = "channel"
 NS = uuid.UUID("b1c2d3e4-0000-4000-8000-000000000000")   # B1-namespaced (distinct from A1/A4)
-VERSION = "20260306"
+VERSION = "20250114"      # real KiCad-10 schematic format (the fictitious "20260306" made KiCad's GUI
+                          # treat the file as newer-than-itself and load it degraded -> phantom parity fails)
 
 def uid(*p): return str(uuid.uuid5(NS, ":".join(str(x) for x in p)))
 def G(v): return round(round(float(v) / 1.27) * 1.27, 4)  # snap to 1.27mm connection grid
@@ -339,14 +340,15 @@ def label(net, x, y, rot=0, j="left bottom"):
 
 def power_sym(net, x, y, key, rot=0):
     iu = uid(key, "pwr", net, x, y)
+    tang = (180 - (rot % 180)) % 180          # keep the "GND"/"+VDC" value text horizontal & upright when rotated
     return ('\t(symbol\n\t\t(lib_id "power:%s")\n\t\t(at %s %s %d)\n\t\t(unit 1)\n\t\t(body_style 1)\n'
             '\t\t(exclude_from_sim no)\n\t\t(in_bom yes)\n\t\t(on_board yes)\n\t\t(in_pos_files yes)\n'
             '\t\t(dnp no)\n\t\t(uuid "%s")\n'
-            '\t\t(property "Reference" "#PWR" (at %s %s 0) (hide yes) (effects (font (size 1.27 1.27))))\n'
-            '\t\t(property "Value" "%s" (at %s %s 0) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Reference" "#PWR" (at %s %s %d) (hide yes) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Value" "%s" (at %s %s %d) (effects (font (size 1.27 1.27))))\n'
             '\t\t(pin "1" (uuid "%s"))\n'
             '\t\t(instances (project "%s" (path "/%s" (reference "#PWR?") (unit 1))))\n\t)' % (
-        net, x, y, rot, iu, x, y - 3, net, x, y + 3, uid(iu, "pin"), PROJ, ROOT))
+        net, x, y, rot, iu, x, y - 3, tang, net, x, y + 3, tang, uid(iu, "pin"), PROJ, ROOT))
 
 def pwrflag(net, x, y, ref, rot=0):
     iu = uid(ROOT, "flag", net, ref)
@@ -420,6 +422,12 @@ def power_terminal(role):
     gx = p2[0] - 16.51                          # GND runs out past the -VDC_IN label column
     W(p2, (p2[0] - 6.35, p2[1]), (gx, p2[1])); pwr("GND", (gx, p2[1]))                       # GND points down
 
+def coax_gnd(role, dx, dy, rot):
+    """Coax shield (pin 2) -> GND on a short stub pointing AWAY from the jack body, so the ground
+    symbol + text sit clear of the connector instead of overlapping it (legibility)."""
+    p = P(role, "2"); q = (p[0] + dx, p[1] + dy)
+    W(p, q); pwr("GND", q, rot=rot)
+
 def rail_labels(role, npin, nnet, ppin, pnet):
     """Stub the -Vs and +Vs supply pins down below the pin-number row and spread their
     labels in opposite directions so the bipolar bias nets never merge/overlap the pins."""
@@ -461,7 +469,9 @@ def layout_channel():
     W(P("J_TEST", "1"), P("R_test", "1"), P("C_test", "1"))    # TEST_IN rail: J3 -- R5 tap -- C3
     lbl("TEST_IN", (69.85, 140.97))
     pwr("GND", P("R_test", "2"))                               # R5 lower leg to ground
-    for j in ("J_BIAS", "J_TEST", "J_SIPM"): pwr("GND", P(j, "2"))
+    coax_gnd("J_BIAS", 0.0, -3.81, 180)      # shield above the body -> GND points up/away
+    coax_gnd("J_TEST", 0.0, -3.81, 180)
+    coax_gnd("J_SIPM", 3.81, 0.0, 90)         # shield right of the body -> GND points right/away
 
     # ===== CR-112 CSP =====
     gnd_bus("U_CSP", ["2", "4", "7"], 128.27, sym_x=P("U_CSP", "7")[0])
@@ -527,7 +537,7 @@ def layout_channel():
     pwr("GND", (P("U_BUF", "1")[0], P("U_BUF", "1")[1] + 3.81))
     pwr("GND", P("R_GAIN", "2"))
     nc(P("U_BUF", "5"))
-    pwr("GND", P("J_OUT50", "2"))
+    coax_gnd("J_OUT50", 0.0, 3.81, 0)         # shield below the body -> GND points down/away
     deco("R_BVP", "C_BVPb", "BVP", "+VDC", top=True)
     deco("R_BVN", "C_BVNb", "BVN", "-VDC", top=False)
     # buffer-bypass 0R jumper (populate when the buffer block is DNP): SHAPER_OUT -> BUF_OUT

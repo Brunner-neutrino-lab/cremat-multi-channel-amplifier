@@ -59,10 +59,16 @@ def parse_netlist(path):
     for cm in re.finditer(r'\(comp\s+\(ref "([^"]+)"\)(.*?)(?=\(comp\s|\(libparts)', t, re.S):
         ref, body = cm.group(1), cm.group(2)
         fp = re.search(r'\(footprint "([^"]*)"\)', body)
-        uid = re.search(r'\(tstamps "([0-9a-fA-F-]{36})"\)', body)
+        m36 = re.search(r'\(tstamps "([0-9a-fA-F-]{36})"\)', body)     # component (symbol) tstamp
+        msp = re.search(r'\(tstamps "(/[0-9a-fA-F/-]*)"\)', body)      # sheetpath tstamps (root-omitted, ends '/')
+        # FULL hierarchical symbol path = sheetpath + symbol uuid. This MUST match the schematic or KiCad
+        # can't link footprint<->symbol: parity storms, and "Update PCB from Schematic" duplicates the whole
+        # board. The child sheet is instantiated 12x sharing ONE symbol uuid per role, so the per-channel
+        # sheet prefix is what makes each of the 12 instances unique -- the symbol uuid alone collides.
+        path = ((msp.group(1) if msp else "/") + m36.group(1)) if m36 else None
         val = re.search(r'\(value "([^"]*)"\)', body)
         fields = dict(re.findall(r'\(field\s+\(name "([^"]+)"\)\s*"([^"]*)"\)', body))
-        comps[ref] = (fp.group(1) if fp else "", uid.group(1) if uid else None,
+        comps[ref] = (fp.group(1) if fp else "", path,
                       val.group(1) if val else "", fields)
     pad_net = {}
     sec = t[t.index("(nets"):]
@@ -142,8 +148,8 @@ def main():
             role = SC_ROLE[fp.GetReference()]; nref = chref(role, n)
             d = dup(fp); out.Add(d); d.Move(off)
             d.SetReference(nref)
-            uid = TW_COMPS.get(nref, ("", None, "", {}))[1]
-            if uid: d.SetPath(pcbnew.KIID_PATH("/" + uid))
+            sym_path = TW_COMPS.get(nref, ("", None, "", {}))[1]
+            if sym_path: d.SetPath(pcbnew.KIID_PATH(sym_path))   # full /sheet/symbol path (already root-omitted)
             try: d.SetDNP(role in DNP_ROLES)
             except Exception: pass
             for pad in d.Pads():
@@ -247,7 +253,7 @@ def place_common(b, H):
         bb = fp.GetBoundingBox(False, False)
         cx = (bb.GetLeft() + bb.GetRight()) / 2e6; cy = (bb.GetTop() + bb.GetBottom()) / 2e6
         fp.SetPosition(V(x - cx, y - cy))
-        if uid: fp.SetPath(pcbnew.KIID_PATH("/" + uid))
+        if uid: fp.SetPath(pcbnew.KIID_PATH(uid))               # full path from netlist (root-level: "/" + symbol)
         if role in ("F_P", "F_N"):                      # KiCad ships no Fuse_1812 3D model; a PTC
             _set_model(fp, "${KICAD10_3DMODEL_DIR}/Resistor_SMD.3dshapes/R_1812_4532Metric.step")  # is a 1812 chip
         b.Add(fp)

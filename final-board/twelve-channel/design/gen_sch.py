@@ -83,13 +83,14 @@ def _alloc(ctr):
 def power_sym_multi(net, x, y, key, rot=0):
     refs = _alloc(PWRCTR); prefs = ["#PWR%d" % r for r in refs]
     iu = uid("pwr", net, x, y, refs[0])
+    tang = (180 - (rot % 180)) % 180          # keep value text upright when the symbol is rotated
     return ('\t(symbol\n\t\t(lib_id "power:%s")\n\t\t(at %s %s %d)\n\t\t(unit 1)\n\t\t(body_style 1)\n'
             '\t\t(exclude_from_sim no)\n\t\t(in_bom yes)\n\t\t(on_board yes)\n\t\t(in_pos_files yes)\n'
             '\t\t(dnp no)\n\t\t(uuid "%s")\n'
-            '\t\t(property "Reference" "%s" (at %s %s 0) (hide yes) (effects (font (size 1.27 1.27))))\n'
-            '\t\t(property "Value" "%s" (at %s %s 0) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Reference" "%s" (at %s %s %d) (hide yes) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Value" "%s" (at %s %s %d) (effects (font (size 1.27 1.27))))\n'
             '\t\t(pin "1" (uuid "%s"))\n'
-            '%s\n\t)' % (net, x, y, rot, iu, prefs[0], x, y - 3, net, x, y + 3,
+            '%s\n\t)' % (net, x, y, rot, iu, prefs[0], x, y - 3, tang, net, x, y + 3, tang,
                          uid(iu, "pin"), instances_multi(prefs)))
 
 def pwrflag_multi(net, x, y, ref, rot=0):
@@ -114,13 +115,14 @@ def root_power_sym(net, x, y, key, rot=0):
     iu = uid("rootpwr", net, x, y, pref)
     inst = ('\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s" (reference "%s") (unit 1))\n'
             '\t\t\t)\n\t\t)' % (PROJ, ROOT_UUID, pref))
+    tang = (180 - (rot % 180)) % 180          # keep value text upright when the symbol is rotated
     return ('\t(symbol\n\t\t(lib_id "power:%s")\n\t\t(at %s %s %d)\n\t\t(unit 1)\n\t\t(body_style 1)\n'
             '\t\t(exclude_from_sim no)\n\t\t(in_bom yes)\n\t\t(on_board yes)\n\t\t(in_pos_files yes)\n'
             '\t\t(dnp no)\n\t\t(uuid "%s")\n'
-            '\t\t(property "Reference" "%s" (at %s %s 0) (hide yes) (effects (font (size 1.27 1.27))))\n'
-            '\t\t(property "Value" "%s" (at %s %s 0) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Reference" "%s" (at %s %s %d) (hide yes) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Value" "%s" (at %s %s %d) (effects (font (size 1.27 1.27))))\n'
             '\t\t(pin "1" (uuid "%s"))\n%s\n\t)' % (
-        net, x, y, rot, iu, pref, x, y - 3, net, x, y + 3, uid(iu, "pin"), inst))
+        net, x, y, rot, iu, pref, x, y - 3, tang, net, x, y + 3, tang, uid(iu, "pin"), inst))
 
 # =====================================================================================
 #  header / footer helpers
@@ -130,7 +132,7 @@ def sheet_file(file_uuid, paper, nodes, is_root=False):
     # declare itself root -- if it does, KiCad opens the child (channel) as the top sheet instead
     # of twelve-channel. Matches reference/cremat-x6-board, whose child has no sheet_instances block.
     tail = '\n\t(sheet_instances\n\t\t(path "/" (page "1"))\n\t)' if is_root else ''
-    return ('(kicad_sch\n\t(version 20260306)\n\t(generator "gen_sch.py")\n\t(generator_version "10.0")\n'
+    return ('(kicad_sch\n\t(version 20250114)\n\t(generator "gen_sch.py")\n\t(generator_version "10.0")\n'
             '\t(uuid "%s")\n\t(paper "%s")\n'
             '\t(title_block\n\t\t(title "12-channel SiPM CSP+shaper+buffer")\n'
             '\t\t(company "Yale / Brunner Neutrino Lab")\n\t)\n%s\n%s\n\t(embedded_fonts no)\n)\n'
