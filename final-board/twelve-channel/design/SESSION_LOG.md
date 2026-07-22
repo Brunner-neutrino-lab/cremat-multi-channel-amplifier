@@ -412,3 +412,39 @@ twelve-channel, uuid: ROOT_UUID}]`; patched the committed `.kicad_pro` in place 
 `.kicad_sch` files unchanged (regen byte-identical), ERC 0, netclasses intact, board untouched.
 The single-channel `channel.kicad_pro` correctly keeps channel as its own root (not touched).
 (The session-16 `sheet_instances` cleanup + the schematic `twelve-channel.pdf` are still valid.)
+
+---
+
+## 2026-07-22 — session 18 — clean up the root common-power section (text/GND/wire cosmetics)
+
+Engineer review of the root `twelve-channel` power section flagged three cosmetic/connectivity
+issues (see the "before" at `_before` render): (a) net/ref/value labels overlapping — the two
+rails were only 12.7 mm apart while the uprated `PTC 1.1A 24V` value ran right across both
+columns; (b) GND symbols whose ground pin/text was buried in the adjacent part instead of
+pointing away; (c) power symbols dropped directly on component pins (no wire stub) so a GUI
+*move* detached them — "looks like lines, not wires".
+
+Re-laid the whole power block (single-channel `layout_power()` + the 7 board-part SPEC
+positions; `J_DAISY` in the 12-ch `build_root`) as **two spacious horizontal rails**:
+`+VDC_IN → [F PTC] → +VDC_F → [D Schottky] → +VDC → PWR_FLAG → [C_BULK] → GND`, +VDC on top /
+−VDC below. Node labels on the left, ref/value centred under each part, rail power-symbols and
+PWR_FLAGs on their own short **up-stubs pointing away**, one isolated GND+PWR_FLAG pair for ERC,
+and a shared `power_terminal()` helper for J_PWR/J_DAISY (GND runs out past the label column and
+points down). Bulk caps hang below their rail with the electrolytic **+** to the GND side.
+
+Two generator bugs fixed along the way:
+- **`text_pos` mis-classified `D_Schottky`** — its pins are horizontal at rot 0 (R/C/fuse are
+  vertical), so its text orientation is rotated 90° from the others (`horiz0` handling added).
+- **rot-180 symbols got left-justified text that KiCad flips to the right**, so a right-stacked
+  value rendered *over* the cap body. KiCad mirrors horizontal justify for a 180°-rotated symbol,
+  so `sym_instance` now pre-flips L↔R justify at rot 180 (`_flip_just_h`). `tang` (text angle)
+  kept at the original upright formula — the earlier `tang = rot` experiment rendered rot-180
+  text upside-down, confirming the angle was already correct and only justify was wrong.
+
+Verification: **ERC 0** (root + single-channel); **netlist partition IDENTICAL** to the pre-change
+baseline (271 nets, same pin-sets — pure cosmetics, connectivity untouched); the **12 child sheets
+are byte-identical** to HEAD (the power roles are board-level / excluded from the child, and the
+child's 5 rot-180 parts use centred justify so the swap is a no-op); `.kicad_pro` still opens the
+root (session-17 fix intact). Refreshed `twelve-channel.pdf`. Fab outputs (gerber/CPL/BOM) are
+untouched — they derive from the PCB, not the schematic. Renders (KiCad → PDF, rasterised with
+the bundled PyMuPDF) confirmed each rail reads cleanly with no overlaps.

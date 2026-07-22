@@ -235,8 +235,8 @@ SPEC = {
     "C_BLNb": ("Device:C", FP_C, False, {"1":"BLVN","2":"GND"},  (257.81,181.61,0)),
     "JP_BLR": ("Device:R", FP_R, True,  {"1":"SH_OUT","2":"SHAPER_OUT"}, (250.19,140.97,90)),
     # ---- board bulk electrolytics (power entry) ----------------------------------------
-    "C_BULKP":("Device:C_Polarized", FP_CPELEC, False, {"1":"+VDC","2":"GND"},  (68.58,200.66,  0)),
-    "C_BULKN":("Device:C_Polarized", FP_CPELEC, False, {"1":"GND","2":"-VDC"},  (81.28,201.93,180)),
+    "C_BULKP":("Device:C_Polarized", FP_CPELEC, False, {"1":"+VDC","2":"GND"},  (111.76,199.39,  0)),
+    "C_BULKN":("Device:C_Polarized", FP_CPELEC, False, {"1":"GND","2":"-VDC"},  (111.76,223.52,180)),
     # ---- THS3491 output buffer ---------------------------------------------------------
     "U_BUF":  ("cremat:THS3491xDDA", FP_SOIC8EP, True,
                {"1":"GND","2":"BUF_FB","3":"SHAPER_OUT","4":"BVN","5":"NC","6":"BUF_OUT","7":"BVP","8":"BVP","9":"BVN"},
@@ -253,13 +253,13 @@ SPEC = {
     "R_BVN":  ("Device:R", FP_R, True, {"1":"-VDC","2":"BVN"}, (312.42,173.99,0)),
     "C_BVNb": ("Device:C", FP_C, True, {"1":"BVN","2":"GND"},  (320.04,181.61,0)),
     # ---- rail protection: connector IN -> PTC fuse -> series Schottky reverse-block -> board rail ----
-    "F_P":    ("Device:Polyfuse_Small", FP_PTC, False, {"1":"+VDC_IN","2":"+VDC_F"}, ( 95.25,187.96,  0)),
-    "D_RP":   ("Device:D_Schottky",     FP_SCH, False, {"1":"+VDC","2":"+VDC_F"},    ( 95.25,195.58, 90)),
-    "F_N":    ("Device:Polyfuse_Small", FP_PTC, False, {"1":"-VDC_IN","2":"-VDC_F"}, (107.95,187.96,  0)),
-    "D_RN":   ("Device:D_Schottky",     FP_SCH, False, {"1":"-VDC_F","2":"-VDC"},    (107.95,195.58,270)),
+    "F_P":    ("Device:Polyfuse_Small", FP_PTC, False, {"1":"+VDC_IN","2":"+VDC_F"}, ( 66.04,195.58, 90)),
+    "D_RP":   ("Device:D_Schottky",     FP_SCH, False, {"1":"+VDC","2":"+VDC_F"},    ( 88.90,195.58,180)),
+    "F_N":    ("Device:Polyfuse_Small", FP_PTC, False, {"1":"-VDC_IN","2":"-VDC_F"}, ( 66.04,219.71, 90)),
+    "D_RN":   ("Device:D_Schottky",     FP_SCH, False, {"1":"-VDC_F","2":"-VDC"},    ( 88.90,219.71,  0)),
     # ---- power entry -------------------------------------------------------------------
     "J_PWR":  ("Connector:Screw_Terminal_01x03", FP_SCREW, False,
-               {"1":"+VDC_IN","2":"GND","3":"-VDC_IN"}, (50.80,203.20,0)),
+               {"1":"+VDC_IN","2":"GND","3":"-VDC_IN"}, (48.26,207.01,0)),
 }
 # reference-designator order (fixes U1..U4, R1.., C1.., J1.., RV1 exactly as the baseline)
 ROLES = ["J_BIAS","Rf1","JP_Rf1","Cf","Rf2","JP_Rf2","J_SIPM","Cc","J_TEST","R_test","C_test",
@@ -294,11 +294,20 @@ def prop(name, val, x, y, hide=False, rot=0, size=1.27, just=None):
     return ('\t\t(property "%s" "%s"\n\t\t\t(at %s %s %d)%s\n'
             '\t\t\t(effects (font (size %s %s))%s)\n\t\t)' % (name, val, x, y, rot, h, size, size, j))
 
+def _flip_just_h(j):
+    """Swap left<->right in a justify string (KiCad mirrors horizontal justify for a 180-rotated symbol)."""
+    if not j: return j
+    return j.replace("left", "\0").replace("right", "left").replace("\0", "right")
+
 def text_pos(lib_id, x, y, rot):
     """Where to put Reference / Value text so it clears pins, GND symbols and power flags.
     Returns (ref_x, ref_y, ref_just, val_x, val_y, val_just)."""
     passive = lib_id in ("Device:R", "Device:C", "Device:C_Polarized", "Device:D_Schottky", "Device:Polyfuse_Small")
-    if passive and rot % 180 == 0:       # vertical 2-pin: stack text to the RIGHT (pins & GND are top/bottom)
+    # D_Schottky's pins are HORIZONTAL at rot 0 (R/C/fuse are vertical); its text orientation is
+    # therefore rotated 90 deg from the others, so classify "pins vertical?" accordingly.
+    horiz0 = lib_id == "Device:D_Schottky"
+    vertical_pins = ((rot + (90 if horiz0 else 0)) % 180) == 0
+    if passive and vertical_pins:        # vertical 2-pin: stack text to the RIGHT (pins & GND are top/bottom)
         return (x + 2.8, y - 1.4, "left", x + 2.8, y + 1.4, "left")
     if passive:                          # horizontal 2-pin: ref above, value below (centered)
         return (x, y - 3.4, None, x, y + 3.4, None)
@@ -307,8 +316,10 @@ def text_pos(lib_id, x, y, rot):
     return (x + 2.0, y - 5.5, None, x + 2.0, y + 5.5, None)   # modules / connectors / trimpot
 
 def sym_instance(lib_id, ref, value, fp, dnp, x, y, rot, root, iu, extra=None, hide_val=False):
-    tang = (180 - (rot % 180)) % 180          # keep Reference/Value text horizontal at any symbol rotation
+    tang = (180 - (rot % 180)) % 180          # keep Reference/Value text horizontal & upright at any symbol rotation
     rx, ry, rj, vx, vy, vj = text_pos(lib_id, x, y, rot)
+    if rot % 360 == 180:                       # KiCad flips L<->R justify for a 180-rotated symbol; pre-flip so
+        rj, vj = _flip_just_h(rj), _flip_just_h(vj)   # left-stacked text still lands to the RIGHT (clear of the body)
     extralines = ""
     if extra:
         extralines = "\n" + "\n".join(prop(n, v, x, y, hide=True) for n, v in extra)
@@ -398,6 +409,16 @@ def gnd_bus(role, gpins, bus_y, sym_x=None):
         px, py = P(role, p); W((px, py), (px, bus_y))
     W((xs[0], bus_y), (xs[-1], bus_y))
     pwr("GND", (sym_x if sym_x is not None else xs[0], bus_y))
+
+def power_terminal(role):
+    """3-pin screw terminal on the RAW rails (pin1=+VDC_IN top, pin2=GND mid, pin3=-VDC_IN bottom).
+    Pins exit left; the two rail labels spread above/below their stubs, and GND runs out to its own
+    clear stub past the label column and points DOWN -- so nothing overlaps the -VDC_IN label."""
+    p1 = P(role, "1"); p2 = P(role, "2"); p3 = P(role, "3")
+    W(p1, (p1[0] - 6.35, p1[1])); lbl("+VDC_IN", (p1[0] - 6.35, p1[1]), j="right bottom")   # text above
+    W(p3, (p3[0] - 6.35, p3[1])); lbl("-VDC_IN", (p3[0] - 6.35, p3[1]), j="right top")       # text below
+    gx = p2[0] - 16.51                          # GND runs out past the -VDC_IN label column
+    W(p2, (p2[0] - 6.35, p2[1]), (gx, p2[1])); pwr("GND", (gx, p2[1]))                       # GND points down
 
 def rail_labels(role, npin, nnet, ppin, pnet):
     """Stub the -Vs and +Vs supply pins down below the pin-number row and spread their
@@ -515,27 +536,40 @@ def layout_channel():
 
 def layout_power():
     # ===== power entry: screw terminal -> PTC fuse -> series Schottky reverse-block -> board rail =====
-    p1 = P("J_PWR", "1"); p2 = P("J_PWR", "2"); p3 = P("J_PWR", "3")
-    # raw inputs off the terminal reach +VDC_F/-VDC_F through the PTC, then the board rails via the Schottky
-    W(p1, (36.83, p1[1])); lbl("+VDC_IN", (36.83, p1[1]), j="right bottom")
-    W(p2, (30.48, p2[1])); pwr("GND", (30.48, p2[1]))
-    W((30.48, p2[1]), (30.48, 208.28)); flag("GND", (30.48, 208.28))
-    W(p3, (36.83, p3[1])); lbl("-VDC_IN", (36.83, p3[1]), j="right bottom")
-    # bulk electrolytics sit on the board rails (post-protection)
-    pwr("+VDC", P("C_BULKP", "1")); pwr("GND", P("C_BULKP", "2"))
-    pwr("-VDC", P("C_BULKN", "2")); pwr("GND", P("C_BULKN", "1"))
-    # +VDC: +VDC_IN --[F_P PTC]--> +VDC_F --[D_RP Schottky, anode(2)->cathode(1)]--> +VDC rail
-    lbl("+VDC_IN", P("F_P", "1"))
-    W(P("F_P", "2"), P("D_RP", "2")); lbl("+VDC_F", P("F_P", "2"))    # +VDC_F: PTC out -> Schottky anode
-    kx, ky = P("D_RP", "1")                                           # +VDC rail = Schottky cathode
-    W((kx, ky), (kx - 5.08, ky)); pwr("+VDC", (kx - 5.08, ky))
-    W((kx, ky), (kx, ky + 3.81)); flag("+VDC", (kx, ky + 3.81))
-    # -VDC: -VDC_IN --[F_N PTC]--> -VDC_F --[D_RN Schottky, cathode(1)->anode(2)]--> -VDC rail
-    lbl("-VDC_IN", P("F_N", "1"))
-    W(P("F_N", "2"), P("D_RN", "1")); lbl("-VDC_F", P("F_N", "2"))    # -VDC_F: PTC out -> Schottky cathode
-    ax, ay = P("D_RN", "2")                                           # -VDC rail = Schottky anode
-    W((ax, ay), (ax + 5.08, ay)); pwr("-VDC", (ax + 5.08, ay), rot=180)
-    W((ax, ay), (ax, ay + 3.81)); flag("-VDC", (ax, ay + 3.81))
+    # Two clean HORIZONTAL rails: +VDC on top, -VDC below, fed BY NAME from the input terminal.
+    # Left = node labels; ref/value sit centred under each part (text_pos); the rail power-symbols and
+    # PWR_FLAGs live on their own short stubs pointing away from the parts; one isolated GND+flag pair
+    # (in clear space) drives the ERC "power-input driven" check for GND.
+    IN = 6.35                                          # input-label stub length
+
+    # ---- input terminal J_PWR (pins exit left) -> +VDC_IN / GND / -VDC_IN
+    power_terminal("J_PWR")
+
+    # ---- +VDC rail:  +VDC_IN --[F_P PTC]--> +VDC_F --[D_RP anode->cathode]--> +VDC (rail) --> C_BULKP -> GND
+    f1 = P("F_P", "1")
+    W(f1, (f1[0] - IN, f1[1])); lbl("+VDC_IN", (f1[0] - IN, f1[1]), j="right bottom")
+    W(P("F_P", "2"), P("D_RP", "2"))                                       # +VDC_F run: PTC out -> Schottky anode
+    lbl("+VDC_F", ((P("F_P", "2")[0] + P("D_RP", "2")[0]) / 2, P("F_P", "2")[1]), j="left bottom")
+    kx, ky = P("D_RP", "1")                                                # +VDC rail node = Schottky cathode
+    W((kx, ky), P("C_BULKP", "1"))                                         # rail across to the bulk cap top pin
+    W((kx + 7.62, ky), (kx + 7.62, ky - 3.81)); pwr("+VDC", (kx + 7.62, ky - 3.81))    # +VDC symbol up-stub
+    W((kx + 12.70, ky), (kx + 12.70, ky - 3.81)); flag("+VDC", (kx + 12.70, ky - 3.81))
+    pwr("GND", P("C_BULKP", "2"))                                          # bulk cap lower leg -> GND (points down)
+
+    # ---- -VDC rail (mirror below):
+    n1 = P("F_N", "1")
+    W(n1, (n1[0] - IN, n1[1])); lbl("-VDC_IN", (n1[0] - IN, n1[1]), j="right bottom")
+    W(P("F_N", "2"), P("D_RN", "1"))                                       # -VDC_F run: PTC out -> Schottky cathode
+    lbl("-VDC_F", ((P("F_N", "2")[0] + P("D_RN", "1")[0]) / 2, P("F_N", "2")[1]), j="left bottom")
+    ax, ay = P("D_RN", "2")                                                # -VDC rail node = Schottky anode
+    W((ax, ay), P("C_BULKN", "2"))
+    W((ax + 7.62, ay), (ax + 7.62, ay - 3.81)); pwr("-VDC", (ax + 7.62, ay - 3.81))    # up-stub, clear of the cap
+    W((ax + 12.70, ay), (ax + 12.70, ay - 3.81)); flag("-VDC", (ax + 12.70, ay - 3.81))
+    pwr("GND", P("C_BULKN", "1"))
+
+    # ---- one isolated GND symbol + PWR_FLAG pair in clear space (right of the caps) for ERC
+    gx = kx + 35.56; gy = ky + 7.62
+    W((gx, gy - 3.81), (gx, gy)); flag("GND", (gx, gy - 3.81)); pwr("GND", (gx, gy))
 
 def layout():
     layout_channel()

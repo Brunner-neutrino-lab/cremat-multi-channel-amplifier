@@ -194,9 +194,9 @@ def build_root():
     lib, fp, dnp, nm, at = sc.SPEC["F_N"]; sc.SPEC["F_N"] = (lib, FP_PTC_BIG, dnp, nm, at)
     lib, fp, dnp, nm, at = sc.SPEC["C_BULKP"]; sc.SPEC["C_BULKP"] = (lib, FP_CPELEC_BIG, dnp, nm, at)
     lib, fp, dnp, nm, at = sc.SPEC["C_BULKN"]; sc.SPEC["C_BULKN"] = (lib, FP_CPELEC_BIG, dnp, nm, at)
-    # DAISY screw terminal: parallel to J_PWR on the RAW rails, placed just below it
+    # DAISY screw terminal: parallel to J_PWR on the RAW rails, placed below the -VDC rail in clear space
     sc.SPEC["J_DAISY"] = ("Connector:Screw_Terminal_01x03", sc.FP_SCREW, False,
-                          {"1": "+VDC_IN", "2": "GND", "3": "-VDC_IN"}, (50.80, 226.06, 0))
+                          {"1": "+VDC_IN", "2": "GND", "3": "-VDC_IN"}, (48.26, 234.95, 0))
 
     ROOT_ROLES = ["J_PWR", "J_DAISY", "F_P", "D_RP", "F_N", "D_RN", "C_BULKP", "C_BULKN"]
     jn = NCH * PREFIX_COUNT["J"]; cn = NCH * PREFIX_COUNT["C"]
@@ -211,10 +211,8 @@ def build_root():
         sc.place(role, ROOT_REF[role], [("MPN", mpn), ("Manufacturer", mfr), ("Distributor PN", dkpn)])
     sc.layout_power()
     # DAISY out to the stacked 2nd board: parallel tap on the RAW rails (label-connected to the
-    # same +VDC_IN/GND/-VDC_IN nets J_PWR drives). A short stub off each pin carries the label.
-    for dp, net, j in [("1", "+VDC_IN", "right bottom"), ("3", "-VDC_IN", "right bottom")]:
-        a = sc.P("J_DAISY", dp); sc.W(a, (a[0] - 6.35, a[1])); sc.lbl(net, (a[0] - 6.35, a[1]), j=j)
-    g = sc.P("J_DAISY", "2"); sc.W(g, (g[0] - 6.35, g[1])); sc.pwr("GND", (g[0] - 6.35, g[1]))
+    # same +VDC_IN/GND/-VDC_IN nets J_PWR drives). Same clean terminal layout as J_PWR.
+    sc.power_terminal("J_DAISY")
     sc.auto_junctions()
 
     nodes = list(sc.NODES)
