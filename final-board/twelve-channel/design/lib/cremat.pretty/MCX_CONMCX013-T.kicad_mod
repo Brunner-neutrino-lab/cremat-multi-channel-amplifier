@@ -1,96 +1,301 @@
-
-(footprint MCX_CONMCX013-T (layer F.Cu) (tedit 6A4E9B86)
-  (descr "")
-  (attr smd)
-  (fp_text reference REF** (at -1.825 -7.635 0) (layer F.SilkS)
-    (effects (font (size 1.0 1.0) (thickness 0.15)))
-  )
-  (fp_text value MCX_CONMCX013-T (at 5.795 -6.135 0) (layer F.Fab)
-    (effects (font (size 1.0 1.0) (thickness 0.15)))
-  )
-  (pad 2 smd custom (at -3.6 1.5) (size 0.5 0.5) (layers F.Cu) (options (clearance outline) (anchor rect))
-    (primitives
-      (gr_poly
-        (pts
-          (xy 1.1 4.8)
-          (xy -1.1 4.8)
-          (xy -1.1 -4.8)
-          (xy 1.75 -4.8)
-          (xy 1.75 -1.5)
-          (xy 1.1 -1.5)
-        ) (width 0.01)
-      )
-    )
-  )
-  (pad 2 smd custom (at 3.6 1.5) (size 0.5 0.5) (layers F.Cu) (options (clearance outline) (anchor rect))
-    (primitives
-      (gr_poly
-        (pts
-          (xy -1.75 -1.5)
-          (xy -1.75 -4.8)
-          (xy 1.1 -4.8)
-          (xy 1.1 4.8)
-          (xy -1.1 4.8)
-          (xy -1.1 -1.5)
-        ) (width 0.01)
-      )
-    )
-  )
-  (pad 1 smd rect (at 0.0 -2.7) (size 1.2 3.8) (layers F.Cu F.Mask F.Paste) (solder_mask_margin 0.102))
-  (fp_line (start -3.35 -3.0) (end 3.35 -3.0) (layer F.Fab) (width 0.127))
-  (fp_line (start 3.35 -3.0) (end 3.35 6.3) (layer F.Fab) (width 0.127))
-  (fp_line (start 3.35 6.3) (end -3.35 6.3) (layer F.Fab) (width 0.127))
-  (fp_line (start -3.35 6.3) (end -3.35 -3.0) (layer F.Fab) (width 0.127))
-  (fp_line (start -4.95 6.55) (end -4.95 -4.85) (layer F.CrtYd) (width 0.05))
-  (fp_line (start -4.95 -4.85) (end 4.95 -4.85) (layer F.CrtYd) (width 0.05))
-  (fp_line (start 4.95 -4.85) (end 4.95 6.55) (layer F.CrtYd) (width 0.05))
-  (fp_line (start 4.95 6.55) (end -4.95 6.55) (layer F.CrtYd) (width 0.05))
-  (fp_poly
-    (pts
-      (xy 1.75 0.1)
-      (xy 1.75 -3.4)
-      (xy 4.8 -3.4)
-      (xy 4.8 6.4)
-      (xy 2.4 6.4)
-      (xy 2.4 0.1)
-    ) (layer F.Mask) (width 0.01)
-  )
-  (fp_poly
-    (pts
-      (xy 1.85 0.0)
-      (xy 1.85 -3.3)
-      (xy 4.7 -3.3)
-      (xy 4.7 6.3)
-      (xy 2.5 6.3)
-      (xy 2.5 0.0)
-    ) (layer F.Paste) (width 0.01)
-  )
-  (fp_poly
-    (pts
-      (xy -2.4 6.4)
-      (xy -4.8 6.4)
-      (xy -4.8 -3.4)
-      (xy -1.75 -3.4)
-      (xy -1.75 0.1)
-      (xy -2.4 0.1)
-    ) (layer F.Mask) (width 0.01)
-  )
-  (fp_poly
-    (pts
-      (xy -2.5 6.3)
-      (xy -4.7 6.3)
-      (xy -4.7 -3.3)
-      (xy -1.85 -3.3)
-      (xy -1.85 0.0)
-      (xy -2.5 0.0)
-    ) (layer F.Paste) (width 0.01)
-  )
-  (fp_line (start -2.5 6.3) (end -2.5 0.0) (layer Edge.Cuts) (width 0.01))
-  (fp_line (start -2.5 0.0) (end 2.5 0.0) (layer Edge.Cuts) (width 0.01))
-  (fp_line (start 2.5 0.0) (end 2.5 6.3) (layer Edge.Cuts) (width 0.01))
-  (model "${KIPRJMOD}/lib/cremat.pretty/CONMCX013-T.step"
-    (offset (xyz 0 0 0))
-    (scale (xyz 1 1 1))
-    (rotate (xyz 270 0 0))
-  )
+(footprint "MCX_CONMCX013-T"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at -1.825 -7.635 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "5c07617a-9dbb-4e4e-a14a-07fa9cdd28db")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "MCX_CONMCX013-T"
+		(at 5.795 -6.135 0)
+		(layer "F.Fab")
+		(uuid "fc80372a-a66a-486d-8075-a787dc56e31a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "59ea57fc-8a29-413a-aaf3-873e5b3d3806")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "202fdd1b-66fa-4b9d-9966-141c37b06da5")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "MPN" "CONMCX013"
+		(at 0 0 270)
+		(layer "F.Fab")
+		(uuid "6d0ceaad-1f35-4d9f-a975-dfe3dfb7864d")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacturer" "TE Connectivity / Linx"
+		(at 0 0 270)
+		(layer "F.Fab")
+		(uuid "b34cf96b-8bf8-45df-b60d-5021e9fe2662")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Distributor PN" "343-CONMCX013-ND"
+		(at 0 0 270)
+		(layer "F.Fab")
+		(uuid "88013913-d7c6-4531-b118-bf27f5161296")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_poly
+		(pts
+			(xy -2.4 6.4) (xy -4.8 6.4) (xy -4.8 -3.4) (xy -1.75 -3.4) (xy -1.75 0.1) (xy -2.4 0.1)
+		)
+		(stroke
+			(width 0.01)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.Mask")
+		(uuid "39cc677f-6dd3-4d48-a57f-1613e4bbee6a")
+	)
+	(fp_poly
+		(pts
+			(xy 1.75 0.1) (xy 1.75 -3.4) (xy 4.8 -3.4) (xy 4.8 6.4) (xy 2.4 6.4) (xy 2.4 0.1)
+		)
+		(stroke
+			(width 0.01)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.Mask")
+		(uuid "171602a6-6eaf-4f86-be6f-905fc81790ab")
+	)
+	(fp_poly
+		(pts
+			(xy -2.5 6.3) (xy -4.7 6.3) (xy -4.7 -3.3) (xy -1.85 -3.3) (xy -1.85 0) (xy -2.5 0)
+		)
+		(stroke
+			(width 0.01)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.Paste")
+		(uuid "13b46fa0-66eb-4c02-a9ae-182fc43a3523")
+	)
+	(fp_poly
+		(pts
+			(xy 1.85 0) (xy 1.85 -3.3) (xy 4.7 -3.3) (xy 4.7 6.3) (xy 2.5 6.3) (xy 2.5 0)
+		)
+		(stroke
+			(width 0.01)
+			(type solid)
+		)
+		(fill yes)
+		(layer "F.Paste")
+		(uuid "37f441f8-d2bc-41d8-a745-85209d994a39")
+	)
+	(fp_line
+		(start -2.5 0)
+		(end 2.5 0)
+		(stroke
+			(width 0.01)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "f9d38ca9-3b39-411f-98db-79f99f70539b")
+	)
+	(fp_line
+		(start -2.5 6.3)
+		(end -2.5 0)
+		(stroke
+			(width 0.01)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "b8cb266c-465c-4d99-afaf-744c0b29264d")
+	)
+	(fp_line
+		(start 2.5 0)
+		(end 2.5 6.3)
+		(stroke
+			(width 0.01)
+			(type solid)
+		)
+		(layer "Dwgs.User")
+		(uuid "1b6d22e8-c360-484b-b014-328d238a2082")
+	)
+	(fp_line
+		(start -4.95 -4.85)
+		(end 4.95 -4.85)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "896168cd-f753-477d-845a-9275638f45c8")
+	)
+	(fp_line
+		(start -4.95 6.55)
+		(end -4.95 -4.85)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "434242f0-5646-4afd-a912-b076dd4f7abc")
+	)
+	(fp_line
+		(start 4.95 -4.85)
+		(end 4.95 6.55)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "8f0964da-eeca-40e3-9d60-a5fe539aa841")
+	)
+	(fp_line
+		(start 4.95 6.55)
+		(end -4.95 6.55)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "7c8f1a78-5995-4656-a3ed-1e8f5b5f7f88")
+	)
+	(fp_line
+		(start -3.35 -3)
+		(end 3.35 -3)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "404038ce-8357-421d-af67-2b1fd9cf2fb2")
+	)
+	(fp_line
+		(start -3.35 6.3)
+		(end -3.35 -3)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "5527686e-f78e-49e2-8dee-212130e9c6ff")
+	)
+	(fp_line
+		(start 3.35 -3)
+		(end 3.35 6.3)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "5df0817e-f43d-4736-ac35-01285d19eaa0")
+	)
+	(fp_line
+		(start 3.35 6.3)
+		(end -3.35 6.3)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "894f100a-d315-4f6e-807b-259ca1d16b68")
+	)
+	(pad "1" smd rect
+		(at 0 -2.7)
+		(size 1.2 3.8)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(solder_mask_margin 0.102)
+		(uuid "bcd72d92-5032-4062-852e-6dbfa1b4bb1d")
+	)
+	(pad "2" smd custom
+		(at -3.6 1.5)
+		(size 0.5 0.5)
+		(layers "F.Cu")
+		(options
+			(clearance outline)
+			(anchor rect)
+		)
+		(primitives
+			(gr_poly
+				(pts
+					(xy 1.1 4.8) (xy -1.1 4.8) (xy -1.1 -4.8) (xy 1.75 -4.8) (xy 1.75 -1.5) (xy 1.1 -1.5)
+				)
+				(width 0.01)
+				(fill yes)
+			)
+		)
+		(uuid "2af71e7f-d431-493b-8ce4-b46a3e4f7c93")
+	)
+	(pad "2" smd custom
+		(at 3.6 1.5)
+		(size 0.5 0.5)
+		(layers "F.Cu")
+		(options
+			(clearance outline)
+			(anchor rect)
+		)
+		(primitives
+			(gr_poly
+				(pts
+					(xy -1.75 -1.5) (xy -1.75 -4.8) (xy 1.1 -4.8) (xy 1.1 4.8) (xy -1.1 4.8) (xy -1.1 -1.5)
+				)
+				(width 0.01)
+				(fill yes)
+			)
+		)
+		(uuid "f8f6a36c-6a6e-44d7-a696-7041dc91e06e")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/lib/cremat.pretty/CONMCX013-T.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 270 0 0)
+		)
+	)
 )
