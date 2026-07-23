@@ -523,3 +523,49 @@ Also fixed two real cosmetics found while investigating:
 Not defects (confirmed): the "blue X" on U4 pin 2 is the correct `no_connect` on the THS3491 NC pin;
 a from-scratch dangling-end detector found **0 stray wire ends**; ERC 0. The single-channel dev
 board's 45 `footprint_symbol_field_mismatch` remain pre-existing/out-of-scope.
+
+---
+
+## 2026-07-22 — session 21 — ROOT CAUSE: netclasses were missing their SCHEMATIC fields
+
+The real cause of "wire T-taps read as unconnected in the GUI" (sessions 18-20 chased this and
+got it wrong three times): **our four netclasses in `.kicad_pro` were PCB-only.** Each defined
+`clearance` / `track_width` / `via_diameter` / `via_drill` but omitted every SCHEMATIC field:
+
+    missing: wire_width, bus_width, line_style, diff_pair_gap, diff_pair_width,
+             microvia_diameter, microvia_drill
+
+A netclass with no `wire_width` breaks eeschema's connectivity for every net in that class --
+wires stop joining at T-taps. Introduced in session 15 when the `hv_bias` class was hand-written
+to get the 0.6 mm bias clearance; the PCB half was written, the schematic half was not.
+
+Why it hid for so long: netclasses only exist when the project is loaded. Opening a sheet
+standalone (no `.kicad_pro`) works, and **`kicad-cli` never reads the project file at all** --
+so ERC, `sch export netlist`, and the pcbnew pad-net parity check ALL reported "connected" while
+the GUI showed unconnected stubs. Every automated gate was structurally blind to it. KiCad's own
+re-save then dissolved the junctions it considered unreachable (116 wires/36 junctions -> 89/3),
+which looked like KiCad corrupting good geometry but was a downstream symptom.
+
+Found by bisection on tiny generated projects (`A_bare` .. `J_nonetclass`): minimal-everything
+worked; swapping in the REAL `.kicad_pro` reproduced the failure with identical schematics;
+dropping `net_settings.classes` fixed it; diffing our classes against a known-good project
+exposed the 7 missing keys.
+
+Fix: `build_pro()` now fills the schematic defaults on every class (wire_width 6, bus_width 12,
+line_style 0, diff_pair_gap 0.25, diff_pair_width 0.2, microvia 0.3/0.1); the single-channel
+`channel.kicad_pro` (which `build_pro` copies) was patched the same way. PCB rules unchanged --
+`hv_bias` still 0.6 mm clearance / 0.4 mm track, and the board's 288 bias tracks measure 0.4 mm,
+confirming the class WAS applied during routing.
+
+Also in this pass: the child sheet is now emitted as 12 SEPARATE files (`channel_ch01..12`), each
+instantiated once, with per-channel symbol UUIDs -- so footprint<->symbol paths are unique by
+construction. (Aimed at a hypothesis that turned out wrong; kept because it removes the
+shared-UUID path collision at the source. `gen_pcb.parse_netlist` builds `/sheet/symbol` paths.)
+
+Verified: ERC 0; PCB DRC 0 violations / 0 unconnected; footprint<->symbol bijection 464<->464;
+pad-net parity 0/1290; 271 nets with only the 24 intentional NC pins unconnected. Fab outputs
+(gerber/CPL/BOM, 07-11) untouched -- no copper changed.
+
+LESSON: a "0 violations" from ERC/kicad-cli does NOT mean the GUI agrees. Those tools never load
+`.kicad_pro`. When the engineer's GUI disagrees with the CLI, trust the GUI and bisect the
+PROJECT, not just the schematic.

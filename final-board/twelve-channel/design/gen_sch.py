@@ -61,19 +61,53 @@ def stride_ref(ref, n):                                     # n = 1..NCH
 # =====================================================================================
 #  multi-instance emitters (for the CHILD sheet)  -- monkeypatched into sc
 # =====================================================================================
-def _paths(refs):
-    return "\n".join('\t\t\t\t(path "/%s/%s" (reference "%s") (unit 1))'
-                     % (ROOT_UUID, SHEET[n], refs[n]) for n in range(NCH))
+CH = [1]                                   # channel currently being emitted (1-based)
+def CHILD_FILE(n): return "channel_ch%02d.kicad_sch" % n
 
-def instances_multi(refs):
-    return '\t\t(instances\n\t\t\t(project "%s"\n%s\n\t\t\t)\n\t\t)' % (PROJ, _paths(refs))
+def instances_single(ref):
+    """ONE instance path. Reusing a single child .kicad_sch N times (shared symbol UUIDs) makes
+    KiCad's GUI drop the wire T-taps inside that sheet -- the file's nets are correct when opened
+    standalone but broken when opened through the project -- and it also collapses the PCB's
+    footprint<->symbol paths (468 footprints -> 47 distinct). So: one FILE per channel."""
+    return ('\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s/%s" (reference "%s") (unit 1))\n'
+            '\t\t\t)\n\t\t)' % (PROJ, ROOT_UUID, SHEET[CH[0] - 1], ref))
 
 _orig_sym = sc.sym_instance
-def sym_instance_multi(lib_id, ref, value, fp, dnp, x, y, rot, root, iu, extra=None, hide_val=False):
-    s = _orig_sym(lib_id, ref, value, fp, dnp, x, y, rot, ROOT_UUID, iu, extra, hide_val)
+def sym_instance_perch(lib_id, ref, value, fp, dnp, x, y, rot, root, iu, extra=None, hide_val=False):
+    nref = stride_ref(ref, CH[0])
+    s = _orig_sym(lib_id, nref, value, fp, dnp, x, y, rot, ROOT_UUID, iu, extra, hide_val)
     i = s.rindex("\t\t(instances")
-    refs = [stride_ref(ref, n) for n in range(1, NCH + 1)]
-    return s[:i] + instances_multi(refs) + "\n\t)"
+    return s[:i] + instances_single(nref) + "\n\t)"
+
+def _pwr_block(lib, val, x, y, rot, ref, iu, hide_val):
+    tang = (180 - (rot % 180)) % 180
+    hv = " (hide yes)" if hide_val else ""
+    return ('\t(symbol\n\t\t(lib_id "power:%s")\n\t\t(at %s %s %d)\n\t\t(unit 1)\n\t\t(body_style 1)\n'
+            '\t\t(exclude_from_sim no)\n\t\t(in_bom yes)\n\t\t(on_board yes)\n\t\t(in_pos_files yes)\n'
+            '\t\t(dnp no)\n\t\t(uuid "%s")\n'
+            '\t\t(property "Reference" "%s" (at %s %s %d) (hide yes) (effects (font (size 1.27 1.27))))\n'
+            '\t\t(property "Value" "%s" (at %s %s %d)%s (effects (font (size 1.27 1.27))))\n'
+            '\t\t(pin "1" (uuid "%s"))\n%s\n\t)' % (
+        lib, x, y, rot, iu, ref, x, y - 3, tang, val, x, y + 3, tang, hv,
+        uid(iu, "pin"), instances_single(ref)))
+
+PWRN = [0]; FLGN = [0]
+def power_sym_perch(net, x, y, key, rot=0):
+    PWRN[0] += 1
+    ref = "#PWR%d" % ((CH[0] - 1) * 100 + PWRN[0])
+    return _pwr_block(net, net, x, y, rot, ref, uid("pwr", CH[0], net, x, y), False)
+
+def pwrflag_perch(net, x, y, ref, rot=0):
+    FLGN[0] += 1
+    fref = "#FLG%d" % ((CH[0] - 1) * 100 + FLGN[0])
+    return _pwr_block("PWR_FLAG", "PWR_FLAG", x, y, rot, fref, uid("flag", CH[0], net, x, y), True)
+
+def remap_uuids(text, n):
+    """Give every element in channel n its own UUID (the geometry is identical across channels, so
+    the raw uid()s would repeat). Only (uuid "...") fields are touched -- (path ...) references to
+    the root/sheet UUIDs must survive verbatim."""
+    return re.sub(r'\(uuid "([0-9a-fA-F-]{36})"\)',
+                  lambda m: '(uuid "%s")' % uid("u", n, m.group(1)), text)
 
 PWRCTR = [0]; FLGCTR = [0]
 def _alloc(ctr):
@@ -111,7 +145,7 @@ def pwrflag_multi(net, x, y, ref, rot=0):
 ROOT_PWRN = [0]
 def root_power_sym(net, x, y, key, rot=0):
     ROOT_PWRN[0] += 1
-    pref = "#PWR%d" % (PWRCTR[0] + 200 + ROOT_PWRN[0])
+    pref = "#PWR%d" % (2000 + ROOT_PWRN[0])   # above the per-channel range ((ch-1)*100 + k) -> no ref clash
     iu = uid("rootpwr", net, x, y, pref)
     inst = ('\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s" (reference "%s") (unit 1))\n'
             '\t\t\t)\n\t\t)' % (PROJ, ROOT_UUID, pref))
@@ -132,7 +166,7 @@ def sheet_file(file_uuid, paper, nodes, is_root=False):
     # declare itself root -- if it does, KiCad opens the child (channel) as the top sheet instead
     # of twelve-channel. Matches reference/cremat-x6-board, whose child has no sheet_instances block.
     tail = '\n\t(sheet_instances\n\t\t(path "/" (page "1"))\n\t)' if is_root else ''
-    return ('(kicad_sch\n\t(version 20250114)\n\t(generator "gen_sch.py")\n\t(generator_version "10.0")\n'
+    return ('(kicad_sch\n\t(version 20250610)\n\t(generator "gen_sch.py")\n\t(generator_version "10.0")\n'
             '\t(uuid "%s")\n\t(paper "%s")\n'
             '\t(title_block\n\t\t(title "12-channel SiPM CSP+shaper+buffer")\n'
             '\t\t(company "Yale / Brunner Neutrino Lab")\n\t)\n%s\n%s\n\t(embedded_fonts no)\n)\n'
@@ -142,27 +176,31 @@ def sheet_file(file_uuid, paper, nodes, is_root=False):
 #  CHILD  channel.kicad_sch
 # =====================================================================================
 def build_child():
-    sc.sym_instance = sym_instance_multi
-    sc.power_sym = power_sym_multi
-    sc.pwrflag = pwrflag_multi
+    """Emit ONE child FILE PER CHANNEL, each instantiated exactly once by the root."""
+    sc.sym_instance = sym_instance_perch
+    sc.power_sym = power_sym_perch
+    sc.pwrflag = pwrflag_perch
     sc.ROLES = CH_ROLES
     sc.ROOT = ROOT_UUID                        # power_sym/pwrflag helpers read sc.ROOT indirectly
-    sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = 0
-    for role in CH_ROLES:
-        extra = None
-        if role in sc.PARTS:
-            _v, mpn, mfr, dkpn = sc.PARTS[role]
-            extra = [("MPN", mpn), ("Manufacturer", mfr), ("Distributor PN", dkpn)]
-        sc.place(role, CH_BASE_REF[role], extra)
-    sc.layout_channel()
-    sc.auto_junctions()
-    # coverage self-check on channel pins
-    missing = [ "%s.%s" % (CH_BASE_REF[r], p)
-                for r in CH_ROLES for p in sc.SPEC[r][3] if sc.P(r, p) not in sc.COVER ]
-    if missing: print("WARNING child: %d uncovered pins: %s" % (len(missing), missing[:8]))
-    open(os.path.join(HERE, "channel.kicad_sch"), "w", encoding="utf-8").write(
-        sheet_file(CHILD_UUID, "A3", list(sc.NODES)))
-    print("wrote channel.kicad_sch: %d channel symbols x%d, %d wire segs" % (len(CH_ROLES), NCH, len(sc.SEGS)))
+    for n in range(1, NCH + 1):
+        CH[0] = n; PWRN[0] = 0; FLGN[0] = 0
+        sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = 0
+        for role in CH_ROLES:
+            extra = None
+            if role in sc.PARTS:
+                _v, mpn, mfr, dkpn = sc.PARTS[role]
+                extra = [("MPN", mpn), ("Manufacturer", mfr), ("Distributor PN", dkpn)]
+            sc.place(role, CH_BASE_REF[role], extra)
+        sc.layout_channel()
+        sc.auto_junctions()
+        if n == 1:                             # coverage self-check (geometry is identical per channel)
+            missing = [ "%s.%s" % (CH_BASE_REF[r], p)
+                        for r in CH_ROLES for p in sc.SPEC[r][3] if sc.P(r, p) not in sc.COVER ]
+            if missing: print("WARNING child: %d uncovered pins: %s" % (len(missing), missing[:8]))
+        txt = remap_uuids(sheet_file(uid("child", n), "A3", list(sc.NODES)), n)
+        open(os.path.join(HERE, CHILD_FILE(n)), "w", encoding="utf-8").write(txt)
+    print("wrote %d channel sheets (%s..%s), %d symbols each, %d wire segs" % (
+        NCH, CHILD_FILE(1), CHILD_FILE(NCH), len(CH_ROLES), len(sc.SEGS)))
 
 # =====================================================================================
 #  ROOT  twelve-channel.kicad_sch  (12 sheet instances + common power section)
@@ -206,7 +244,8 @@ def build_root():
                 "F_P": "F1", "F_N": "F2", "D_RP": "D1", "D_RN": "D2",
                 "C_BULKP": "C%d" % (cn + 1), "C_BULKN": "C%d" % (cn + 2)}
 
-    sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = FLGCTR[0] + 100   # root #FLG above child range
+    sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = 2000   # root #FLG above the
+                                                        # per-channel range ((ch-1)*100 + k) -> no ref clash
     sc.ROLES = ROOT_ROLES
     for role in ROOT_ROLES:
         _v, mpn, mfr, dkpn = sc.PARTS[role]
@@ -229,9 +268,10 @@ def build_root():
             '\t\t(on_board yes)\n\t\t(dnp no)\n\t\t(fields_autoplaced yes)\n'
             '\t\t(stroke (width 0.1524) (type solid))\n\t\t(fill (color 0 0 0 0.0000))\n\t\t(uuid "%s")\n'
             '\t\t(property "Sheetname" "ch%02d" (at %s %s 0) (effects (font (size 1.27 1.27)) (justify left bottom)))\n'
-            '\t\t(property "Sheetfile" "channel.kicad_sch" (at %s %s 0) (effects (font (size 1.27 1.27)) (justify left top)))\n'
+            '\t\t(property "Sheetfile" "%s" (at %s %s 0) (effects (font (size 1.27 1.27)) (justify left top)))\n'
             '\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s" (page "%d"))\n\t\t\t)\n\t\t)\n\t)'
-            % (x, y, SW, SHH, SHEET[n], n + 1, x, y - 0.7, x, y + SHH + 0.5, PROJ, ROOT_UUID, n + 2))
+            % (x, y, SW, SHH, SHEET[n], n + 1, x, y - 0.7, CHILD_FILE(n + 1), x, y + SHH + 0.5,
+               PROJ, ROOT_UUID, n + 2))
     open(os.path.join(HERE, "%s.kicad_sch" % PROJ), "w", encoding="utf-8").write(
         sheet_file(ROOT_UUID, "A2", nodes, is_root=True))
     print("wrote %s.kicad_sch: %d sheet instances + %d common-power parts" % (PROJ, NCH, len(ROOT_ROLES)))
@@ -256,6 +296,16 @@ def build_pro():
     d["meta"]["filename"] = "%s.kicad_pro" % PROJ
     d.setdefault("net_settings", {})["netclass_patterns"] = [
         {"netclass": nc, "pattern": p} for nc, p in NETCLASS_PATTERNS]
+    # A netclass MUST carry its SCHEMATIC fields too. Ours were PCB-only (clearance/track/via), and a
+    # class with no wire_width breaks eeschema's connectivity for every net in that class: wires stop
+    # joining at T-taps. It only bites through the .kicad_pro (netclasses don't exist when a sheet is
+    # opened standalone, and kicad-cli never reads the project file) -- which is exactly why ERC, the
+    # netlist and standalone-open all looked correct while the GUI showed unconnected stubs.
+    SCH_DEFAULTS = {"wire_width": 6, "bus_width": 12, "line_style": 0,
+                    "diff_pair_gap": 0.25, "diff_pair_width": 0.2,
+                    "microvia_diameter": 0.3, "microvia_drill": 0.1}
+    for cls in d["net_settings"].get("classes", []):
+        for k, v in SCH_DEFAULTS.items(): cls.setdefault(k, v)
     d["sheets"] = [[ROOT_UUID, PROJ]] + [[SHEET[n], "ch%02d" % (n + 1)] for n in range(NCH)]
     # CRITICAL: the single-channel .kicad_pro we copied lists channel.kicad_sch as the top-level
     # sheet. Left as-is, KiCad's GUI opens the CHILD (channel) instead of twelve-channel. Point

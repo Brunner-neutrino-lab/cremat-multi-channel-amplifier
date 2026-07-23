@@ -42,7 +42,7 @@ CREMAT_SYM = os.path.join(HERE, "lib", "cremat.kicad_sym")
 STOCK = r"C:/Program Files/KiCad/10.0/share/kicad/symbols"
 PROJ = "channel"
 NS = uuid.UUID("b1c2d3e4-0000-4000-8000-000000000000")   # B1-namespaced (distinct from A1/A4)
-VERSION = "20250114"      # real KiCad-10 schematic format (the fictitious "20260306" made KiCad's GUI
+VERSION = "20250610"      # real KiCad-10 schematic format (the fictitious "20260306" made KiCad's GUI
                           # treat the file as newer-than-itself and load it degraded -> phantom parity fails)
 
 def uid(*p): return str(uuid.uuid5(NS, ":".join(str(x) for x in p)))
@@ -262,6 +262,19 @@ SPEC = {
     "J_PWR":  ("Connector:Screw_Terminal_01x03", FP_SCREW, False,
                {"1":"+VDC_IN","2":"GND","3":"-VDC_IN"}, (48.26,207.01,0)),
 }
+# --- keep component pins OFF the rails -------------------------------------------------
+# A pin sitting mid-way along a straight wire is only connected via a junction dot: KiCad
+# accepts it (ERC/netlist agree) but it is ambiguous -- dragging the part does not stretch
+# anything and the pin draws its own "endpoint" circle, which reads as unconnected. Shift the
+# rail decoupling R's UP and their caps DOWN one grid step so each pin TERMINATES its own
+# perpendicular stub and the junction lands on the rail (wire-to-wire), never on a pin.
+for _r in ("R_dvp", "R_dvn", "R_SHP", "R_SHN", "R_BLP", "R_BLN", "R_BVP", "R_BVN"):
+    _l, _f, _d, _n, (_x, _y, _o) = SPEC[_r]; SPEC[_r] = (_l, _f, _d, _n, (_x, _y - 2.54, _o))
+for _c in ("Cp1", "Cn1", "C_SHPb", "C_SHNb", "C_BLPb", "C_BLNb", "C_BVPb", "C_BVNb", "Cf"):
+    _l, _f, _d, _n, (_x, _y, _o) = SPEC[_c]; SPEC[_c] = (_l, _f, _d, _n, (_x, _y + 2.54, _o))
+_l, _f, _d, _n, (_x, _y, _o) = SPEC["R_test"]                      # same for the TEST_IN shunt
+SPEC["R_test"] = (_l, _f, _d, _n, (_x, _y + 2.54, _o))
+
 # reference-designator order (fixes U1..U4, R1.., C1.., J1.., RV1 exactly as the baseline)
 ROLES = ["J_BIAS","Rf1","JP_Rf1","Cf","Rf2","JP_Rf2","J_SIPM","Cc","J_TEST","R_test","C_test",
          "U_CSP","R_dvp","Cp1","R_dvn","Cn1",
@@ -404,9 +417,9 @@ def place(role, ref, extra):
 def P(role, num): return pinpt(role, num)
 
 def gnd_bus(role, gpins, bus_y, sym_x=None):
-    """Stub each GND pin down/up to a horizontal bus and drop ONE GND symbol."""
+    """Stub each GND pin down/up to a horizontal bus and drop ONE GND symbol.
+    (auto_junctions() pre-splits the bus at every stub so all taps are end-to-end.)"""
     xs = sorted(P(role, p)[0] for p in gpins)
-    y0 = P(role, gpins[0])[1]
     for p in gpins:
         px, py = P(role, p); W((px, py), (px, bus_y))
     W((xs[0], bus_y), (xs[-1], bus_y))
@@ -438,13 +451,18 @@ def rail_labels(role, npin, nnet, ppin, pnet):
 
 def deco(rrole, cb, rail, vdc, top=True):
     """+/- rail decoupling: VDC -> R -> rail node -> one bulk cap to GND, + label + flag."""
-    railY = P(rrole, "2")[1]
-    Xc = P(rrole, "2")[0]
-    endx = P(cb, "1")[0] + 5.08
+    rp = P(rrole, "2"); cp = P(cb, "1")
+    bus = rp[1] + 2.54                     # rail runs BETWEEN the R pin and the cap pin, through neither
+    x0 = rp[0] - 6.35; x1 = cp[0] + 5.08
     pwr(vdc, P(rrole, "1"))
-    W((Xc - 6.35, railY), P(rrole, "2"), P(cb, "1"), (endx, railY))
-    flag(rail, (Xc - 6.35, railY))
-    lbl(rail, (endx, railY))               # label sits ON the bus end so it names the rail
+    # The rail is SPLIT at each tap so every T is wire-END-to-wire-END. A stub that merely ends
+    # part-way along a longer wire does NOT connect in KiCad's GUI (its netlister is lenient and
+    # will claim it does -- that discrepancy is what hid this for so long).
+    W((x0, bus), (rp[0], bus), (cp[0], bus), (x1, bus))
+    W(rp, (rp[0], bus))                    # R lower pin -> its own stub down -> T into the rail
+    W(cp, (cp[0], bus))                    # cap upper pin -> its own stub up  -> T into the rail
+    flag(rail, (x0, bus))
+    lbl(rail, (x1, bus))                   # label sits ON the bus end so it names the rail
     pwr("GND", P(cb, "2"))
 
 # ---------- the layout ----------------------------------------------------------------
@@ -454,7 +472,9 @@ def layout_channel():
     W(P("J_BIAS", "1"), P("Rf1", "1")); W(P("Rf1", "1"), P("JP_Rf1", "1"))
     lbl("BIAS_IN", P("Rf1", "1"), j="right bottom")
     # N_filt: Rf1 -> Rf2, Cf tap down, JP_Rf1/JP_Rf2 bypass taps up
-    W(P("Rf1", "2"), P("Cf", "1"), P("Rf2", "1"))      # N_filt: Rf1 -> Cf tap (to GND) -> Rf2
+    _fx, _fy = P("Cf", "1")[0], P("Rf1", "2")[1]       # N_filt run, SPLIT at the Cf tap
+    W(P("Rf1", "2"), (_fx, _fy), P("Rf2", "1"))
+    W(P("Cf", "1"), (_fx, _fy))                        # Cf top pin -> stub up -> T into N_filt
     W(P("Rf1", "2"), P("JP_Rf1", "2")); W(P("Rf2", "1"), P("JP_Rf2", "1"))
     pwr("GND", P("Cf", "2"))
     lbl("N_filt", P("Cf", "1"))
@@ -466,7 +486,9 @@ def layout_channel():
     W(P("Cc", "2"), P("U_CSP", "1")); W(P("Cc", "2"), (P("C_test", "2")[0], P("Cc", "2")[1]), P("C_test", "2"))
     lbl("CSP_IN", (P("Cc", "2")[0] + 1.27, P("Cc", "2")[1]))
     # test-injection branch: coax -> TEST_IN node (R5 = shunt termination to GND) -> C3 couples in
-    W(P("J_TEST", "1"), P("R_test", "1"), P("C_test", "1"))    # TEST_IN rail: J3 -- R5 tap -- C3
+    _tx, _ty = P("R_test", "1")[0], P("J_TEST", "1")[1]        # TEST_IN rail, SPLIT at the R5 tap
+    W(P("J_TEST", "1"), (_tx, _ty), P("C_test", "1"))
+    W(P("R_test", "1"), (_tx, _ty))                            # R5 top pin -> stub up -> T into rail
     lbl("TEST_IN", (69.85, 140.97))
     pwr("GND", P("R_test", "2"))                               # R5 lower leg to ground
     coax_gnd("J_BIAS", 0.0, -3.81, 180)      # shield above the body -> GND points up/away
@@ -585,7 +607,32 @@ def layout():
     layout_channel()
     layout_power()
 
+def split_wires_at_taps():
+    """KiCad connects wires END-to-END. A wire that merely ENDS part-way along another wire is NOT
+    connected in the GUI -- even with a junction dot on top of it. (kicad-cli's netlister *is*
+    lenient and reports such a tap as connected, which is exactly why this hid for so long.)
+    So: split every segment at any other wire's endpoint lying on it, making all T-taps end-to-end."""
+    pts = {p for seg in SEGS for p in seg}
+    def on(p, a, b):
+        if p == a or p == b: return False
+        if a[1] == b[1] == p[1]: return min(a[0], b[0]) < p[0] < max(a[0], b[0])
+        if a[0] == b[0] == p[0]: return min(a[1], b[1]) < p[1] < max(a[1], b[1])
+        return False
+    new = []
+    for a, b in SEGS:
+        cut = sorted((p for p in pts if on(p, a, b)),
+                     key=lambda p: (p[0] - a[0]) ** 2 + (p[1] - a[1]) ** 2)
+        chain = [a] + cut + [b]
+        new += list(zip(chain, chain[1:]))
+    NODES[:] = [n for n in NODES if not n.lstrip().startswith("(wire")]
+    SEGS[:] = []
+    for a, b in new:
+        NODES.append('\t(wire (pts (xy %s %s) (xy %s %s))\n\t\t(stroke (width 0) (type default))\n'
+                     '\t\t(uuid "%s"))' % (a[0], a[1], b[0], b[1], uid("w", a, b)))
+        SEGS.append((a, b))
+
 def auto_junctions():
+    split_wires_at_taps()          # make every T end-to-end BEFORE deciding where dots go
     from collections import Counter
     cnt = Counter()
     for a, b in SEGS: cnt[a] += 1; cnt[b] += 1
@@ -605,7 +652,9 @@ def auto_junctions():
         degree = cnt.get(p, 0) + 2 * sum(1 for s in SEGS if interior(p, s)) + pin_pts.get(p, 0)
         if degree >= 3: junc.add(p)
     for p in sorted(junc):
-        NODES.append('\t(junction (at %s %s) (diameter 0.9144) (color 0 0 0 0) (uuid "%s"))'
+        # diameter 0 = "use the theme default" -- what KiCad itself writes. An explicit diameter is
+        # legal but non-canonical, and is the only thing odd about how we emit junctions.
+        NODES.append('\t(junction (at %s %s) (diameter 0) (color 0 0 0 0) (uuid "%s"))'
                      % (p[0], p[1], uid("j", p)))
 
 def build():
