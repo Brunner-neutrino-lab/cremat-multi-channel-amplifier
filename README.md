@@ -44,9 +44,18 @@ Full detail: [docs/hardware/channel.md](docs/hardware/channel.md).
 
 ## Documentation map
 
+> **Looking for the actual orderable board? It is [`final-board/twelve-channel/`](final-board/twelve-channel/).**
+> Reviewing it → [REVIEW.md](final-board/twelve-channel/REVIEW.md) · ordering it →
+> [ORDERING.md](final-board/twelve-channel/ORDERING.md) · resuming work on it →
+> [HANDOFF.md](final-board/twelve-channel/HANDOFF.md).
+
 | Doc | Contents |
 |-----|----------|
-| [docs/agent-project/](docs/agent-project/) | **Parallel agent-developed build** — bottom-up (per-chip eval boards → single channel → 12-ch board), 12 tracks with briefs, conventions, session-log/report protocol. **Start at [docs/agent-project/README.md](docs/agent-project/README.md).** |
+| **[final-board/twelve-channel/REVIEW.md](final-board/twelve-channel/REVIEW.md)** | **Design-review pack** — verified state, the acceptance gate, and what needs human eyes before ordering |
+| [final-board/twelve-channel/INTERFACE.md](final-board/twelve-channel/INTERFACE.md) | The final board: layout intent, connector map, stackup, per-channel cell |
+| [final-board/twelve-channel/ORDERING.md](final-board/twelve-channel/ORDERING.md) | Buy sheet — JLCPCB (fab + SMT) + DigiKey (hand parts), quantities, upload steps |
+| [final-board/twelve-channel/HANDOFF.md](final-board/twelve-channel/HANDOFF.md) | Resume on a new machine: toolchain, paths, regeneration commands, gotchas |
+| [docs/agent-project/](docs/agent-project/) | **Parallel agent-developed build** — bottom-up (per-chip eval boards → single channel → 12-ch board), 12 tracks with briefs, conventions, session-log/report protocol. **Start at [docs/agent-project/README.md](docs/agent-project/README.md).** *(Historical: intermediate figures here — e.g. bias ≤ 60 V, board 235.1 × 264.1 mm — are superseded by the final board.)* |
 | [docs/development-plan.md](docs/development-plan.md) | Earlier work-track breakdown (the rapid top-down build in `hardware/`); superseded by the agent-project for the final design |
 | [docs/architecture.md](docs/architecture.md) | System/board block diagram, channel signal chain, design partitioning |
 | [docs/modifications.md](docs/modifications.md) | **The four changes vs. `cremat-x6-board`, with rationale + the optional/DNP jumper scheme** |

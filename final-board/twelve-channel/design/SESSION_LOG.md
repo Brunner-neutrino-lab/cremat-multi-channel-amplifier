@@ -569,3 +569,62 @@ pad-net parity 0/1290; 271 nets with only the 24 intentional NC pins unconnected
 LESSON: a "0 violations" from ERC/kicad-cli does NOT mean the GUI agrees. Those tools never load
 `.kicad_pro`. When the engineer's GUI disagrees with the CLI, trust the GUI and bisect the
 PROJECT, not just the schematic.
+
+---
+
+## 2026-07-23 — session 22 — engineer review round: thermal relief + 4-layer justification
+
+Two questions from the reviewing engineer. One was a real defect; one was a documentation gap.
+
+**1. "Why is there no thermal relief on pins connected to the ground pour?" — a real bug.**
+
+All four zones were on `ZONE_CONNECTION_NONE`, which does not merely omit spokes — it **isolates
+the pour from every pad**. The GND pour and the In1 GND plane were therefore contributing *nothing*
+to the ground return: every GND connection was being carried by tracks and vias alone. DRC still
+reported 0 unconnected (the tracks satisfied connectivity), so no automated gate ever flagged it.
+Another instance of the project's recurring pattern — a green check that was structurally unable
+to see the defect.
+
+Fixed in `fill_zones.py`: all zones → `ZONE_CONNECTION_THERMAL` (gap 0.5 mm, spoke 0.5 mm), refilled.
+THERMAL rather than FULL because **218 GND pads on this board are hand-soldered** (120 SIP-8 socket
+pins + 96 MCX shields + 2 screw-terminal); soldering those into a 65 000 mm² plane gives cold joints
+and lifted pads. Spoke cost is negligible here: rail draw is milliamps, and ~1–2 nH of spoke
+inductance at a ~350 kHz knee is <10 µΩ.
+
+Effect on copper: 6.45 → 7.13 MB, `filled_polygon` count 16 → 40. Routing untouched (tracks 1920,
+vias 388, footprints 468 all unchanged). Fab outputs regenerated; gerber zip 2.58 → 2.72 MB, same
+28-file set (drill re-exported **merged**, matching the original — do *not* pass
+`--excellon-separate-th`, which splits it into PTH/NPTH). CPL/BOM unchanged and re-verified
+(246 rows, all designators present, all positions match).
+
+**2. "Why 4 layers — is it for impedance control?" — no, and the docs never said why.**
+
+It is explicitly *not* impedance control (that was already documented). The real reason is
+plane-based power/return distribution, and the routed board makes it numerical: **464 of 1290 pads
+are GND/+VDC/−VDC** (364/50/50) yet those three nets carry only **490 mm of track total** — each pad
+drops through a via onto its plane (240 GND vias, 50 per rail). A 2-layer build must route all 464
+as tracks alongside 12 signal chains and 12 HV bias nets. Three-part justification (return-path
+integrity for a charge integrator, bipolar rails to 12 channels, HV creepage competing for outer-layer
+space) written up in `docs/hardware/pcb-design-rules.md` § *Why four layers*.
+
+**New: `check_board.py` — the acceptance gate as a runnable tool.**
+
+The parity/bijection/netclass checks had only ever existed as ad-hoc scratchpad code, so the engineer
+could not re-run them. Now a project script covering: footprint↔symbol UUID bijection · **pad-net
+parity** (the real one — `kicad-cli pcb drc --schematic-parity` is footprint-level and does not
+compare pad nets) · ERC/DRC · **zone pad-connection mode** (would have caught the bug above) ·
+**netclass schematic-fields + measured copper width** (would have caught session 21's root cause) ·
+CPL-vs-board consistency. Every check prints what it *cannot* see.
+
+It immediately found something the ad-hoc checks had not: the 12 `OUT_50` nets carry both 0.33 and
+0.4 mm copper. Investigated — **not a defect**: `gen_pcb.py:172` draws the 76 mm right-edge extension
+run to the output MCX at 0.4 mm, and a netclass `track_width` is the default/minimum, not a cap.
+Wider is electrically better on a long run. The *check* was wrong, so the check was fixed to assert
+"no copper narrower than the class width" and report wider runs as informational. No copper changed.
+
+**Verified after all of the above:** ERC 0 · DRC 0 violations / 0 unconnected / 0 parity ·
+bijection 464↔464 · pad-net parity 1290/1290 · 4 zones filled and THERMAL · all 4 netclasses carry
+their 7 schematic fields and measure correctly in copper · CPL 246/246. `check_board.py` exits 0.
+
+LESSON (again, in a new costume): "DRC reports 0 unconnected" does not mean the pours are doing
+anything. Assert the *mechanism* (pad-connection mode, measured track width), not just the outcome.

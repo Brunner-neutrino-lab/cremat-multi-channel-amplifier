@@ -95,6 +95,43 @@ same gate `ets-breakout` enforces.
 
 ## Stackup
 
+### Why four layers (it is **not** for impedance control)
+
+Asked directly, since 2-layer is cheaper and faster: the fourth layer here buys **plane-based
+power/return distribution**, not controlled impedance. Impedance is explicitly *not* controlled on
+this board — see the bullets below the table.
+
+The as-routed board makes the case numerically. Of 1290 pads, **464 are `GND` / `+VDC` / `-VDC`**
+(364 / 50 / 50), yet those three nets account for only **490 mm of track in total** across a
+213 × 335 mm board — because each of those pads drops through a via straight onto its plane
+(240 GND vias, 50 per rail). **A 2-layer build has to route all 464 of those connections as
+tracks**, in the same two layers that already carry 12 analog signal chains and 12 HV bias nets.
+
+Three reasons that matters here specifically:
+
+1. **The return path is the signal.** A CSP is a charge integrator: it sums *every* current
+   arriving at its input node. Return current from a neighbouring channel flowing through shared
+   ground metal appears at that input as charge — i.e. as a pulse indistinguishable from a real
+   SiPM event. A solid, unbroken **GND plane (In1) directly beneath the analog chain** gives each
+   channel a low-impedance image return under its own trace, so 12 channels do not share return
+   metal. On 2 layers the bottom-side ground must be sliced by rail routing; every slice forces a
+   detour and re-introduces exactly the shared impedance we are trying to avoid. With 12 channels
+   on one board, inter-channel crosstalk is the dominant systematic risk.
+2. **The rails are bipolar and go everywhere.** Both `+VDC` **and** `-VDC` must reach all 12
+   channels. That is two more distribution networks on top of ground. Two copper layers cannot
+   hold GND + two rails + 12 signal chains + 12 HV bias nets and leave the ground solid — there
+   is no arrangement where it survives.
+3. **HV bias competes for the same space.** The 12 bias nets are on the `hv_bias` class
+   (0.6 mm clearance, 0.4 mm track). Their creepage keep-outs consume routing channels on the
+   outer layers; taking away two layers makes the crowding worse precisely where clearance is a
+   safety rule rather than a preference.
+
+Cost check: at this board size and a small build quantity, JLC's 4-layer adder is small in
+absolute terms and far below the cost of one respin. The 4-layer version is already routed and
+DRC-clean, so the 4→2 conversion would also be a full re-layout, not a stackup swap.
+
+### The ordered stack
+
 Fabbed at **JLCPCB on their standard 4-layer 1.6 mm stackup `JLC04161H-7628`** — a **normal,
 non-impedance-controlled** build:
 
@@ -122,3 +159,48 @@ continuous return reference under the analog chain.
   (trace width **and** the coplanar gap, plus the plane below) and **order controlled impedance**
   so JLC tunes it to their etched stack — do not hand them a bare microstrip width, which ignores
   the surrounding ground.
+
+---
+
+## Copper zones and pad connection (thermal relief)
+
+Four zones, filled as a separate pass by
+[`fill_zones.py`](../../final-board/twelve-channel/design/fill_zones.py) (an in-memory
+`ZONE_FILLER.Fill()` during board construction segfaults headless):
+
+| Layer | Net | Priority | Filled area |
+|---|---|---|---|
+| `F.Cu` | `GND` | 2 | 53 295 mm² |
+| `GND.Cu` (In1) | `GND` | 0 | 65 389 mm² |
+| `PWR.Cu` (In2) | `-VDC` | 0 | 63 166 mm² |
+| `B.Cu` | `+VDC` | 1 | 65 363 mm² |
+
+**Pad connection = `THERMAL` (spoke relief), board-wide.** Gap 0.5 mm, spoke width 0.5 mm.
+
+This was a **fix**, not a default: the zones had been left on `ZONE_CONNECTION_NONE`, which
+isolates the pour from *every* pad. The GND pour then contributed nothing to the ground return —
+all GND connectivity went via tracks and vias, so DRC still reported 0 unconnected and the defect
+never surfaced in any automated check. Switching to `THERMAL` both restores the pad-to-pour ties
+and keeps them solderable.
+
+**Why thermal spokes rather than solid (`FULL`) connections:** **218 GND pads on this board are
+hand-soldered** — 120 SIP-8 socket pins for the Cremat modules, 96 MCX shield pads, and the
+2-pin screw terminal (the board reports 122 through-hole GND pads; the MCX shields are SMD-attribute
+but still hand-assembled). Soldering those directly into a 65 000 mm² copper plane wicks heat away
+faster than a hand iron can replace it, giving cold joints and lifted pads. Spokes are the standard
+answer and cost essentially nothing here:
+
+- **Current:** rail draw is milliamps per channel; a 0.5 mm spoke is orders of magnitude more
+  copper than needed.
+- **Inductance:** four spokes add ~1–2 nH. At a ~350 kHz knee that is <10 µΩ of reactance —
+  irrelevant. (On a fast digital board this trade would go the other way.)
+
+Regenerate with:
+
+```bash
+"C:/Program Files/KiCad/10.0/bin/python.exe" final-board/twelve-channel/design/fill_zones.py
+```
+
+`fill_zones.py` first checks that the `.kicad_pro` still holds its netclasses and restores them if
+a GUI save has flattened the file — otherwise the fill silently ignores the `hv_bias` clearance and
+a subsequent DRC passes vacuously.

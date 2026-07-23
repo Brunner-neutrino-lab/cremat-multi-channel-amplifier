@@ -2,7 +2,14 @@
 """Fill copper zones on the saved 12-channel board (separate pass; in-memory Fill during
 construction segfaults). Zones (from gen_pcb.py): In1=GND plane, In2=-VDC plane, B.Cu=+VDC
 pour. Adds an F.Cu GND ground-fill (priority 2) so top-side GND ties around the cloned tracks.
-FULL pad connection keeps the planes low-Z (no starved-thermal spokes).
+
+PAD CONNECTION = THERMAL relief, deliberately. The board had been left on ZONE_CONNECTION_NONE,
+which cuts the pour away from EVERY pad: the GND pour/plane then contributes nothing to the ground
+return (all GND went via tracks+vias, so DRC still passed with 0 unconnected -- it never surfaced).
+THERMAL both restores those pad-to-pour ties AND keeps them hand-solderable, which matters here:
+218 GND pads are soldered BY HAND (120 SIP-8 socket pins + 96 MCX shields + 2 screw-terminal), and
+soldering those into a solid plane is impractical. Spoke current capacity is a non-issue at
+~20 mA/channel; the added spoke inductance (~1-2 nH) is negligible at this bandwidth (knee ~350 kHz).
 
   "C:/Program Files/KiCad/10.0/bin/python.exe" fill_zones.py
 """
@@ -44,7 +51,7 @@ def main():
         b.Add(z)
     n = len(list(b.Zones()))
     for z in b.Zones():
-        z.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL)
+        z.SetPadConnection(pcbnew.ZONE_CONNECTION_THERMAL)   # see module docstring
     pcbnew.ZONE_FILLER(b).Fill(b.Zones())
     pcbnew.SaveBoard(PCB, b)
     print("filled %d zone(s)" % n)

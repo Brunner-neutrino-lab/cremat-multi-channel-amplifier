@@ -36,12 +36,14 @@ See [`docs/modifications.md`](docs/modifications.md) for the authoritative chang
    the `SIPM`/`BIAS_IN` nets must be rated and spaced for the full SiPM bias voltage
    (the reference uses a 100 V X5R coupling cap). HV creepage is a DRC concern — see
    [`docs/hardware/pcb-design-rules.md`](docs/hardware/pcb-design-rules.md).
-5. **CR-210 pinout + bypass are confirmed; the SiPM bias range is not.** The CR-210 map
+5. **CR-210 pinout + bypass are confirmed, and so is the SiPM bias range.** The CR-210 map
    and the jumper-bypass scheme are taken from Cremat's own open-source board
-   `reference/cremat-CR-160-R7` (pin 2 = GND, vs the CR-200's P/Z). The target SiPM **bias
-   voltage** is still open and gates HV creepage + cap ratings — flag, don't guess. See
-   [`docs/session-report.md`](docs/session-report.md) and the decision list in
-   [`docs/development-plan.md`](docs/development-plan.md).
+   `reference/cremat-CR-160-R7` (pin 2 = GND, vs the CR-200's P/Z). Bias is **≤ 70 V**
+   (decision D1) with HV parts rated **100 V** → `hv_bias` **0.6 mm** clearance / 0.4 mm track,
+   as fabbed. *A ≤ 60 V figure appears in `docs/agent-project/` — that tree is explicitly
+   historical; the decision table in [`docs/development-plan.md`](docs/development-plan.md) is
+   authoritative.* If the bias target ever moves **above 70 V**, it re-opens HV creepage and the
+   `Cc`/`Cf` ratings — flag, don't guess.
 
 ## Build philosophy (inherited from `ets-breakout`)
 

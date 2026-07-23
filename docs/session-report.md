@@ -115,12 +115,21 @@ footprint links, expected); exported netlist matches integration-notes.md node-b
 warm-vs-cold OV offset from the 20 kΩ drop; single-p.e. amplitude / CR-112-vs-CR-113 range;
 pole-zero trim.
 
-**Resolved — product decisions (D1–D6, 2026-06-24):** bias ≤ 60 V / 100 V parts; all
-per-channel I/O is MCX `CONMCX013`; **`BIAS_IN` is per-channel** (architecture correction —
-not a shared rail); modules CR-112 + CR-200-1µs (+ CR-210); **1U** open rack tray
-≈ 482 × 244 mm, two boards side-by-side on standoffs (per-board ≈ 225 × 235 mm, tall parts
-< ~35 mm, no panel/cutouts); first build = Full. Details + the D6 explanation in
-[development-plan.md](development-plan.md#decisions--resolved-2026-06-24).
+**Resolved — product decisions (D1–D6).** Summarised here; the **decision table in
+[development-plan.md](development-plan.md#decisions--resolved-2026-06-24) is authoritative** if
+the two ever disagree:
+
+- **D1 bias:** **≤ 70 V**, HV parts (`Cc`,`Cf`) rated **100 V** → `hv_bias` **0.6 mm** clearance /
+  0.4 mm track, as fabbed. *(An earlier ≤ 60 V figure from 2026-06-29 is superseded; both are
+  covered by the 0.6 mm clearance actually built, so no copper is affected. `docs/agent-project/`
+  still shows the 60 V intermediate state and is explicitly historical.)*
+- **D2/D3 connectors:** all per-channel I/O — including `BIAS_IN` — is MCX `CONMCX013`;
+  **`BIAS_IN` is per-channel**, not a shared rail (architecture correction).
+- **D4 modules:** CR-112 CSP + CR-200-1µs shaper (+ CR-210 BLR), all socketed.
+- **D5 enclosure:** **Hammond RM1U1908VBK 1U vented case, ONE board per case**, boxes
+  daisy-chained via `J_DAISY`. Board **213.2 × 334.7 mm**, passing through a ~340 × 7 mm slot
+  milled in each front/rear panel (slot-through); tall parts **< ~40 mm**.
+- **D6 first build:** **Full** variant (bias filter fitted + CR-210 fitted).
 
 ---
 

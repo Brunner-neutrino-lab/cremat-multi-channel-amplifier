@@ -1,7 +1,13 @@
 # HANDOFF — resume the 12-channel board on another machine
 
-> Read this first when picking up on a new machine. Last worked: **2026-07-11** (session 14).
+> Read this first when picking up on a new machine. Last worked: **2026-07-23** (session 22).
 > Active focus: `final-board/twelve-channel/` (the final orderable board).
+>
+> **Reviewing the board rather than resuming work? → [`REVIEW.md`](REVIEW.md)** — the design-review
+> pack: what changed, what's verified, and the list of things that need human eyes.
+> **The acceptance gate is `design/check_board.py`** — run it after any change; it covers the
+> checks `kicad-cli` structurally cannot (pad-net parity, footprint↔symbol bijection, zone
+> pad-connection mode, netclass-actually-applied).
 
 ## Where we are (one paragraph)
 
@@ -73,11 +79,12 @@ DigiKey/Mouser links, Cremat-direct ordering, and the Hammond case is in
 ```
 # --- PCB (from single source) ---  (KiCad python for pcbnew)
 cd final-board/twelve-channel/design
-"C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py        # W=180 is the one width knob
+"C:/Program Files/KiCad/10.0/bin/python.exe" gen_pcb.py        # W=213.2 is the one width knob
 "C:/Program Files/KiCad/10.0/bin/python.exe" fill_zones.py
 "C:/Program Files/KiCad/10.0/bin/python.exe" polish_silk.py
-"C:/Program Files/KiCad/10.0/bin/kicad-cli.exe" pcb drc --schematic-parity twelve-channel.kicad_pcb
+"C:/Program Files/KiCad/10.0/bin/python.exe" check_board.py    # <-- THE GATE. run after any change
 # fab (gitignored): kicad-cli pcb export gerbers|drill|pos|step
+#   drill: do NOT pass --excellon-separate-th (JLC package expects ONE merged .drl)
 
 # --- SPICE ---
 cd ../sim
