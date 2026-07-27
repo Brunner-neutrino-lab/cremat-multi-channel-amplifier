@@ -4,12 +4,15 @@
 Single source of truth = the reviewed single-channel cell
 (../../../integration/single-channel/design/gen_sch.py). This script:
 
-  * CHILD  channel.kicad_sch : the single channel MINUS the board-level power entry
-    (roles J_PWR, F_P/D_RP/F_N/D_RN, C_BULKP/C_BULKN dropped). Every symbol is placed
-    ONCE but carries a 12-path (instances) block with strided refs, so KiCad expands it
-    into 12 channels. The channel is self-contained (its MCX jacks are inside it; only
-    +VDC/-VDC/GND cross the boundary as GLOBAL power) -> NO hierarchical pins needed,
-    exactly like reference/cremat-x6-board. Local nets auto-scope to /chNN/<net>.
+  * CHILDREN  channel_ch01.kicad_sch .. channel_ch12.kicad_sch : ONE FILE PER CHANNEL,
+    each the single channel MINUS the board-level power entry (roles J_PWR, F_P/D_RP/F_N/D_RN,
+    C_BULKP/C_BULKN dropped) and each instantiated ONCE by the root. Emitting 12 separate
+    files (rather than one child reused 12x) makes every footprint<->symbol UUID path unique
+    BY CONSTRUCTION -- see SESSION_LOG session 20/21. The channel is self-contained (its MCX
+    jacks are inside it; only +VDC/-VDC/GND cross the boundary as GLOBAL power) -> NO
+    hierarchical pins needed, like reference/cremat-x6-board. Local nets scope to /chNN/<net>.
+    (There is NO singular channel.kicad_sch output; a tracked leftover of that name was
+    removed in the session-22 cleanup as it was inert -- not written here, not in the root.)
   * ROOT   twelve-channel.kicad_sch : 12 (sheet) instances (ch01..ch12) + ONE common
     power section shared by all channels:
       - power IN  (J_PWR)  and a board-to-board DAISY out (J_DAISY), both on the RAW
@@ -173,7 +176,7 @@ def sheet_file(file_uuid, paper, nodes, is_root=False):
             % (file_uuid, paper, sc.lib_symbols_block(), "\n".join(nodes) + tail))
 
 # =====================================================================================
-#  CHILD  channel.kicad_sch
+#  CHILDREN  channel_ch01..12.kicad_sch  (one file per channel; see module docstring)
 # =====================================================================================
 def build_child():
     """Emit ONE child FILE PER CHANNEL, each instantiated exactly once by the root."""
