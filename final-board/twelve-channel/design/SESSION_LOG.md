@@ -628,3 +628,53 @@ their 7 schematic fields and measure correctly in copper · CPL 246/246. `check_
 
 LESSON (again, in a new costume): "DRC reports 0 unconnected" does not mean the pours are doing
 anything. Assert the *mechanism* (pad-connection mode, measured track width), not just the outcome.
+
+---
+
+## 2026-07-23 — session 23 — schematic reverted to a SINGLE daughter file (channel.kicad_sch)
+
+User request: go back to ONE reused channel sheet instead of 12 separate files, for
+maintainability (edit the sheet once; the standard KiCad repeated-block pattern).
+
+Context / why this is safe now. Sessions 20-21 had split the child into 12 separate files
+(channel_ch01..12) while chasing a wire-T-tap dropout. Session 21 established the ACTUAL cause
+was a netclass missing its SCHEMATIC fields (wire_width etc.) -- NOT the sheet reuse. The
+12-file split was kept only because it made footprint<->symbol UUID paths unique "by
+construction." With the netclass fix in place (build_pro fills the 7 schematic fields, verified),
+the single-daughter design is electrically valid -- as the independently-developed Moore-Lab
+board confirmed by running exactly that case.
+
+What changed:
+- gen_sch.py: added the missing `instances_multi()` and a `sym_instance_multi()`; `build_child()`
+  now emits ONE channel.kicad_sch whose every symbol carries a 12-path (instances) block with
+  strided refs (shared symbol UUIDs; per-instance uniqueness from the distinct per-sheet path).
+  `build_root()` points all 12 (sheet) blocks at channel.kicad_sch. The dead per-file emitters
+  (sym_instance_perch/power_sym_perch/pwrflag_perch/instances_single/remap_uuids) remain but are
+  no longer called. channel_ch01..12.kicad_sch deleted.
+- The PCB was NOT re-routed. gen_pcb.py is schematic-driven (it sets each footprint's path from
+  the netlist), so re-running the pipeline re-tiled identical copper with the new single-daughter
+  paths.
+
+Reproducibility proven, then applied. Ran the full pipeline in an isolated git worktree first:
+gen_sch -> export netlist -> gen_pcb -> fill_zones -> polish_silk. Verified against the committed
+board:
+- Netlist: pin->net membership BYTE-IDENTICAL (1242 pins, 0 on different nets, identical net
+  partition) -- the single-daughter schematic is electrically equal to the 12-file one.
+- Copper GEOMETRY IDENTICAL: tracks 1920, vias 388, pads 1342 all match as exact sets (layer,
+  position, width, net); zone filled areas match to <5e-6 mm^2 (float epsilon). So gerbers render
+  identically -- the committed fab package (gerber zip / BOM / CPL) stays valid, no re-fab.
+- Full gate PASS: ERC 0, DRC 0/0/0, footprint<->symbol bijection 464<->464 (paths still unique
+  despite shared symbol UUIDs), pad-net parity 1290/1290, netclasses carry schematic fields and
+  measure correctly, CPL 246/246. Then applied the same pipeline to the main tree; gate PASS again.
+
+BLIND SPOT (must be GUI-verified). kicad-cli / ERC / netlist export never load the .kicad_pro, so
+they CANNOT see a GUI-only wire-T-tap dropout -- the exact failure mode of the session-20/21 saga.
+Every headless check here is therefore blind to the one property that specifically distinguishes
+single-daughter behaviour. The netclass-fields fix is what makes it work in the GUI, but the
+definitive confirmation is a human opening twelve-channel.kicad_pro in KiCad and checking that the
+per-channel nets (e.g. J2<->R3<->C2, the CSP GND, the buffer R15<->R18) are intact. DO THIS before
+ordering.
+
+Live docs already described "one hierarchical sheet instantiated 12x" (architecture.md, board.md,
+INTERFACE.md) -- the 12-file split was the deviation, so reverting makes them accurate again; no
+doc edits needed beyond this log.

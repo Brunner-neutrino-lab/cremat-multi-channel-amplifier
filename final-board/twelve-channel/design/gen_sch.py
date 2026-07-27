@@ -4,15 +4,20 @@
 Single source of truth = the reviewed single-channel cell
 (../../../integration/single-channel/design/gen_sch.py). This script:
 
-  * CHILDREN  channel_ch01.kicad_sch .. channel_ch12.kicad_sch : ONE FILE PER CHANNEL,
-    each the single channel MINUS the board-level power entry (roles J_PWR, F_P/D_RP/F_N/D_RN,
-    C_BULKP/C_BULKN dropped) and each instantiated ONCE by the root. Emitting 12 separate
-    files (rather than one child reused 12x) makes every footprint<->symbol UUID path unique
-    BY CONSTRUCTION -- see SESSION_LOG session 20/21. The channel is self-contained (its MCX
-    jacks are inside it; only +VDC/-VDC/GND cross the boundary as GLOBAL power) -> NO
-    hierarchical pins needed, like reference/cremat-x6-board. Local nets scope to /chNN/<net>.
-    (There is NO singular channel.kicad_sch output; a tracked leftover of that name was
-    removed in the session-22 cleanup as it was inert -- not written here, not in the root.)
+  * CHILD  channel.kicad_sch : ONE daughter file, the single channel MINUS the board-level
+    power entry (roles J_PWR, F_P/D_RP/F_N/D_RN, C_BULKP/C_BULKN dropped), instantiated 12x by
+    the root (the standard KiCad repeated-sheet pattern -- edit the sheet once, all 12 channels
+    follow). Every symbol carries a 12-path (instances) block with strided refs; symbol UUIDs are
+    SHARED across channels and per-instance uniqueness comes from the distinct per-sheet path, so
+    footprint<->symbol paths stay a bijection (verified in check_board). The channel is
+    self-contained (its MCX jacks are inside it; only +VDC/-VDC/GND cross the boundary as GLOBAL
+    power) -> NO hierarchical pins, like reference/cremat-x6-board. Local nets scope to /chNN/<net>.
+    History: this was briefly emitted as 12 separate files (channel_ch01..12, session 20/21) while
+    chasing a wire-T-tap dropout -- but the real cause was a netclass missing its SCHEMATIC fields
+    (fixed in build_pro), NOT the sheet reuse. Reverted to the single daughter (session 23) for
+    maintainability; both forms are electrically valid and the Moore-Lab board runs the reuse case.
+    NOTE: the single-daughter GUI connectivity depends on build_pro's netclass schematic fields;
+    kicad-cli/ERC/netlist cannot see a GUI-only T-tap dropout, so confirm nets in the KiCad GUI.
   * ROOT   twelve-channel.kicad_sch : 12 (sheet) instances (ch01..ch12) + ONE common
     power section shared by all channels:
       - power IN  (J_PWR)  and a board-to-board DAISY out (J_DAISY), both on the RAW
@@ -75,7 +80,25 @@ def instances_single(ref):
     return ('\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s/%s" (reference "%s") (unit 1))\n'
             '\t\t\t)\n\t\t)' % (PROJ, ROOT_UUID, SHEET[CH[0] - 1], ref))
 
+def instances_multi(refs):
+    """SINGLE-DAUGHTER design: ONE symbol reused across all NCH sheets. Emit NCH instance paths --
+    path k -> /root/sheet_k -- each carrying channel k's strided reference. `refs` is a length-NCH
+    list in channel order. The symbol UUID is SHARED across channels; per-instance uniqueness comes
+    from the distinct per-sheet path. (The old per-file design used instances_single + remap_uuids
+    instead; both are valid -- the reason the single daughter once appeared to drop wire T-taps was
+    a netclass missing its SCHEMATIC fields, not the reuse itself. That is fixed in build_pro.)"""
+    paths = "".join('\t\t\t\t(path "/%s/%s" (reference "%s") (unit 1))\n' % (ROOT_UUID, SHEET[k], refs[k])
+                    for k in range(NCH))
+    return '\t\t(instances\n\t\t\t(project "%s"\n%s\t\t\t)\n\t\t)' % (PROJ, paths)
+
 _orig_sym = sc.sym_instance
+def sym_instance_multi(lib_id, ref, value, fp, dnp, x, y, rot, root, iu, extra=None, hide_val=False):
+    # ONE symbol, emitted once, whose (instances) block lists all NCH channels with strided refs.
+    # `ref` is the channel-1 (base) reference; iu is the shared symbol UUID.
+    refs = [stride_ref(ref, k + 1) for k in range(NCH)]
+    s = _orig_sym(lib_id, ref, value, fp, dnp, x, y, rot, ROOT_UUID, iu, extra, hide_val)
+    i = s.rindex("\t\t(instances")
+    return s[:i] + instances_multi(refs) + "\n\t)"
 def sym_instance_perch(lib_id, ref, value, fp, dnp, x, y, rot, root, iu, extra=None, hide_val=False):
     nref = stride_ref(ref, CH[0])
     s = _orig_sym(lib_id, nref, value, fp, dnp, x, y, rot, ROOT_UUID, iu, extra, hide_val)
@@ -176,34 +199,42 @@ def sheet_file(file_uuid, paper, nodes, is_root=False):
             % (file_uuid, paper, sc.lib_symbols_block(), "\n".join(nodes) + tail))
 
 # =====================================================================================
-#  CHILDREN  channel_ch01..12.kicad_sch  (one file per channel; see module docstring)
+#  CHILD  channel.kicad_sch  (ONE daughter file, instantiated NCH times by the root)
 # =====================================================================================
 def build_child():
-    """Emit ONE child FILE PER CHANNEL, each instantiated exactly once by the root."""
-    sc.sym_instance = sym_instance_perch
-    sc.power_sym = power_sym_perch
-    sc.pwrflag = pwrflag_perch
+    """Emit ONE daughter FILE (channel.kicad_sch) that the root instantiates NCH times. Every
+    symbol carries an NCH-path (instances) block with strided refs (sym_instance_multi /
+    power_sym_multi / pwrflag_multi), so the ONE file expands into all 12 channels -- the standard
+    KiCad repeated-sheet pattern, and the easier-to-maintain form (edit the sheet once). Contrast
+    the earlier per-file design (build via sym_instance_perch + remap_uuids, one file per channel);
+    both are electrically valid, see instances_multi()."""
+    sc.sym_instance = sym_instance_multi
+    sc.power_sym = power_sym_multi
+    sc.pwrflag = pwrflag_multi
     sc.ROLES = CH_ROLES
     sc.ROOT = ROOT_UUID                        # power_sym/pwrflag helpers read sc.ROOT indirectly
+    PWRCTR[0] = 0; FLGCTR[0] = 0; CH[0] = 1
+    sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = 0
+    for role in CH_ROLES:
+        extra = None
+        if role in sc.PARTS:
+            _v, mpn, mfr, dkpn = sc.PARTS[role]
+            extra = [("MPN", mpn), ("Manufacturer", mfr), ("Distributor PN", dkpn)]
+        sc.place(role, CH_BASE_REF[role], extra)
+    sc.layout_channel()
+    sc.auto_junctions()
+    missing = [ "%s.%s" % (CH_BASE_REF[r], p)
+                for r in CH_ROLES for p in sc.SPEC[r][3] if sc.P(r, p) not in sc.COVER ]
+    if missing: print("WARNING child: %d uncovered pins: %s" % (len(missing), missing[:8]))
+    # ONE file, NO per-channel uuid remap (it appears once; the sheet paths make instances unique).
+    txt = sheet_file(CHILD_UUID, "A3", list(sc.NODES))
+    open(os.path.join(HERE, "channel.kicad_sch"), "w", encoding="utf-8").write(txt)
+    # remove any stale per-channel files from the old design so the two schemes can't coexist
     for n in range(1, NCH + 1):
-        CH[0] = n; PWRN[0] = 0; FLGN[0] = 0
-        sc.NODES[:] = []; sc.SEGS[:] = []; sc.COVER.clear(); sc.FLAGN[0] = 0
-        for role in CH_ROLES:
-            extra = None
-            if role in sc.PARTS:
-                _v, mpn, mfr, dkpn = sc.PARTS[role]
-                extra = [("MPN", mpn), ("Manufacturer", mfr), ("Distributor PN", dkpn)]
-            sc.place(role, CH_BASE_REF[role], extra)
-        sc.layout_channel()
-        sc.auto_junctions()
-        if n == 1:                             # coverage self-check (geometry is identical per channel)
-            missing = [ "%s.%s" % (CH_BASE_REF[r], p)
-                        for r in CH_ROLES for p in sc.SPEC[r][3] if sc.P(r, p) not in sc.COVER ]
-            if missing: print("WARNING child: %d uncovered pins: %s" % (len(missing), missing[:8]))
-        txt = remap_uuids(sheet_file(uid("child", n), "A3", list(sc.NODES)), n)
-        open(os.path.join(HERE, CHILD_FILE(n)), "w", encoding="utf-8").write(txt)
-    print("wrote %d channel sheets (%s..%s), %d symbols each, %d wire segs" % (
-        NCH, CHILD_FILE(1), CHILD_FILE(NCH), len(CH_ROLES), len(sc.SEGS)))
+        old = os.path.join(HERE, CHILD_FILE(n))
+        if os.path.exists(old): os.remove(old)
+    print("wrote channel.kicad_sch (single daughter x%d instances), %d symbols, %d wire segs" % (
+        NCH, len(CH_ROLES), len(sc.SEGS)))
 
 # =====================================================================================
 #  ROOT  twelve-channel.kicad_sch  (12 sheet instances + common power section)
@@ -273,7 +304,7 @@ def build_root():
             '\t\t(property "Sheetname" "ch%02d" (at %s %s 0) (effects (font (size 1.27 1.27)) (justify left bottom)))\n'
             '\t\t(property "Sheetfile" "%s" (at %s %s 0) (effects (font (size 1.27 1.27)) (justify left top)))\n'
             '\t\t(instances\n\t\t\t(project "%s"\n\t\t\t\t(path "/%s" (page "%d"))\n\t\t\t)\n\t\t)\n\t)'
-            % (x, y, SW, SHH, SHEET[n], n + 1, x, y - 0.7, CHILD_FILE(n + 1), x, y + SHH + 0.5,
+            % (x, y, SW, SHH, SHEET[n], n + 1, x, y - 0.7, "channel.kicad_sch", x, y + SHH + 0.5,
                PROJ, ROOT_UUID, n + 2))
     open(os.path.join(HERE, "%s.kicad_sch" % PROJ), "w", encoding="utf-8").write(
         sheet_file(ROOT_UUID, "A2", nodes, is_root=True))

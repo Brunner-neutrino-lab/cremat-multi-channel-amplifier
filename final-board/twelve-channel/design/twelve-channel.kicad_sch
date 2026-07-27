@@ -3649,7 +3649,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "067aca90-5b43-5ba3-a708-cb035a0fc90a")
 		(property "Sheetname" "ch01" (at 150.0 19.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch01.kicad_sch" (at 150.0 46.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 150.0 46.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "2"))
@@ -3668,7 +3668,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "37442379-1e74-58d6-9267-d56d2d0db20e")
 		(property "Sheetname" "ch02" (at 150.0 51.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch02.kicad_sch" (at 150.0 78.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 150.0 78.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "3"))
@@ -3687,7 +3687,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "e3d8d6ec-c87c-5044-98eb-360343a24053")
 		(property "Sheetname" "ch03" (at 150.0 83.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch03.kicad_sch" (at 150.0 110.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 150.0 110.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "4"))
@@ -3706,7 +3706,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "3f15f05e-62bf-5189-8577-3de86f480791")
 		(property "Sheetname" "ch04" (at 150.0 115.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch04.kicad_sch" (at 150.0 142.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 150.0 142.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "5"))
@@ -3725,7 +3725,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "967223e8-30b4-5991-b3d0-6e8810260dfb")
 		(property "Sheetname" "ch05" (at 150.0 147.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch05.kicad_sch" (at 150.0 174.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 150.0 174.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "6"))
@@ -3744,7 +3744,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "fadf435f-9fce-5a9e-bedc-496c6533f66b")
 		(property "Sheetname" "ch06" (at 150.0 179.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch06.kicad_sch" (at 150.0 206.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 150.0 206.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "7"))
@@ -3763,7 +3763,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "b5f592da-9d4a-53dc-b1f6-67a811aa6ad7")
 		(property "Sheetname" "ch07" (at 205.0 19.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch07.kicad_sch" (at 205.0 46.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 205.0 46.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "8"))
@@ -3782,7 +3782,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "559c5ed0-df21-5bc8-9b09-35997017af3f")
 		(property "Sheetname" "ch08" (at 205.0 51.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch08.kicad_sch" (at 205.0 78.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 205.0 78.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "9"))
@@ -3801,7 +3801,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "ac830635-a758-5517-ade2-089cffd2a8f4")
 		(property "Sheetname" "ch09" (at 205.0 83.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch09.kicad_sch" (at 205.0 110.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 205.0 110.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "10"))
@@ -3820,7 +3820,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "e3ce810c-db37-5e7b-a3e5-648ad6b4adb3")
 		(property "Sheetname" "ch10" (at 205.0 115.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch10.kicad_sch" (at 205.0 142.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 205.0 142.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "11"))
@@ -3839,7 +3839,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "237eba08-6191-5b8b-aac0-7523c2fd34a5")
 		(property "Sheetname" "ch11" (at 205.0 147.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch11.kicad_sch" (at 205.0 174.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 205.0 174.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "12"))
@@ -3858,7 +3858,7 @@
 		(fill (color 0 0 0 0.0000))
 		(uuid "8cd2feb7-28bc-56a8-b1ea-f3906c79fd27")
 		(property "Sheetname" "ch12" (at 205.0 179.3 0) (effects (font (size 1.27 1.27)) (justify left bottom)))
-		(property "Sheetfile" "channel_ch12.kicad_sch" (at 205.0 206.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
+		(property "Sheetfile" "channel.kicad_sch" (at 205.0 206.5 0) (effects (font (size 1.27 1.27)) (justify left top)))
 		(instances
 			(project "twelve-channel"
 				(path "/34920c42-dfa3-528a-8705-b164f9d1a6e1" (page "13"))
