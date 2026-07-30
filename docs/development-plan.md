@@ -277,7 +277,7 @@ are this board's additions on top of the single-channel CR-160-R7 reference.
 | D2 | `SIPM`/`OUT` jack | **MCX edge-mount, TE Connectivity Linx `CONMCX013`** (DK `343-CONMCX013-ND`), 50 Ω SMT board-edge | T1, T4 |
 | D3 | `BIAS_IN` connector | **Same MCX `CONMCX013`** — *not* SHV | T1, T4 |
 | D4 | Modules to order | shaper **CR-200-1µs**; CSP **CR-112** (reference x6-board used CR-113) | T1 (BOM) |
-| D5 | Enclosure | **Hammond RM1U1908VBK 1U vented case, ONE board per case** (multiple boxes daisy-chained via `J_DAISY`); board **213.2 × 334.7 mm** on standoffs off the bottom cover, passing through a **~340 × 7 mm slot** in each front/rear panel (slot-through, not an open tray); tall parts **< ~40 mm** (interior 40.09 mm). See [hardware/board.md](hardware/board.md) | T4 |
+| D5 | Enclosure | **[Superseded 2026-07-30 → 2U: Hammond RM2U1908VBK (DK HM1166-ND), TWO boards stacked per box on M3 corner standoffs ~1 in apart; modules stand upright in the 84.53 mm interior. Detailed 2U geometry + panel/standoff drawings pending. See ORDERING.md.]** ~~Hammond RM1U1908VBK 1U vented case, ONE board per case (multiple boxes daisy-chained via `J_DAISY`); board 213.2 × 334.7 mm on standoffs off the bottom cover, ~340 × 7 mm slot in each front/rear panel; tall parts < ~40 mm (interior 40.09 mm).~~ See [hardware/board.md](hardware/board.md) | T4 |
 | D6 | First-build variant | **Full (bias filter fitted + CR-210 fitted)** — confirmed; changeable per build | T7 |
 
 ### ⚠ Connector clarification (architecture-affecting)

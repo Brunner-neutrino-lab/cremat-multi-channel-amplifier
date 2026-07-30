@@ -48,7 +48,7 @@
 			)
 		)
 	)
-	(property "MPN" "CONMCX013"
+	(property "MPN" "BWMCX-KEF"
 		(at 0 0 270)
 		(layer "F.Fab")
 		(uuid "6d0ceaad-1f35-4d9f-a975-dfe3dfb7864d")
@@ -59,7 +59,7 @@
 			)
 		)
 	)
-	(property "Manufacturer" "TE Connectivity / Linx"
+	(property "Manufacturer" "BAT WIRELESS"
 		(at 0 0 270)
 		(layer "F.Fab")
 		(uuid "b34cf96b-8bf8-45df-b60d-5021e9fe2662")
@@ -70,7 +70,7 @@
 			)
 		)
 	)
-	(property "Distributor PN" "343-CONMCX013-ND"
+	(property "Distributor PN" "LCSC C5250059"
 		(at 0 0 270)
 		(layer "F.Fab")
 		(uuid "88013913-d7c6-4531-b118-bf27f5161296")

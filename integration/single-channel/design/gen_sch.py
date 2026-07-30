@@ -132,7 +132,9 @@ FP_SIP   = "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical"  # SIP-8
                                                                          # (pads+courtyard identical to the
                                                                          # PinHeader_1x08 it replaces)
 FP_TRIM  = "Potentiometer_THT:Potentiometer_Bourns_3296W_Vertical"
-FP_MCX   = "cremat:MCX_CONMCX013-T"   # Linx CONMCX013-T edge-mount jack (user-downloaded footprint)
+FP_MCX   = "cremat:MCX_CONMCX013-T"   # footprint geometry = Linx CONMCX013-T land pattern;
+                                      # part fitted = BAT WIRELESS BWMCX-KEF (LCSC C5250059),
+                                      # user-verified drop-in on this land pattern (SMD, JLC-assembled)
 FP_SCREW = "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-3_1x03_P5.00mm_Horizontal"
 FP_SOIC8EP = "Package_SO:SOIC-8-1EP_3.9x4.9mm_P1.27mm_EP2.29x3mm"
 FP_SCH     = "Diode_SMD:D_SMA"                  # SS14 40V 1A Schottky reverse-block (DO-214AC / SMA)
@@ -143,7 +145,7 @@ FP_PTC     = "Fuse:Fuse_1206_3216Metric"        # Littelfuse 1206L010/60WR reset
 PARTS = {
     "Cf":     ("100nF 100V X7R",      "CL21B104KCFNNNE",   "Samsung Electro-Mechanics", "1276-6840-1-ND"),
     "Cc":     ("0.22uF 100V X7R",     "C0805C224K1RACTU",  "KEMET",                     "399-C0805C224K1RACTUCT-ND"),  # was Murata GRM21AR72A224KAC5K (DK 0-stock 2026-07); equal-spec 100V X7R
-    "C_test": ("1pF 50V C0G",         "CC0805CRNPO9BN1R0", "Yageo",                     "311-1089-1-ND"),
+    "C_test": ("10pF 1% 50V C0G",     "CC0805FRNPO9BN100", "Yageo",                     "(verify DK)"),
     "Rf1":    ("10k",                 "RC0805FR-0710KL",   "Yageo",                     "311-10.0KCRCT-ND"),
     "Rf2":    ("10k",                 "RC0805FR-0710KL",   "Yageo",                     "311-10.0KCRCT-ND"),
     "JP_Rf1": ("0R",                  "RC0805JR-070RL",    "Yageo",                     "311-0.0ARCT-ND"),
@@ -182,10 +184,10 @@ PARTS = {
     "R_BVN":  ("4.7",                 "RC0805JR-074R7L",   "Yageo",                     "311-4.7ARCT-ND"),
     "C_BVPb": ("10uF 25V X5R",        "C0805C106K3PACTU",  "KEMET",                     "399-11939-1-ND"),
     "C_BVNb": ("10uF 25V X5R",        "C0805C106K3PACTU",  "KEMET",                     "399-11939-1-ND"),
-    "J_BIAS": ("MCX edge jack 50R",   "CONMCX013",         "TE Connectivity / Linx",    "343-CONMCX013-ND"),
-    "J_SIPM": ("MCX edge jack 50R",   "CONMCX013",         "TE Connectivity / Linx",    "343-CONMCX013-ND"),
-    "J_TEST": ("MCX edge jack 50R",   "CONMCX013",         "TE Connectivity / Linx",    "343-CONMCX013-ND"),
-    "J_OUT50":("MCX edge jack 50R",   "CONMCX013",         "TE Connectivity / Linx",    "343-CONMCX013-ND"),
+    "J_BIAS": ("MCX edge jack 50R",   "BWMCX-KEF",         "BAT WIRELESS",              "LCSC C5250059"),
+    "J_SIPM": ("MCX edge jack 50R",   "BWMCX-KEF",         "BAT WIRELESS",              "LCSC C5250059"),
+    "J_TEST": ("MCX edge jack 50R",   "BWMCX-KEF",         "BAT WIRELESS",              "LCSC C5250059"),
+    "J_OUT50":("MCX edge jack 50R",   "BWMCX-KEF",         "BAT WIRELESS",              "LCSC C5250059"),
     "J_PWR":  ("Screw terminal 3-pos 5.08mm", "1715734",   "Phoenix Contact",           "277-1264-ND"),
 }
 def _val(role): return PARTS[role][0] if role in PARTS else role
