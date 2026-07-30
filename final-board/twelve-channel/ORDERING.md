@@ -7,7 +7,7 @@
 
 **BUILD PLAN: 5 assembled boards.** JLC: **fab qty 5** (JLC's 4-layer minimum) + **assembly qty 5**
 (all five assembled — no bare spares; raise PCB qty if you want some). DigiKey hand parts: **SIP-8
-sockets for 6 boards** (5 + one board of spares) and **one 2U case** (holds the 2-board stack; the
+sockets for 2.5 boards** (the 2 boxed boards + spares) and **one 2U case** (holds the 2-board stack; the
 other 3 boards are spares, unboxed).
 
 > ## ⚠ Assembly tier: **STANDARD, not Economic**
@@ -115,16 +115,16 @@ JLC BOM/CPL — populate by hand later if wanted).
 
 ## 2. DigiKey order (hand parts) — `models-bom/digikey-hand-bom.csv`
 
-Quick-Add paste for the **5-board build** (sockets for 6 boards; one 2U case):
+Quick-Add paste for the **5-board build** (sockets for 2.5 boards; one 2U case):
 
 ```
-612-SS-108-TT-2-ND, 216
+612-SS-108-TT-2-ND, 90
 HM1166-ND, 1
 ```
 
-= **~$412.57** (sockets 216 × $0.99 ≈ $213.84 + one 2U case $198.73). Optional buffer if ever
+= **~$304.03** (sockets 90 × $1.17 ≈ $105.30 + one 2U case $198.73). Optional buffer if ever
 populating (5 boards, DNP by default): `296-49085-1-ND, 60` + `311-976CRCT-ND, 120` (+~$1.1k).
-⚠ **Sockets: order qty 216 vs ~649 DigiKey stock — verify at order.** The trimpots and screw
+⚠ **Sockets: order qty 90 (2.5 boards' worth); DigiKey stock ~649.** The trimpots and screw
 terminals are **no longer on this list** — JLC wave-solders them now.
 
 ## 3. Hand-assembly order of operations (per board — ×5)
@@ -143,8 +143,8 @@ terminals are **no longer on this list** — JLC wave-solders them now.
 |---|---|
 | JLC: 5× PCB fab (4L, HASL, large-size incl.) | ~$74 (+$25 ENIG option) |
 | JLC: **Standard**-tier assembly, 5 boards (setup + stencil + feeders + THT wave + joints + parts) | ~$275 |
-| DigiKey: 216× SIP-8 sockets + 1× 2U case | ~$413 |
-| **Total ex-shipping (Cremat modules already owned)** | **~$760** |
+| DigiKey: 90× SIP-8 sockets + 1× 2U case + standoffs | ~$311 |
+| **Total ex-shipping (Cremat modules already owned)** | **~$660** |
 
 Shipping: JLC ~$40 (DHL, 5 boards); DigiKey usual. (+ possible ~$59 JLC assembly large-size fee,
 and a DFM/handling surcharge for the High-difficulty MCX — see above.)
