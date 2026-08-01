@@ -17,7 +17,6 @@ fp-info-cache
 **/fab/*
 # ...but keep the JLC assembly BOM/CPL (part of the ordering record; zip is regenerable)
 !**/fab/jlc
-**/fab/jlc/*.zip
 # packaged fab zip (regenerable; OneDrive-synced anyway)
 **/*-fab.zip
 **/gerbers/
